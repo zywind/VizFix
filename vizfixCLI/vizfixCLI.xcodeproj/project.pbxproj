@@ -1,0 +1,357 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3B46B84C11016DE7002DF0C3 /* VFAudioSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B82E11016DE7002DF0C3 /* VFAudioSource.m */; };
+		3B46B84D11016DE7002DF0C3 /* VFBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B83011016DE7002DF0C3 /* VFBlock.m */; };
+		3B46B84E11016DE7002DF0C3 /* VFCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B83211016DE7002DF0C3 /* VFCondition.m */; };
+		3B46B84F11016DE7002DF0C3 /* VFFixation.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B83411016DE7002DF0C3 /* VFFixation.m */; };
+		3B46B85011016DE7002DF0C3 /* VFGazeSample.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B83611016DE7002DF0C3 /* VFGazeSample.m */; };
+		3B46B85111016DE7002DF0C3 /* VFKeyboardEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B83811016DE7002DF0C3 /* VFKeyboardEvent.m */; };
+		3B46B85311016DE7002DF0C3 /* VFResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B83C11016DE7002DF0C3 /* VFResponse.m */; };
+		3B46B85711016DE7002DF0C3 /* VFSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B84411016DE7002DF0C3 /* VFSession.m */; };
+		3B46B85811016DE7002DF0C3 /* VFSubTrial.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B84611016DE7002DF0C3 /* VFSubTrial.m */; };
+		3B46B85A11016DE7002DF0C3 /* VFTrial.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B84A11016DE7002DF0C3 /* VFTrial.m */; };
+		3B8A24A010FEFFCB00DBFA0C /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B8A249F10FEFFCB00DBFA0C /* CoreData.framework */; };
+		3B8A263710FF0E9600DBFA0C /* VFDualTaskImport.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8A263610FF0E9600DBFA0C /* VFDualTaskImport.m */; };
+		3B8A26A510FF0FDA00DBFA0C /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B8A26A410FF0FDA00DBFA0C /* AppKit.framework */; };
+		3BC50575110AE3640004A125 /* VFAuditoryStimulus.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5056C110AE3640004A125 /* VFAuditoryStimulus.m */; };
+		3BC50576110AE3640004A125 /* VFCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5056E110AE3640004A125 /* VFCustomEvent.m */; };
+		3BC50577110AE3640004A125 /* VFVisualStimulus.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50570110AE3640004A125 /* VFVisualStimulus.m */; };
+		3BC50578110AE3640004A125 /* VFVisualStimulusFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50572110AE3640004A125 /* VFVisualStimulusFrame.m */; };
+		3BC50579110AE3640004A125 /* VFVisualStimulusTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50574110AE3640004A125 /* VFVisualStimulusTemplate.m */; };
+		3BFC653310FF3BE900D4258A /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BFC653210FF3BE900D4258A /* libicucore.dylib */; };
+		3BFC653710FF3C0A00D4258A /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BFC653610FF3C0A00D4258A /* RegexKitLite.m */; };
+		8DD76F9A0486AA7600D96B5E /* vizfixCLI.m in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* vizfixCLI.m */; settings = {ATTRIBUTES = (); }; };
+		8DD76F9C0486AA7600D96B5E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08FB779EFE84155DC02AAC07 /* Foundation.framework */; };
+		8DD76F9F0486AA7600D96B5E /* vizfixCLI.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859EA3029092ED04C91782 /* vizfixCLI.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8DD76F9E0486AA7600D96B5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				8DD76F9F0486AA7600D96B5E /* vizfixCLI.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		08FB7796FE84155DC02AAC07 /* vizfixCLI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vizfixCLI.m; sourceTree = "<group>"; };
+		08FB779EFE84155DC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		32A70AAB03705E1F00C91783 /* vizfixCLI_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vizfixCLI_Prefix.pch; sourceTree = "<group>"; };
+		3B46B82D11016DE7002DF0C3 /* VFAudioSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFAudioSource.h; sourceTree = "<group>"; };
+		3B46B82E11016DE7002DF0C3 /* VFAudioSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFAudioSource.m; sourceTree = "<group>"; };
+		3B46B82F11016DE7002DF0C3 /* VFBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFBlock.h; sourceTree = "<group>"; };
+		3B46B83011016DE7002DF0C3 /* VFBlock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFBlock.m; sourceTree = "<group>"; };
+		3B46B83111016DE7002DF0C3 /* VFCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFCondition.h; sourceTree = "<group>"; };
+		3B46B83211016DE7002DF0C3 /* VFCondition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFCondition.m; sourceTree = "<group>"; };
+		3B46B83311016DE7002DF0C3 /* VFFixation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFFixation.h; sourceTree = "<group>"; };
+		3B46B83411016DE7002DF0C3 /* VFFixation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFFixation.m; sourceTree = "<group>"; };
+		3B46B83511016DE7002DF0C3 /* VFGazeSample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFGazeSample.h; sourceTree = "<group>"; };
+		3B46B83611016DE7002DF0C3 /* VFGazeSample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFGazeSample.m; sourceTree = "<group>"; };
+		3B46B83711016DE7002DF0C3 /* VFKeyboardEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFKeyboardEvent.h; sourceTree = "<group>"; };
+		3B46B83811016DE7002DF0C3 /* VFKeyboardEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFKeyboardEvent.m; sourceTree = "<group>"; };
+		3B46B83B11016DE7002DF0C3 /* VFResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFResponse.h; sourceTree = "<group>"; };
+		3B46B83C11016DE7002DF0C3 /* VFResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFResponse.m; sourceTree = "<group>"; };
+		3B46B84311016DE7002DF0C3 /* VFSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFSession.h; sourceTree = "<group>"; };
+		3B46B84411016DE7002DF0C3 /* VFSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFSession.m; sourceTree = "<group>"; };
+		3B46B84511016DE7002DF0C3 /* VFSubTrial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFSubTrial.h; sourceTree = "<group>"; };
+		3B46B84611016DE7002DF0C3 /* VFSubTrial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFSubTrial.m; sourceTree = "<group>"; };
+		3B46B84911016DE7002DF0C3 /* VFTrial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFTrial.h; sourceTree = "<group>"; };
+		3B46B84A11016DE7002DF0C3 /* VFTrial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFTrial.m; sourceTree = "<group>"; };
+		3B8A249F10FEFFCB00DBFA0C /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		3B8A263510FF0E9600DBFA0C /* VFDualTaskImport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFDualTaskImport.h; sourceTree = "<group>"; };
+		3B8A263610FF0E9600DBFA0C /* VFDualTaskImport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFDualTaskImport.m; sourceTree = "<group>"; };
+		3B8A26A410FF0FDA00DBFA0C /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		3BC5056B110AE3640004A125 /* VFAuditoryStimulus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFAuditoryStimulus.h; sourceTree = "<group>"; };
+		3BC5056C110AE3640004A125 /* VFAuditoryStimulus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFAuditoryStimulus.m; sourceTree = "<group>"; };
+		3BC5056D110AE3640004A125 /* VFCustomEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFCustomEvent.h; sourceTree = "<group>"; };
+		3BC5056E110AE3640004A125 /* VFCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFCustomEvent.m; sourceTree = "<group>"; };
+		3BC5056F110AE3640004A125 /* VFVisualStimulus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFVisualStimulus.h; sourceTree = "<group>"; };
+		3BC50570110AE3640004A125 /* VFVisualStimulus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFVisualStimulus.m; sourceTree = "<group>"; };
+		3BC50571110AE3640004A125 /* VFVisualStimulusFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFVisualStimulusFrame.h; sourceTree = "<group>"; };
+		3BC50572110AE3640004A125 /* VFVisualStimulusFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFVisualStimulusFrame.m; sourceTree = "<group>"; };
+		3BC50573110AE3640004A125 /* VFVisualStimulusTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFVisualStimulusTemplate.h; sourceTree = "<group>"; };
+		3BC50574110AE3640004A125 /* VFVisualStimulusTemplate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFVisualStimulusTemplate.m; sourceTree = "<group>"; };
+		3BF07E1E10FFDE78004E5CAF /* outputSpec.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = outputSpec.txt; sourceTree = "<group>"; };
+		3BFC653210FF3BE900D4258A /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
+		3BFC653510FF3C0A00D4258A /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RegexKitLite.h; path = RegexKitLite/RegexKitLite.h; sourceTree = "<group>"; };
+		3BFC653610FF3C0A00D4258A /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RegexKitLite.m; path = RegexKitLite/RegexKitLite.m; sourceTree = "<group>"; };
+		3BFC662710FF523500D4258A /* P04 1-1 (Sound No Gaze No File 1)_v3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "P04 1-1 (Sound No Gaze No File 1)_v3.txt"; sourceTree = "<group>"; };
+		8DD76FA10486AA7600D96B5E /* vizfixCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vizfixCLI; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6859EA3029092ED04C91782 /* vizfixCLI.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = vizfixCLI.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8DD76F9B0486AA7600D96B5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8DD76F9C0486AA7600D96B5E /* Foundation.framework in Frameworks */,
+				3B8A24A010FEFFCB00DBFA0C /* CoreData.framework in Frameworks */,
+				3B8A26A510FF0FDA00DBFA0C /* AppKit.framework in Frameworks */,
+				3BFC653310FF3BE900D4258A /* libicucore.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* vizfixCLI */ = {
+			isa = PBXGroup;
+			children = (
+				3B7205DB11015516007E2380 /* Managed Objects */,
+				3BFC653410FF3BF900D4258A /* RegexKitLite */,
+				08FB7795FE84155DC02AAC07 /* Source */,
+				C6859EA2029092E104C91782 /* Documentation */,
+				08FB779DFE84155DC02AAC07 /* External Frameworks and Libraries */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+				3BFC653210FF3BE900D4258A /* libicucore.dylib */,
+			);
+			name = vizfixCLI;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				32A70AAB03705E1F00C91783 /* vizfixCLI_Prefix.pch */,
+				08FB7796FE84155DC02AAC07 /* vizfixCLI.m */,
+				3B8A263510FF0E9600DBFA0C /* VFDualTaskImport.h */,
+				3B8A263610FF0E9600DBFA0C /* VFDualTaskImport.m */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		08FB779DFE84155DC02AAC07 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				3B8A26A410FF0FDA00DBFA0C /* AppKit.framework */,
+				3B8A249F10FEFFCB00DBFA0C /* CoreData.framework */,
+				08FB779EFE84155DC02AAC07 /* Foundation.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DD76FA10486AA7600D96B5E /* vizfixCLI */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3B7205DB11015516007E2380 /* Managed Objects */ = {
+			isa = PBXGroup;
+			children = (
+				3BC5056B110AE3640004A125 /* VFAuditoryStimulus.h */,
+				3BC5056C110AE3640004A125 /* VFAuditoryStimulus.m */,
+				3BC5056D110AE3640004A125 /* VFCustomEvent.h */,
+				3BC5056E110AE3640004A125 /* VFCustomEvent.m */,
+				3BC5056F110AE3640004A125 /* VFVisualStimulus.h */,
+				3BC50570110AE3640004A125 /* VFVisualStimulus.m */,
+				3BC50571110AE3640004A125 /* VFVisualStimulusFrame.h */,
+				3BC50572110AE3640004A125 /* VFVisualStimulusFrame.m */,
+				3BC50573110AE3640004A125 /* VFVisualStimulusTemplate.h */,
+				3BC50574110AE3640004A125 /* VFVisualStimulusTemplate.m */,
+				3B46B82D11016DE7002DF0C3 /* VFAudioSource.h */,
+				3B46B82E11016DE7002DF0C3 /* VFAudioSource.m */,
+				3B46B82F11016DE7002DF0C3 /* VFBlock.h */,
+				3B46B83011016DE7002DF0C3 /* VFBlock.m */,
+				3B46B83111016DE7002DF0C3 /* VFCondition.h */,
+				3B46B83211016DE7002DF0C3 /* VFCondition.m */,
+				3B46B83311016DE7002DF0C3 /* VFFixation.h */,
+				3B46B83411016DE7002DF0C3 /* VFFixation.m */,
+				3B46B83511016DE7002DF0C3 /* VFGazeSample.h */,
+				3B46B83611016DE7002DF0C3 /* VFGazeSample.m */,
+				3B46B83711016DE7002DF0C3 /* VFKeyboardEvent.h */,
+				3B46B83811016DE7002DF0C3 /* VFKeyboardEvent.m */,
+				3B46B83B11016DE7002DF0C3 /* VFResponse.h */,
+				3B46B83C11016DE7002DF0C3 /* VFResponse.m */,
+				3B46B84311016DE7002DF0C3 /* VFSession.h */,
+				3B46B84411016DE7002DF0C3 /* VFSession.m */,
+				3B46B84511016DE7002DF0C3 /* VFSubTrial.h */,
+				3B46B84611016DE7002DF0C3 /* VFSubTrial.m */,
+				3B46B84911016DE7002DF0C3 /* VFTrial.h */,
+				3B46B84A11016DE7002DF0C3 /* VFTrial.m */,
+			);
+			name = "Managed Objects";
+			path = ../VizFix/managedObjects;
+			sourceTree = SOURCE_ROOT;
+		};
+		3BFC653410FF3BF900D4258A /* RegexKitLite */ = {
+			isa = PBXGroup;
+			children = (
+				3BFC653510FF3C0A00D4258A /* RegexKitLite.h */,
+				3BFC653610FF3C0A00D4258A /* RegexKitLite.m */,
+			);
+			name = RegexKitLite;
+			sourceTree = "<group>";
+		};
+		C6859EA2029092E104C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				3BF07E1E10FFDE78004E5CAF /* outputSpec.txt */,
+				3BFC662710FF523500D4258A /* P04 1-1 (Sound No Gaze No File 1)_v3.txt */,
+				C6859EA3029092ED04C91782 /* vizfixCLI.1 */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8DD76F960486AA7600D96B5E /* vizfixCLI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB927408733DD40010E9CD /* Build configuration list for PBXNativeTarget "vizfixCLI" */;
+			buildPhases = (
+				8DD76F990486AA7600D96B5E /* Sources */,
+				8DD76F9B0486AA7600D96B5E /* Frameworks */,
+				8DD76F9E0486AA7600D96B5E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = vizfixCLI;
+			productInstallPath = "$(HOME)/bin";
+			productName = vizfixCLI;
+			productReference = 8DD76FA10486AA7600D96B5E /* vizfixCLI */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB927808733DD40010E9CD /* Build configuration list for PBXProject "vizfixCLI" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* vizfixCLI */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DD76F960486AA7600D96B5E /* vizfixCLI */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8DD76F990486AA7600D96B5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8DD76F9A0486AA7600D96B5E /* vizfixCLI.m in Sources */,
+				3B8A263710FF0E9600DBFA0C /* VFDualTaskImport.m in Sources */,
+				3BFC653710FF3C0A00D4258A /* RegexKitLite.m in Sources */,
+				3B46B84C11016DE7002DF0C3 /* VFAudioSource.m in Sources */,
+				3B46B84D11016DE7002DF0C3 /* VFBlock.m in Sources */,
+				3B46B84E11016DE7002DF0C3 /* VFCondition.m in Sources */,
+				3B46B84F11016DE7002DF0C3 /* VFFixation.m in Sources */,
+				3B46B85011016DE7002DF0C3 /* VFGazeSample.m in Sources */,
+				3B46B85111016DE7002DF0C3 /* VFKeyboardEvent.m in Sources */,
+				3B46B85311016DE7002DF0C3 /* VFResponse.m in Sources */,
+				3B46B85711016DE7002DF0C3 /* VFSession.m in Sources */,
+				3B46B85811016DE7002DF0C3 /* VFSubTrial.m in Sources */,
+				3B46B85A11016DE7002DF0C3 /* VFTrial.m in Sources */,
+				3BC50575110AE3640004A125 /* VFAuditoryStimulus.m in Sources */,
+				3BC50576110AE3640004A125 /* VFCustomEvent.m in Sources */,
+				3BC50577110AE3640004A125 /* VFVisualStimulus.m in Sources */,
+				3BC50578110AE3640004A125 /* VFVisualStimulusFrame.m in Sources */,
+				3BC50579110AE3640004A125 /* VFVisualStimulusTemplate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB927508733DD40010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_GC = required;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = vizfixCLI_Prefix.pch;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = vizfixCLI;
+			};
+			name = Debug;
+		};
+		1DEB927608733DD40010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = vizfixCLI_Prefix.pch;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = vizfixCLI;
+			};
+			name = Release;
+		};
+		1DEB927908733DD40010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+			};
+			name = Debug;
+		};
+		1DEB927A08733DD40010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB927408733DD40010E9CD /* Build configuration list for PBXNativeTarget "vizfixCLI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB927508733DD40010E9CD /* Debug */,
+				1DEB927608733DD40010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB927808733DD40010E9CD /* Build configuration list for PBXProject "vizfixCLI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB927908733DD40010E9CD /* Debug */,
+				1DEB927A08733DD40010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
