@@ -29,6 +29,8 @@
 	IBOutlet NSTreeController *treeController;
 	IBOutlet NSArrayController *tableViewController;
 	
+	IBOutlet NSObjectController *fileURLController;
+	
 	IBOutlet VFView *layoutView;
 	IBOutlet NSSplitView *splitView;
 	IBOutlet NSSlider *slider;
@@ -41,8 +43,9 @@
 	double viewEndTime;
 	double currentTime;
 	double viewRefreshRate;
-	double playbackSpeedModifier;
-
+	NSArray *playbackSpeedModifiers;
+	int playbackSpeedModifiersIndex;
+	
 	NSTimer *playTimer;
 	
 	BOOL playing;
@@ -59,6 +62,9 @@
 - (void)updateViewContents;
 
 - (IBAction)togglePlayState:(id)sender;
+- (IBAction)speedUp:(id)sender;
+- (IBAction)slowDown:(id)sender;
+
 - (void)increaseCurrentTime:(NSTimer*)theTimer;
 - (IBAction)toggleSummaryMode:(id)sender;
 - (void)changeSelectedGroup;

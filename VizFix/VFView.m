@@ -10,11 +10,47 @@
 
 @implementation VFView
 
+- (id)initWithFrame:(NSRect)frameRect
+{
+	self = [super initWithFrame:frameRect];
+    if (self != nil) {
+		imageCacheDict = [NSMutableDictionary dictionaryWithCapacity:10];
+    }
+    return self;
+}
+
 - (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate;
 {
 	if (visualStimulusTemplate.fillColor != nil) {
 		[visualStimulusTemplate.fillColor setFill];
 		[visualStimulusTemplate.bound fill];
+	} else if (visualStimulusTemplate.imageFilePath != nil) {
+		NSURL *imageURL = [NSURL URLWithString:visualStimulusTemplate.imageFilePath 
+								 relativeToURL:[fileURLController content]];
+		
+		NSImage *stimulusImage = [imageCacheDict valueForKey:visualStimulusTemplate.imageFilePath];
+		if (stimulusImage == nil) {
+			stimulusImage = [[NSImage alloc] initWithContentsOfURL:imageURL];
+			// Cache loaded images.
+			[imageCacheDict setValue:stimulusImage forKey:visualStimulusTemplate.imageFilePath];
+			
+			if (stimulusImage == nil) {
+				NSLog(@"Image file %@ does not exist.", [imageURL path]);
+			}
+		}
+				
+		NSAffineTransform* xform = [NSAffineTransform transform];
+		[xform translateXBy:0.0 yBy:stimulusImage.size.height];
+		[xform scaleXBy:1.0 yBy:-1.0];
+		[xform concat];
+		
+		[stimulusImage drawAtPoint:NSMakePoint(0.0f, 0.0f) 
+						 fromRect:NSZeroRect 
+						operation:NSCompositeSourceOver
+						 fraction:1.0];
+		
+		[xform invert];
+		[xform concat];
 	}
 }
 
@@ -43,14 +79,66 @@
 	}
 	
 }
+
+- (void)drawFixations
+{
+	NSArray *fixations = [fixationController arrangedObjects];
+	
+	for (int i = 0; i < [fixations count]; i++) {
+		VFFixation *currentFixation = [fixations objectAtIndex:i];
+		double x = currentFixation.location.x;
+		double y = currentFixation.location.y;
+		
+		NSColor *color;
+		if ([fixations count] == 1) {
+			color = [NSColor colorWithCalibratedHue:0.75 
+										 saturation:0.5 
+										 brightness:1.0 
+											  alpha:1.0];
+		} else {
+			color = [NSColor colorWithCalibratedHue:0.75 
+										 saturation:(1.0 - ((i / (float)[fixations count]) / 2.0)) 
+										 brightness:(0.5 + ((i / (float)[fixations count]) / 2.0)) 
+											  alpha:1.0];
+		}
+		
+		[color setFill];
+		[color setStroke];
+		NSRect innerRect = NSMakeRect( x - 3.0, y - 3.0, 6.0, 6.0);
+		
+		NSBezierPath *fixLocPath = [NSBezierPath bezierPathWithOvalInRect:innerRect];
+		[fixLocPath fill];
+		
+		double radius = log([currentFixation.endTime intValue] - [currentFixation.startTime intValue]) * 2;
+		NSRect durationRect = NSMakeRect(x - radius , y - radius, 2 * radius, 2 * radius);
+		NSBezierPath *durationPath = [NSBezierPath bezierPathWithOvalInRect:durationRect];	
+		[durationPath setLineWidth:2];
+		
+		[durationPath stroke];
+		[[color colorWithAlphaComponent:0.4] setFill];
+		[durationPath fill];
+		
+		// Draw a line from last fixation to this one.
+		if (i > 0) {
+			VFFixation *lastFixation = [fixations objectAtIndex:i - 1];
+			
+			NSBezierPath *linePath = [NSBezierPath bezierPath];
+			[linePath moveToPoint:lastFixation.location];
+			[linePath lineToPoint:currentFixation.location];
+			[linePath stroke];
+		}
+	}
+}
+
 - (void)drawRect:(NSRect)rect
 {
-	//Save the previous graphics state
+	// Save the previous graphics state
 	[NSGraphicsContext saveGraphicsState];
 	
-	[[NSColor grayColor] setFill];
-	[NSBezierPath fillRect:rect];
-
+	// Draw background.
+	VFSession *session = [sessionController content];
+	[self drawVisualStimulusTemplate:session.background];
+	
 	// Draw screen objects.
 	for (int i = 0; i < [[visualStimuliController arrangedObjects] count]; i++)
 	{
@@ -66,6 +154,7 @@
 			
 			[transform invert];
 			[transform concat];
+			
 			[eachVisualStimulus.label drawAtPoint:eachFrame.location
 			 withAttributes:[NSDictionary dictionaryWithObject:[NSColor whiteColor] 
 														forKey:NSForegroundColorAttributeName]];
@@ -76,57 +165,14 @@
 	[self drawGazes];
 	
 	// Draw fixations
-	NSArray *fixations = [fixationController arrangedObjects];
-	
-	for (int i = 0; i < [fixations count]; i++) {
-		VFFixation *currentFixation = [fixations objectAtIndex:i];
-		double x = currentFixation.location.x;
-		double y = currentFixation.location.y;
-		
-		NSColor *color;
-		if ([fixations count] == 1) {
-			color = [NSColor colorWithCalibratedHue:0.75 
-												  saturation:0.5 
-												  brightness:1.0 
-													   alpha:1.0];
-		} else {
-			color = [NSColor colorWithCalibratedHue:0.75 
-												  saturation:(1.0 - ((i / (float)[fixations count]) / 2.0)) 
-												  brightness:(0.5 + ((i / (float)[fixations count]) / 2.0)) 
-													   alpha:1.0];
-		}
-						  
-		[color setFill];
-		[color setStroke];
-		NSRect innerRect = NSMakeRect( x - 3.0, y - 3.0, 6.0, 6.0);
-		
-		NSBezierPath *fixLocPath = [NSBezierPath bezierPathWithOvalInRect:innerRect];
-		[fixLocPath fill];
-		
-		double radius = log([currentFixation.endTime intValue] - [currentFixation.startTime intValue]) * 2;
-		NSRect durationRect = NSMakeRect(x - radius , y - radius, 2 * radius, 2 * radius);
-		NSBezierPath *durationPath = [NSBezierPath bezierPathWithOvalInRect:durationRect];	
-		[durationPath setLineWidth:2];
-		
-		[durationPath stroke];
-		
-		// Draw a line from last fixation to this one.
-		if (i > 0) {
-			VFFixation *lastFixation = [fixations objectAtIndex:i - 1];
-			
-			NSBezierPath *linePath = [NSBezierPath bezierPath];
-			[linePath moveToPoint:lastFixation.location];
-			[linePath lineToPoint:currentFixation.location];
-			[linePath stroke];
-		}
-	}
+	[self drawFixations];
 	
 	//	Restore the previous graphics state
 	//	saved at the beginning of this method
 	[NSGraphicsContext restoreGraphicsState];	
 }
 
-- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if(object == visualStimuliController && [keyPath isEqualToString:@"filterPredicate"])
 	{

@@ -31,7 +31,6 @@
 
 - (NSPoint)location
 {
-	
     [self willAccessValueForKey:@"location"];
 	
     NSPoint aLocatinon = location;

@@ -18,6 +18,8 @@
 #import "VFVisualStimulus.h"
 #import "VFVisualStimulusFrame.h"
 #import "VFVisualStimulusTemplate.h"
+#import "VFKeyboardEvent.h"
+#import "VFAuditoryStimulus.h"
 
 #import "RegexKitLite.h"
 
@@ -44,10 +46,10 @@
 	VFCondition *blipDesignationHostile;
 	VFCondition *blipSensorFail;
 	VFCondition *blipSensorNotFail;
+	NSArray *blipColorCodes;
+	NSArray *trackNumConditions;
 	
 	NSArray *visualStimuliTemplates;
-	NSArray *blipColorCodes;
-	NSMutableArray *trackNumConditions;
 	
 	VFSession *session;
 	VFBlock *currentBlock;
@@ -55,7 +57,12 @@
 	NSMutableDictionary *ongoingTrials;
 	NSMutableArray *ongoingGazes;
 	
-	NSUInteger discardedGazeCount;
+	int discardedGazeCount;
+	int lastGazeTimeStamp;
+	int startAccumulateTimeStamp;
+	int consolidateState;
+	
+	NSUInteger blockEndTime;
 }
 
 @property (nonatomic, retain) NSManagedObjectContext * moc;
@@ -64,8 +71,11 @@
 - (VFDualTaskImport *)initWithMOC:(NSManagedObjectContext *)anMOC;
 - (void)import:(NSURL *)rawDataFileURL;
 - (void)prepareImport;
+- (void)saveData;
 
 - (void)importGaze;
+- (void)consolidateGazesToIndex:(NSUInteger)index;
+
 - (void)startBlock;
 - (void)endBlock;
 - (void)startTrial;
@@ -73,6 +83,9 @@
 - (void)parseBlipMoved;
 - (void)parseBlipChangedColor;
 - (void)parseBlipDisappeared;
+- (void)parseKeyEvent;
+- (void)parseSound;
+- (void)parseFailureForType:(NSString *)failureType unparsed:(NSString *)unparsedString;
 
 - (VFVisualStimulusFrame *)makeBlipFrame;
 - (void)endBlipFrameForBlip:(VFVisualStimulus *)vs;

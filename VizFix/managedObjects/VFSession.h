@@ -7,6 +7,7 @@
 //
 
 #import <CoreData/CoreData.h>
+#import <AppKit/AppKit.h>
 
 @class VFVisualStimulusTemplate;
 @class VFBlock;
@@ -15,6 +16,7 @@
 {
 }
 
+@property (nonatomic, retain) VFVisualStimulusTemplate * background;
 @property (nonatomic, retain) NSNumber * screenResolutionHeight;
 @property (nonatomic, retain) NSNumber * screenDimensionHeight;
 @property (nonatomic, retain) NSString * sessionID;

@@ -13,12 +13,13 @@
 
 @interface VFAuditoryStimulus :  NSManagedObject  
 {
+	NSPoint location;
 }
 
-@property (nonatomic, retain) NSNumber * x;
-@property (nonatomic, retain) NSNumber * y;
+@property (nonatomic, assign) NSPoint location;
+@property (nonatomic, assign) NSPoint primitiveLocation;
+@property (nonatomic, retain) NSString * locationAsString;
 @property (nonatomic, retain) NSNumber * time;
-@property (nonatomic, retain) NSNumber * z;
 @property (nonatomic, retain) VFAudioSource * audioSource;
 @property (nonatomic, retain) VFTrial * isTargetOfTrial;
 

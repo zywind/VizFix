@@ -20,8 +20,11 @@
 	IBOutlet NSArrayController *visualStimulusFramesController;
 	IBOutlet NSArrayController *gazeSampleController;
 	IBOutlet NSArrayController *fixationController;
-
 	IBOutlet NSObjectController *sessionController;
+
+	IBOutlet NSObjectController *fileURLController;
+	
+	NSMutableDictionary *imageCacheDict;
 }
 
 - (NSArray*)zorderSortDescriptor;

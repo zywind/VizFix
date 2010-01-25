@@ -13,11 +13,51 @@
 
 @implementation VFAuditoryStimulus 
 
-@dynamic x;
-@dynamic y;
 @dynamic time;
-@dynamic z;
 @dynamic audioSource;
 @dynamic isTargetOfTrial;
+@dynamic locationAsString;
+
+- (NSPoint)primitiveLocation
+{
+    return location;
+}
+
+- (void)setPrimitiveLocation:(NSPoint)aLocation
+{
+	location = aLocation;
+}
+
+- (NSPoint)location
+{
+	
+    [self willAccessValueForKey:@"location"];
+	
+    NSPoint aLocatinon = location;
+	
+    [self didAccessValueForKey:@"location"];
+	
+    if (aLocatinon.x == 0 && aLocatinon.y == 0) // TODO: check if this assumption works.
+    {
+        NSString *locationAsString = [self locationAsString];
+		
+        if (locationAsString != nil) 
+		{
+            location = NSPointFromString(locationAsString);
+        }
+    }
+	
+    return location;
+}
+
+- (void)setLocation:(NSPoint)aPoint
+{
+    [self willChangeValueForKey:@"location"];
+    location = aPoint;
+    [self didChangeValueForKey:@"location"];
+	
+    NSString *locationAsString = NSStringFromPoint(aPoint);
+	[self setValue:locationAsString forKey:@"locationAsString"]; 
+}
 
 @end

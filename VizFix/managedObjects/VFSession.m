@@ -11,7 +11,7 @@
 #import "VFVisualStimulusTemplate.h"
 #import "VFBlock.h"
 
-@implementation VFSession 
+@implementation VFSession
 
 @dynamic screenResolutionHeight;
 @dynamic screenDimensionHeight;
@@ -24,6 +24,8 @@
 @dynamic date;
 @dynamic screenResolutionWidth;
 @dynamic blocks;
+@dynamic background;
+
 
 - (BOOL)leaf
 {
@@ -35,10 +37,9 @@
 	return self.blocks;
 }
 
-
 - (NSString *)ID
 {
-	return self.sessionID;
+	return [NSString stringWithFormat:@"%@ %@", self.subjectID, self.sessionID];
 }
 
 @end

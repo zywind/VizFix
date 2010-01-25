@@ -29,7 +29,10 @@
 		inSummaryMode = NO;
 		playing = NO;
 		viewRefreshRate = 30.0;
-		playbackSpeedModifier = 1.0/1.0; // three times slow of realtime.
+		playbackSpeedModifiers = [NSArray arrayWithObjects:[NSNumber numberWithDouble:0.1/1.0], 
+								  [NSNumber numberWithDouble:0.3/1.0], [NSNumber numberWithDouble:0.5/1.0], 
+								  [NSNumber numberWithDouble:1.0/1.0], [NSNumber numberWithDouble:2.0/1.0], nil];
+		playbackSpeedModifiersIndex = 1;
     }
     return self;
 }
@@ -42,6 +45,8 @@
 - (void)windowControllerDidLoadNib:(NSWindowController *)windowController 
 {
     [super windowControllerDidLoadNib:windowController];
+	
+	[fileURLController setContent:[self fileURL]];
 	
 	[visualStimuliController addObserver:layoutView forKeyPath:@"filterPredicate" options:NSKeyValueObservingOptionNew context:nil];
 	[treeController addObserver:self forKeyPath:@"selectionIndexPaths" options:NSKeyValueObservingOptionNew context:nil];
@@ -167,9 +172,23 @@
 	}
 }
 
+- (IBAction)speedUp:(id)sender
+{
+	if (playbackSpeedModifiersIndex < [playbackSpeedModifiers count] - 1) {
+		playbackSpeedModifiersIndex++;
+	}
+}
+
+- (IBAction)slowDown:(id)sender
+{
+	if (playbackSpeedModifiersIndex > 0) {
+		playbackSpeedModifiersIndex--;
+	}
+}
+
 - (void)increaseCurrentTime:(NSTimer*)theTimer
 {
-	double step = 1000.0 / viewRefreshRate * playbackSpeedModifier;
+	double step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
 	if (self.currentTime <= self.viewEndTime - step)
 		self.currentTime += step;
 	else {
@@ -189,36 +208,37 @@
 		contextInfo:(void *)contextInfo
 {
 	if (returnCode == NSAlertFirstButtonReturn) {
-		NSManagedObjectContext *moc = [self managedObjectContext];
+		NSManagedObjectContext *importFixationsMoc = [self managedObjectContext];
 		
 		// Delete old fixations
 		NSEntityDescription *fixatinoEntityDescription = [NSEntityDescription
-														  entityForName:@"Fixation" inManagedObjectContext:moc];
+														  entityForName:@"Fixation" inManagedObjectContext:importFixationsMoc];
 		NSFetchRequest *fixationRequest = [[NSFetchRequest alloc] init];
 		[fixationRequest setEntity:fixatinoEntityDescription];
 		
 		NSError *error;
-		NSArray *fixationArray = [moc executeFetchRequest:fixationRequest error:&error];
+		NSArray *fixationArray = [importFixationsMoc executeFetchRequest:fixationRequest error:&error];
 		
 		for (VFFixation *eachFixation in fixationArray) {
-			[moc deleteObject:eachFixation];
+			[importFixationsMoc deleteObject:eachFixation];
 		}
 		
 		// Delete block-fixations relationship.
 		for (VFBlock *eachBlock in session.blocks) {
 			eachBlock.fixations = nil;
 		}
+		fixationArray = nil;
 		
 		// Retrieve gazes
 		NSEntityDescription *entityDescription = [NSEntityDescription
-												  entityForName:@"GazeSample" inManagedObjectContext:moc];
+												  entityForName:@"GazeSample" inManagedObjectContext:importFixationsMoc];
 		NSFetchRequest *request = [[NSFetchRequest alloc] init];
 		[request setEntity:entityDescription];
 		
 		NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
 		[request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
 		
-		NSArray *gazeArray = [moc executeFetchRequest:request error:&error];
+		NSArray *gazeArray = [importFixationsMoc executeFetchRequest:request error:&error];
 		if (gazeArray == nil)
 		{
 			NSLog(@"Fetch gaze samples failed.\n%@", [error localizedDescription]);
@@ -228,19 +248,20 @@
 		VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
 		fixationDetectionAlg.gazeSampleRate = 120;
 		fixationDetectionAlg.radiusThreshold = 30; // TODO:
+		
 		NSMutableArray *fixations = [NSMutableArray arrayWithArray:
-									 [fixationDetectionAlg detectFixation:gazeArray inMOC:[self managedObjectContext]]];
+									 [fixationDetectionAlg detectFixation:gazeArray inMOC:importFixationsMoc]];
+		gazeArray = nil;
 		
 		for (VFBlock *eachBlock in session.blocks) {
-			for (VFFixation *eachFixation in fixations) {
-				if (([eachFixation.startTime intValue] <= [eachBlock.startTime intValue]
-					 && [eachFixation.endTime intValue] >= [eachBlock.startTime intValue])
-					|| ([eachFixation.startTime intValue]>= [eachBlock.startTime intValue]
-						&& [eachFixation.startTime intValue] <= [eachBlock.endTime intValue])) {
-					[eachBlock addFixationsObject:eachFixation];
-				}
-			}
+			NSMutableArray *tempFixations = [NSMutableArray arrayWithArray:fixations];
+			NSPredicate * predicateForTimePeriod = [NSPredicate predicateWithFormat:
+													@"(startTime <= %@ AND endTime >= %@) OR (startTime >= %@ AND startTime <= %@)", 
+													eachBlock.startTime, eachBlock.startTime, eachBlock.startTime, eachBlock.endTime];
+			[tempFixations filterUsingPredicate:predicateForTimePeriod];
+			[eachBlock addFixations:[NSSet setWithArray:tempFixations]];
 		}
+		fixations = nil;
     }
 }
 
@@ -331,11 +352,18 @@
 		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Experiment", @"entry", session.experiment, @"value", nil];
 		[tableViewController addObject:tempDict];
 		NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-		[dateFormat setDateFormat:@"yyyy-MM-dd"];
+		[dateFormat setDateStyle:NSDateFormatterMediumStyle];
 		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Date", @"entry", 
 					[dateFormat stringFromDate:session.date], @"value", nil];
 		[tableViewController addObject:tempDict];
+		[dateFormat setDateStyle:NSDateFormatterNoStyle];
+		[dateFormat setTimeStyle:NSDateFormatterMediumStyle];
+		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Time", @"entry", 
+					[dateFormat stringFromDate:session.date], @"value", nil];
+		[tableViewController addObject:tempDict];
 		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Subject", @"entry", session.subjectID, @"value", nil];
+		[tableViewController addObject:tempDict];
+		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Session", @"entry", session.sessionID, @"value", nil];
 		[tableViewController addObject:tempDict];
 		return;
 	}
@@ -357,6 +385,7 @@
 		selectedTrial = [[[[selectedBlock trials] allObjects] 
 						 sortedArrayUsingDescriptors:[self startTimeSortDescriptor]]
 						 objectAtIndex:[indexPath indexAtPosition:2]];
+				
 		for (VFCondition *eachCondition in selectedTrial.conditions) {
 			tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachCondition.factor, 
 					@"entry", eachCondition.level, @"value", nil];

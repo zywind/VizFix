@@ -17,9 +17,14 @@
 - (VFDualTaskImport *)initWithMOC:(NSManagedObjectContext *)anMOC
 {	
 	if (self = [super init]) {
-		[anMOC setUndoManager:nil];
-		self.moc = anMOC;
-		self.lineNum = 0;
+		moc = anMOC;
+		[moc setUndoManager:nil];
+		lineNum = 0;
+		discardedGazeCount = 0;
+		
+		lastGazeTimeStamp = 0;
+		startAccumulateTimeStamp = 0;
+		consolidateState = 0;
     }
     return self;
 }
@@ -34,24 +39,28 @@
 	session.gazeSampleRate = [NSNumber numberWithInt:120]; // per second.
 	session.screenDimensionWidth = [NSNumber numberWithInt:432]; // in mm.
 	session.screenDimensionHeight = [NSNumber numberWithInt:407]; // in mm.
+	VFVisualStimulusTemplate *backgroundTemplate = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate"
+																				 inManagedObjectContext:moc];
+	backgroundTemplate.imageFilePath = @"img/background.png";
+	backgroundTemplate.category = @"background";
 	
-	
-	// TODO: load background bmp
+	session.background = backgroundTemplate;
+		
+	NSString *fileName = [[rawDataFileURL path] lastPathComponent];
 	
 	// Parse participant ID from raw data file name	
-	session.subjectID = [[[rawDataFileURL absoluteString] lastPathComponent] substringToIndex:3];
-	// TODO: parse session ID.
-	session.sessionID = [[[rawDataFileURL absoluteString] lastPathComponent] substringToIndex:3];
+	session.subjectID = [fileName substringToIndex:3];
+	session.sessionID = [fileName substringWithRange:NSMakeRange(4,3)];
 	
 	NSArray  *matchArray = nil;
-	NSString *regexStr = @"Sound\%20(\\w*)\%20Gaze\%20(\\w*)";
-	
+	NSString *regexStr = @"Sound (\\w*) Gaze (\\w*)";
+	matchArray = [fileName arrayOfCaptureComponentsMatchedByRegex:regexStr];
+
 	// Parse scenario conditions.
 	// Parse sound condition.
 	soundCondition = [NSEntityDescription insertNewObjectForEntityForName:@"Condition" inManagedObjectContext:moc];
 	soundCondition.factor = @"sound";
 	// Get the position of the initial character of the sound condition.
-	matchArray = [[[rawDataFileURL absoluteString] lastPathComponent] arrayOfCaptureComponentsMatchedByRegex:regexStr];
 	soundCondition.level = [[matchArray objectAtIndex:0] objectAtIndex:1];
 	// Parse gaze condition.
 	gazeCondition = [NSEntityDescription insertNewObjectForEntityForName:@"Condition" inManagedObjectContext:moc];
@@ -69,17 +78,17 @@
 			  [error localizedDescription] : @"Unknown Error");
 		return;
 	}
+	
 	lines = [fileContents componentsSeparatedByString:@"\n"];
 	
 	// Parse date.
-	matchArray = nil;
 	regexStr = @"^\\d\\tDate\\t(\\d{4})(\\d{2})(\\d{2})_(\\d{2})(\\d{2})(\\d{2})$";
 	
 	matchArray = [[lines objectAtIndex:lineNum++] arrayOfCaptureComponentsMatchedByRegex:regexStr];
 	NSEnumerator *matchEnumerator = [[matchArray objectAtIndex:0] objectEnumerator];
 	[matchEnumerator nextObject];
 	// Constructing date.
-	NSMutableString *date = [NSMutableString stringWithCapacity:10] ;
+	NSMutableString *date = [NSMutableString stringWithCapacity:10];
 	for (int i = 0; i < 2; i++) {
 		[date appendString:[matchEnumerator nextObject]];
 		[date appendString:@"-"]; 
@@ -87,57 +96,77 @@
 	[date appendString:[matchEnumerator nextObject]];
 	
 	// Constructing time.
-	NSMutableString *time = [NSMutableString stringWithCapacity:10] ;
+	NSMutableString *time = [NSMutableString stringWithCapacity:10];
 	for (int i = 0; i < 2; i++) {
 		[time appendString:[matchEnumerator nextObject]];
 		[time appendString:@":"]; 
 	}
 	[time appendString:[matchEnumerator nextObject]];
 	
-	// Time Zone string.
-	NSString *timeZone = @"+0800";
+	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+	[dateFormatter setDateFormat:@"yyyy-MM-dd 'at' HH:mm:ss"];
 	// Finally, save date. 
-	session.date = [NSDate dateWithString:[NSString stringWithFormat:@"%@ %@ %@", date, time, timeZone]];
+	session.date = [dateFormatter dateFromString:[NSString stringWithFormat:@"%@ at %@", date, time]];
 	
 	[self prepareImport];
 	
 	// Main loop.	
-	//	The next line must contains at least 2 columns.
+	// The next line must contains at least 2 columns.
+	BOOL readyToEndBlock = NO;
+	blockEndTime = 0;
 	while(([currentLineFields = [[lines objectAtIndex:lineNum++] componentsSeparatedByString:@"\t"] 
-			count] > 1)
-		  && lineNum < [lines count])
-	{		
-		if ([[currentLineFields objectAtIndex:1] isEqualToString:@"EyeGaze"]) {
+			count] > 1) && lineNum < [lines count])
+	{
+		if (readyToEndBlock && [[currentLineFields objectAtIndex:0] intValue] > blockEndTime+1) {
+			[self endBlock];
+			readyToEndBlock = NO;
+		}
+		NSString *eventType = [currentLineFields objectAtIndex:1];
+		if ([eventType isEqualToString:@"EyeGaze"]) {
 			[self importGaze];
-		} else if([[currentLineFields objectAtIndex:1] isEqualToString:@"Comment"]) {
-			if ([[currentLineFields objectAtIndex:2] isEqualToString:@"wave_start"]) {				
+		} else if([eventType isEqualToString:@"Comment"]) {
+			NSString *commentType = [currentLineFields objectAtIndex:2];
+			if ([commentType isEqualToString:@"wave_start"]) {				
 				[self startBlock];
-			} else if ([[currentLineFields objectAtIndex:2] isEqualToString:@"wave_end"]) {
-				[self endBlock];
+			} else if ([commentType isEqualToString:@"wave_end"]) {
+				if (!readyToEndBlock) {
+					blockEndTime = [[currentLineFields objectAtIndex:0] intValue];
+					readyToEndBlock = YES;
+				}
 			} else {
-				// TODO: error handliing.
-				NSLog(@"Unknow comment.");
+				[self parseFailureForType:@"comment type" unparsed:commentType];
 			}
-		} else if ([[currentLineFields objectAtIndex:1] isEqualToString:@"BlipAppeared"]) {			
+		} else if ([eventType isEqualToString:@"BlipAppeared"]) {			
 			[self startTrial];
-		} else if ([[currentLineFields objectAtIndex:1] isEqualToString:@"BlipMoved"]) {
+		} else if ([eventType isEqualToString:@"BlipMoved"]) {
 			[self parseBlipMoved];
-		} else if ([[currentLineFields objectAtIndex:1] isEqualToString:@"BlipChangedColor"]) {
+		} else if ([eventType isEqualToString:@"BlipChangedColor"]) {
 			[self parseBlipChangedColor];
-		} else if ([[currentLineFields objectAtIndex:1] isEqualToString:@"BlipDisappeared"]) {
+		} else if ([eventType isEqualToString:@"BlipDisappeared"]) {
 			[self parseBlipDisappeared];
-		} else if ([[currentLineFields objectAtIndex:1] isEqualToString:@"TrialData"]) {
+		} else if ([eventType isEqualToString:@"TrialData"]) {
 			[self endTrial];
+		} else if ([eventType isEqualToString:@"Keyboard"]) {
+			[self parseKeyEvent];
+		} else if ([eventType isEqualToString:@"Sound"]) {
+			continue;
+		} else if ([eventType isEqualToString:@"TrackingError"]) {
+			continue;
+		} else {
+			[self parseFailureForType:@"event type" unparsed:eventType];
 		}
 	}
 	
-	for (VFGazeSample *gaze in ongoingGazes) {
-		[moc deleteObject:gaze];
-	}
+	[self consolidateGazesToIndex:[ongoingGazes count] - 1];
 	NSLog(@"Discarded %d gaze samples.", discardedGazeCount);
-	[ongoingGazes removeAllObjects];
 	
 	// Import completed. Save.
+	[self saveData];
+}
+
+- (void)saveData
+{
+	NSError *error = nil;
 	if (![moc save:&error])
 	{
 		NSLog(@"Data Import Failure\n%@",
@@ -201,34 +230,15 @@
 	blipSensorNotFail.factor = @"sensor fail";
 	blipSensorNotFail.level = @"no";
 	
-	trackNumConditions = [NSMutableArray arrayWithCapacity:9];
+	NSMutableArray * tempTrackNumConditions = [NSMutableArray arrayWithCapacity:9];
 	for (int i =  1; i <= 9; i++) {
 		VFCondition *tempCondition = [NSEntityDescription insertNewObjectForEntityForName:@"Condition" inManagedObjectContext:moc];
 		tempCondition.factor = @"track number";
 		tempCondition.level = [[NSNumber numberWithInt:i] stringValue];
 
-		[trackNumConditions addObject:tempCondition];
+		[tempTrackNumConditions addObject:tempCondition];
 	}
-	
-	NSBezierPath *fighterPath = [NSBezierPath bezierPath];
-	[fighterPath moveToPoint:NSMakePoint(0, 0)];
-	[fighterPath lineToPoint:NSMakePoint(32, 0)];
-	[fighterPath lineToPoint:NSMakePoint(16, 32)];
-	[fighterPath closePath];
-	NSBezierPath *supportPath = [NSBezierPath bezierPath];
-	[supportPath moveToPoint:NSMakePoint(16, 0)];
-	[supportPath lineToPoint:NSMakePoint(0, 16)];
-	[supportPath lineToPoint:NSMakePoint(16, 32)];
-	[supportPath lineToPoint:NSMakePoint(32, 16)];
-	[supportPath closePath];
-	NSBezierPath *missilePath = [NSBezierPath bezierPath];
-	[missilePath appendBezierPathWithOvalInRect:NSMakeRect(0, 0, 32, 32)];
-	[missilePath closePath];
-	
-	NSArray *blipTypePaths = [NSArray arrayWithObjects:fighterPath, supportPath, missilePath, nil];
-	NSArray *blipColors = [NSArray arrayWithObjects:[NSColor blackColor], [NSColor greenColor], 
-													[NSColor redColor], [NSColor whiteColor],
-													[NSColor yellowColor], nil];
+	trackNumConditions = [NSArray arrayWithArray:tempTrackNumConditions];
 	
 	NSMutableArray *tempTemplates = [NSMutableArray arrayWithCapacity:15];
 	for (int i = 0; i < 5; i++) {
@@ -236,8 +246,7 @@
 			VFVisualStimulusTemplate *aBlipTemplate = 
 				[NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate" inManagedObjectContext:moc];
 			
-			aBlipTemplate.bound = [blipTypePaths objectAtIndex:j];
-			aBlipTemplate.fillColor = [blipColors objectAtIndex:i];
+			aBlipTemplate.imageFilePath = [NSString stringWithFormat:@"img/%d-%d.png", i, j];
 			aBlipTemplate.category = @"blip";
 			
 			[tempTemplates addObject:aBlipTemplate];
@@ -252,15 +261,12 @@
 	ongoingBlips = [NSMutableDictionary dictionaryWithCapacity:10];
 	ongoingTrials = [NSMutableDictionary dictionaryWithCapacity:10];
 	ongoingGazes = [NSMutableArray arrayWithCapacity:10];
-	
-	discardedGazeCount = 0;
 }
 
+#pragma mark -
+#pragma mark -------PARSE GAZE-------
 - (void)importGaze
 {
-	static int lastGazeTimeStamp = 0;
-	static int startAccumulateTimeStamp = 0;
-	static BOOL consolidateState = 0;
 	// If it is not preparing to consolidate, record and accumulate the gaze sample, but does not record its time stamp.
 	if (consolidateState == 0) {
 		[ongoingGazes addObject:[self makeGazeSample]];
@@ -279,44 +285,61 @@
 	} else if (consolidateState == 2) {
 		if ([[currentLineFields objectAtIndex:0] intValue] != lastGazeTimeStamp) {
 			// Two different records appeared. Now start the consolidating process.
-			NSUInteger consolidateEndTimeStamp = [((VFGazeSample *)[ongoingGazes objectAtIndex:([ongoingGazes count] - 2)]).time intValue];
-			float timePerGaze = (float)(consolidateEndTimeStamp - startAccumulateTimeStamp) / (float)([ongoingGazes count] - 1);
-			// Sample rate cannot be larger than 122. If so, use 8.2.
-			if (timePerGaze < 8.2)
-				timePerGaze = 8.2;
-			// Assign time backwards.
-			for (int i = [ongoingGazes count] - 2; i >= 0; i--) {
-				int assignTime = consolidateEndTimeStamp - (NSUInteger) (timePerGaze * ([ongoingGazes count] - 2 - i));
-				if (assignTime <= startAccumulateTimeStamp || assignTime > [((VFGazeSample *)[ongoingGazes objectAtIndex:i]).time intValue]  + 10) {
-					//NSLog(@"Discard the gaze sample of time stamp %d for it is less than %d", assignTime, startAccumulateTimeStamp);
-					[moc deleteObject:[ongoingGazes objectAtIndex:i]];
-					discardedGazeCount++;
-				} else {
-					((VFGazeSample *)[ongoingGazes objectAtIndex:i]).time = [NSNumber numberWithUnsignedInt:assignTime];
-					[currentBlock addGazeSamplesObject:[ongoingGazes objectAtIndex:i]];
-				}
-			}
-			
-			[ongoingGazes removeObjectsInRange:NSMakeRange(0, [ongoingGazes count] - 1)];
-			// Consolidating finished.
-			consolidateState = 0;
-			startAccumulateTimeStamp = consolidateEndTimeStamp;
+			[self consolidateGazesToIndex:[ongoingGazes count] - 2];
 			// Record the new gaze sample.
 			[ongoingGazes addObject:[self makeGazeSample]];
-			lastGazeTimeStamp = consolidateEndTimeStamp;
+			lastGazeTimeStamp = startAccumulateTimeStamp;
 		} else {
 			consolidateState = 1;
 		}
 	}
 }
-		 
+
+- (void)consolidateGazesToIndex:(NSUInteger)index
+{
+	NSUInteger consolidateEndTimeStamp = [((VFGazeSample *)[ongoingGazes objectAtIndex:index]).time intValue];
+	float timePerGaze = (float)(consolidateEndTimeStamp - startAccumulateTimeStamp) / (float)(index + 1);
+	// Sample rate cannot be larger than 122. If so, use 8.2.
+	if (timePerGaze < 8.2)
+		timePerGaze = 8.2;
+	// Assign time backwards.
+	for (int i = index; i >= 0; i--) {
+		int assignTime = consolidateEndTimeStamp - (NSUInteger) (timePerGaze * (index - i));
+		if (assignTime <= startAccumulateTimeStamp || assignTime > [((VFGazeSample *)[ongoingGazes objectAtIndex:i]).time intValue]  + 10) {
+			//NSLog(@"Discard the gaze sample of time stamp %d for it is less than %d", assignTime, startAccumulateTimeStamp);
+			[moc deleteObject:[ongoingGazes objectAtIndex:i]];
+			discardedGazeCount++;
+		} else {
+			((VFGazeSample *)[ongoingGazes objectAtIndex:i]).time = [NSNumber numberWithUnsignedInt:assignTime];
+			[currentBlock addGazeSamplesObject:[ongoingGazes objectAtIndex:i]];
+		}
+	}
+	
+	[ongoingGazes removeObjectsInRange:NSMakeRange(0, index + 1)];
+	// Consolidating finished.
+	consolidateState = 0;
+	startAccumulateTimeStamp = consolidateEndTimeStamp;
+}
+
+- (VFGazeSample *)makeGazeSample
+{
+	VFGazeSample *gaze = [NSEntityDescription insertNewObjectForEntityForName:@"GazeSample" inManagedObjectContext:moc];
+	
+	gaze.location = [self makeLocation];
+	gaze.valid = [NSNumber numberWithBool:([[currentLineFields objectAtIndex:5] isEqualToString:@"1"]) ? YES : NO];
+	gaze.time = [NSNumber numberWithUnsignedInt:[[currentLineFields objectAtIndex:0] intValue]];
+	
+	return gaze;
+}
+#pragma mark -
+#pragma mark -------PARSE BLOCK-------
 - (void)startBlock
 {
 	currentBlock = [NSEntityDescription insertNewObjectForEntityForName:@"Block" inManagedObjectContext:moc];	
 	[session addBlocksObject:currentBlock];
 	
 	currentBlock.ID = [@"wave " stringByAppendingString:[currentLineFields objectAtIndex:3]];
-	currentBlock.order = [NSNumber numberWithInt:[currentBlock.ID intValue]];
+	currentBlock.order = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:3] intValue]];
 	currentBlock.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 	
 	[currentBlock addConditionsObject:gazeCondition];
@@ -334,57 +357,73 @@
 		[currentBlock addConditionsObject:waveSizeSix];
 	} else if ([waveSize isEqualToString:@"8"]) {
 		[currentBlock addConditionsObject:waveSizeEight];
+	} else {
+		[self parseFailureForType:@"wave size" unparsed:waveSize];
 	}
+	
 	NSString *waveType = [currentLineFields objectAtIndex:5];
 	if ([waveType isEqualToString:@"ran"]) {
 		[currentBlock addConditionsObject:waveTypeRandom];
 	} else if ([waveType isEqualToString:@"pre"]) {
 		[currentBlock addConditionsObject:waveTypePreclassifiable];
+	} else {
+		[self parseFailureForType:@"wave type" unparsed:waveType];
 	}
 }
 
 - (void)endBlock
 {
-	currentBlock.endTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
+	currentBlock.endTime = [NSNumber numberWithInt:blockEndTime];
 	
-	// TODO: Consolidate ongoing gaze samples.
+	// Consolidate ongoing gaze samples.
+	[self consolidateGazesToIndex:[ongoingGazes count] - 1];
+	
 	currentBlock = nil;
-	
-	// TODO: Validate if the end comment has the same string as the start comment.
+	[self saveData];
 }
 
+#pragma mark -
+#pragma mark -------PARSE TRIAL AND SUBTRIAL-------
 - (void)startTrial
 {
 	VFTrial *trial = [NSEntityDescription insertNewObjectForEntityForName:@"Trial" inManagedObjectContext:moc];
 	[currentBlock addTrialsObject:trial];
 	trial.ID = [@"blip " stringByAppendingString:[currentLineFields objectAtIndex:2]];
-	trial.order = [NSNumber numberWithInt:[trial.ID intValue]];
+	trial.order = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:2] intValue]];
 	trial.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 
 	[ongoingTrials setObject:trial forKey:trial.ID];
-
-	if ([[currentLineFields objectAtIndex:5] isEqualToString:@"1"]) {
+	
+	NSString *blipType = [currentLineFields objectAtIndex:5];
+	if ([blipType isEqualToString:@"1"]) {
 		[trial addConditionsObject:blipTypeFighter];
-	} else if ([[currentLineFields objectAtIndex:5] isEqualToString:@"2"]) {
+	} else if ([blipType isEqualToString:@"2"]) {
 		[trial addConditionsObject:blipTypeSupport];
-	} else if ([[currentLineFields objectAtIndex:5] isEqualToString:@"3"]) {
+	} else if ([blipType isEqualToString:@"3"]) {
 		[trial addConditionsObject:blipTypeMissile];
+	} else {
+		[self parseFailureForType:@"blip type" unparsed:blipType];
 	}
 	
-	if ([[currentLineFields objectAtIndex:6] isEqualToString:@"1"]) {
+	NSString *blipDesignation = [currentLineFields objectAtIndex:6];
+	if ([blipDesignation isEqualToString:@"1"]) {
 		[trial addConditionsObject:blipDesignationNeutral];
-	} else if ([[currentLineFields objectAtIndex:6] isEqualToString:@"2"]) {
+	} else if ([blipDesignation isEqualToString:@"2"]) {
 		[trial addConditionsObject:blipDesignationHostile];
+	} else {
+		[self parseFailureForType:@"blip designation" unparsed:blipDesignation];
 	}
 	
 	VFCondition *trackNumCondition = [trackNumConditions objectAtIndex:[[currentLineFields objectAtIndex:10] intValue] - 1];
 	[trial addConditionsObject:trackNumCondition];
 	
-	// TODO: check the coding.
-	if ([[currentLineFields objectAtIndex:7] isEqualToString:@"1"]) {
+	NSString *blipSensor = [currentLineFields objectAtIndex:7];
+	if ([blipSensor isEqualToString:@"1"]) {
 		[trial addConditionsObject:blipSensorFail];
-	} else if ([[currentLineFields objectAtIndex:7] isEqualToString:@"0"]) {
+	} else if ([blipSensor isEqualToString:@"0"]) {
 		[trial addConditionsObject:blipSensorNotFail];
+	} else {
+		[self parseFailureForType:@"blip sensor" unparsed:blipSensor];
 	}
 	
 	// Parse subTrial.
@@ -396,6 +435,7 @@
 	// Parse screen object.
 	VFVisualStimulus *blip = [self makeBlip];
 	blip.label = [currentLineFields objectAtIndex:10];
+	// Black blip.
 	blip.template = [visualStimuliTemplates objectAtIndex:[[currentLineFields objectAtIndex:5] intValue] - 1];
 	
 	[ongoingBlips setObject:blip forKey:blip.ID];
@@ -430,6 +470,18 @@
 	[ongoingTrials removeObjectForKey:trial.ID];
 }
 
+- (void)endLastSubTrial {
+	// End the last subTrial.
+	VFTrial *trial = [ongoingTrials objectForKey:[@"blip " stringByAppendingString:[currentLineFields objectAtIndex:2]]];
+	// End the previous subTrial.
+	for (VFSubTrial *aSubTrial in [trial subTrials]) {
+		if (aSubTrial.endTime == nil) {
+			aSubTrial.endTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue] - 1];
+			break;
+		}
+	}
+}
+
 #pragma mark -
 #pragma mark -------PARSE BLIP EVENTS-------
 - (void)parseBlipMoved
@@ -458,17 +510,21 @@
 	// End last subTrial.
 	[self endLastSubTrial];
 
+	VFTrial *trial = [ongoingTrials objectForKey:[@"blip " stringByAppendingString:[currentLineFields objectAtIndex:2]]];
+	
 	// Start new subTrial
 	VFSubTrial *subTrial = [NSEntityDescription insertNewObjectForEntityForName:@"SubTrial" inManagedObjectContext:moc];
 	if (![[currentLineFields objectAtIndex:6] isEqualToString:@"5"]) // It's not changing to white.
 	{
+		// Add target stimulus.
+		[trial addTargetVisualStimuliObject:newBlip];
+		
 		subTrial.ID = @"InClassify";
 	} else {
 		subTrial.ID = @"PostClassify";
 	}
 	subTrial.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 	// Add it to trial's subTrials list.
-	VFTrial *trial = [ongoingTrials objectForKey:[@"blip " stringByAppendingString:[currentLineFields objectAtIndex:2]]];
 	[trial addSubTrialsObject:subTrial];
 }
 
@@ -476,34 +532,10 @@
 - (void)parseBlipDisappeared
 {
 	VFVisualStimulus *blip = [ongoingBlips objectForKey:[currentLineFields objectAtIndex:2]];
+	// End blip frame.
 	[self endBlipFrameForBlip:blip];
+	// End blip.
 	blip.endTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue] - 1];
-}
-
-#pragma mark -
-#pragma mark ------HELPER METHODS-------
-
-
-- (void)endLastSubTrial {
-	// End the last subTrial.
-	VFTrial *trial = [ongoingTrials objectForKey:[@"blip " stringByAppendingString:[currentLineFields objectAtIndex:2]]];
-	// End the previous subTrial.
-	for (VFSubTrial *aSubTrial in [trial subTrials]) {
-		if (aSubTrial.endTime == nil) {
-			aSubTrial.endTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue] - 1];
-			break;
-		}
-	}
-}
-
-- (NSPoint)makeLocation {
-	// The output blip location indicates the position of the blip icon's left-top corner.
-	NSPoint location;
-	
-	location.x = [[currentLineFields objectAtIndex:3] floatValue];
-	location.y = [[currentLineFields objectAtIndex:4] floatValue];
-	
-	return location;
 }
 
 - (VFVisualStimulus *)makeBlip
@@ -518,13 +550,12 @@
 	return blip;
 }
 
-
 - (VFVisualStimulusFrame *)makeBlipFrame
 {
 	VFVisualStimulusFrame *aFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" inManagedObjectContext:moc];
 	aFrame.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 	aFrame.location = [self makeLocation];
-		
+	
 	return aFrame;
 }
 
@@ -538,14 +569,46 @@
 	}
 }
 
-- (VFGazeSample *)makeGazeSample
+#pragma mark -
+#pragma mark ------PARSE OTHER EVENTS-------
+- (void)parseKeyEvent
 {
-	VFGazeSample *gaze = [NSEntityDescription insertNewObjectForEntityForName:@"GazeSample" inManagedObjectContext:moc];
+	VFKeyboardEvent *keyEvent = [NSEntityDescription insertNewObjectForEntityForName:@"KeyboardEvent" inManagedObjectContext:moc];
+	keyEvent.key = [currentLineFields objectAtIndex:2];
+	NSString *keyCategory = [currentLineFields objectAtIndex:3];
+	if ([keyCategory isEqualToString:@"1"]) {
+		keyEvent.category = @"first key";
+	} else if ([keyCategory isEqualToString:@"2"]) {
+		keyEvent.category = @"second key";
+	} else {
+		[self parseFailureForType:@"key category" unparsed:keyCategory];
+	}
+	keyEvent.time = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
+	[currentBlock addKeyboardEventsObject:keyEvent];
+}
 
-	gaze.location = [self makeLocation];
-	gaze.valid = [NSNumber numberWithBool:([[currentLineFields objectAtIndex:5] isEqualToString:@"1"]) ? YES : NO];
-	gaze.time = [NSNumber numberWithUnsignedInt:[[currentLineFields objectAtIndex:0] intValue]];
-			
-	return gaze;
+- (void)parseSound
+{
+	// TODO: Incomplete.
+	VFAuditoryStimulus *sound = [NSEntityDescription insertNewObjectForEntityForName:@"AuditoryStimulus" inManagedObjectContext:moc];
+	sound.location = [self makeLocation];
+}
+
+#pragma mark -
+#pragma mark ------HELPER METHODS-------
+- (NSPoint)makeLocation 
+{
+	// The output blip location indicates the position of the blip icon's left-top corner.
+	NSPoint location;
+	
+	location.x = [[currentLineFields objectAtIndex:3] floatValue];
+	location.y = [[currentLineFields objectAtIndex:4] floatValue];
+	
+	return location;
+}
+
+- (void)parseFailureForType:(NSString *)failureType unparsed:(NSString *)unparsedString
+{
+	NSLog(@"Parsing %@ failed. The unparsed string is: %@.\n%@", failureType, unparsedString, [lines objectAtIndex:lineNum - 1]);
 }
 @end
