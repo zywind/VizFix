@@ -15,7 +15,9 @@
 	self = [super initWithFrame:frameRect];
     if (self != nil) {
 		imageCacheDict = [NSMutableDictionary dictionaryWithCapacity:10];
-    }
+		viewScale = 100.0 / 100.0;
+		showLabel = YES;
+	}
     return self;
 }
 
@@ -52,6 +54,24 @@
 		[xform invert];
 		[xform concat];
 	}
+}
+
+- (void)drawFrame:(VFVisualStimulusFrame *)frame
+{
+	NSAffineTransform *transform = [NSAffineTransform transform];
+	// Transform the coordinate system to the origin of the ScreenOjbect
+	[transform translateXBy:frame.location.x yBy:frame.location.y];	
+	[transform concat];
+	
+	[self drawVisualStimulusTemplate:frame.ofVisualStimulus.template];
+	if (showLabel) {
+		[frame.ofVisualStimulus.label drawAtPoint:NSMakePoint(0, 0)
+		 withAttributes:[NSDictionary dictionaryWithObject:[NSColor whiteColor] 
+													forKey:NSForegroundColorAttributeName]];
+	}
+	
+	[transform invert];
+	[transform concat];
 }
 
 - (void)drawGazes 
@@ -135,29 +155,39 @@
 	// Save the previous graphics state
 	[NSGraphicsContext saveGraphicsState];
 	
-	// Draw background.
+	[[NSColor grayColor] drawSwatchInRect:rect];
+	
 	VFSession *session = [sessionController content];
+
+//	double viewWidth = [session.screenResolutionWidth floatValue] * viewScale;
+//	double scrollViewWidth = [scrollView.contentView frame].size.width;
+//	if (viewWidth < scrollViewWidth) {
+//		[self setFrame:NSMakeRect((scrollViewWidth - viewWidth)/2.0, 0.0, rect.size.width, rect.size.height)];
+//		[self setNeedsDisplay:YES];
+//	}
+	
+	NSAffineTransform* xform = [NSAffineTransform transform];
+	[xform scaleXBy:viewScale yBy:viewScale];
+	[xform concat];
+	
+	// Draw background.
 	[self drawVisualStimulusTemplate:session.background];
 	
 	// Draw screen objects.
 	for (int i = 0; i < [[visualStimuliController arrangedObjects] count]; i++)
 	{
 		[visualStimuliController setSelectionIndex:i];
-		VFVisualStimulus * eachVisualStimulus = [[visualStimuliController selectedObjects] objectAtIndex:0];
-		for (VFVisualStimulusFrame *eachFrame in [visualStimulusFramesController arrangedObjects]) {
-			NSAffineTransform *transform = [NSAffineTransform transform];
-			// Transform the coordinate system to the origin of the ScreenOjbect
-			[transform translateXBy:eachFrame.location.x yBy:eachFrame.location.y];	
-			[transform concat];
-			
-			[self drawVisualStimulusTemplate:eachVisualStimulus.template];
-			
-			[transform invert];
-			[transform concat];
-			
-			[eachVisualStimulus.label drawAtPoint:eachFrame.location
-			 withAttributes:[NSDictionary dictionaryWithObject:[NSColor whiteColor] 
-														forKey:NSForegroundColorAttributeName]];
+		NSArray *frames = [visualStimulusFramesController arrangedObjects];
+		
+		// In summary mode.
+		if (![viewModeController content]) {
+			VFVisualStimulusFrame *frame = [frames objectAtIndex:0];
+			[self drawFrame:frame];
+		} else {
+			for (int j = 0; j < [frames count]; j = j+20) {
+				VFVisualStimulusFrame *eachFrame = [frames objectAtIndex:j];
+				[self drawFrame:eachFrame];
+			}
 		}
 	}
 	
@@ -185,10 +215,20 @@
 	return YES;
 }
 
-- (NSArray*)zorderSortDescriptor
+- (IBAction)setViewScale:(id)sender
 {
-	NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"zorder" ascending:YES];
-	return [NSArray arrayWithObject:sort];
+	sender = (NSComboBox *)sender;
+	viewScale = [[sender objectValueOfSelectedItem] doubleValue] / 100.0;
+	VFSession *session = [sessionController content];
+	NSSize originalFrameSize = NSMakeSize([session.screenResolutionWidth floatValue], 
+								   [session.screenResolutionHeight floatValue]);
+	[self setFrameSize:NSMakeSize(originalFrameSize.width * viewScale, originalFrameSize.height * viewScale)];
+	[self setNeedsDisplay:YES];
 }
 
+- (void)setShowLabel:(BOOL)value;
+{
+	showLabel = !showLabel;
+	[self setNeedsDisplay:YES];
+}
 @end

@@ -32,7 +32,7 @@
 		playbackSpeedModifiers = [NSArray arrayWithObjects:[NSNumber numberWithDouble:0.1/1.0], 
 								  [NSNumber numberWithDouble:0.3/1.0], [NSNumber numberWithDouble:0.5/1.0], 
 								  [NSNumber numberWithDouble:1.0/1.0], [NSNumber numberWithDouble:2.0/1.0], nil];
-		playbackSpeedModifiersIndex = 1;
+		playbackSpeedModifiersIndex = 2; // Default speed 0.5/1.0.
     }
     return self;
 }
@@ -114,6 +114,13 @@
 	return [NSArray arrayWithObject:sort];
 }
 
+- (NSArray*)visualStimuliSortDescriptor
+{
+	NSSortDescriptor *zorderSort = [[NSSortDescriptor alloc] initWithKey:@"template.zorder" ascending:YES];
+	NSSortDescriptor *timeSort = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
+	return [NSArray arrayWithObjects:zorderSort, timeSort, nil];
+}
+
 - (void)updateViewContents
 {
 	NSPredicate *predicateForTimePeriod, *timePredicate;
@@ -162,11 +169,13 @@
 {
 	playing = !playing;
 	if (playing) {
-		playTimer = [NSTimer scheduledTimerWithTimeInterval:(1.0/viewRefreshRate)
-													 target:self 
-												   selector:@selector(increaseCurrentTime:) 
-												   userInfo:nil 
-													repeats:YES];
+		NSRunLoop *runloop = [NSRunLoop currentRunLoop];
+		playTimer = [NSTimer timerWithTimeInterval:(1.0/viewRefreshRate)
+											target:self 
+										  selector:@selector(increaseCurrentTime:) 
+										  userInfo:nil 
+										   repeats:YES];
+		[runloop addTimer:playTimer forMode:NSRunLoopCommonModes];
 	} else {
 		[playTimer invalidate];
 	}
@@ -423,5 +432,12 @@
 		self.viewEndTime = [selectedBlock.endTime intValue];
 	}
 	self.currentTime = self.viewStartTime;
+}
+
+- (IBAction)toggleShowLabel:(id)sender
+{
+	sender = (NSMenuItem *)sender;
+	[layoutView setShowLabel:[sender state]];
+	[sender setState:![sender state]];
 }
 @end

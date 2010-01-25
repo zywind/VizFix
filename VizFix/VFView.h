@@ -15,7 +15,7 @@
 #import "VFSession.h"
 #import "VFFixation.h"
 
-@interface VFView : NSClipView {
+@interface VFView : NSView {
 	IBOutlet NSArrayController *visualStimuliController;
 	IBOutlet NSArrayController *visualStimulusFramesController;
 	IBOutlet NSArrayController *gazeSampleController;
@@ -23,10 +23,16 @@
 	IBOutlet NSObjectController *sessionController;
 
 	IBOutlet NSObjectController *fileURLController;
+	IBOutlet NSScrollView *scrollView;
+	double viewScale;
+	
+	IBOutlet NSObjectController *viewModeController;
 	
 	NSMutableDictionary *imageCacheDict;
+	BOOL showLabel;
 }
 
-- (NSArray*)zorderSortDescriptor;
 - (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate;
+- (void)setShowLabel:(BOOL)value;
+- (IBAction)setViewScale:(id)sender;
 @end

@@ -26,26 +26,25 @@
 	IBOutlet NSArrayController *fixationController;
 	IBOutlet NSObjectController *sessionController;
 	IBOutlet NSArrayController *blockController;
+	
 	IBOutlet NSTreeController *treeController;
 	IBOutlet NSArrayController *tableViewController;
-	
 	IBOutlet NSObjectController *fileURLController;
-	
-	IBOutlet VFView *layoutView;
+
 	IBOutlet NSSplitView *splitView;
-	IBOutlet NSSlider *slider;
+	PrioritySplitViewDelegate *splitViewDelegate;
 	IBOutlet NSButton *playButton;
 	
 	VFSession *session;
-	PrioritySplitViewDelegate *splitViewDelegate;
 	
-	double viewStartTime;
-	double viewEndTime;
-	double currentTime;
+	IBOutlet VFView	*layoutView;
 	double viewRefreshRate;
 	NSArray *playbackSpeedModifiers;
 	int playbackSpeedModifiersIndex;
-	
+	double viewStartTime;
+	double viewEndTime;
+	double currentTime;
+		
 	NSTimer *playTimer;
 	
 	BOOL playing;
@@ -58,12 +57,15 @@
 @property (nonatomic, assign) BOOL inSummaryMode;
 
 - (NSArray *)startTimeSortDescriptor;
+- (NSArray *)visualStimuliSortDescriptor;
 - (NSArray *)timeSortDescriptor;
+
 - (void)updateViewContents;
 
 - (IBAction)togglePlayState:(id)sender;
 - (IBAction)speedUp:(id)sender;
 - (IBAction)slowDown:(id)sender;
+- (IBAction)toggleShowLabel:(id)sender;
 
 - (void)increaseCurrentTime:(NSTimer*)theTimer;
 - (IBAction)toggleSummaryMode:(id)sender;
