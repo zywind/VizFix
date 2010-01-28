@@ -68,10 +68,10 @@
 - (IBAction)togglePlayState:(id)sender;
 - (IBAction)speedUp:(id)sender;
 - (IBAction)slowDown:(id)sender;
+- (void)increaseCurrentTime:(NSTimer*)theTimer;
+
 - (IBAction)toggleShowLabel:(id)sender;
 
-- (void)increaseCurrentTime:(NSTimer*)theTimer;
-- (IBAction)toggleSummaryMode:(id)sender;
 - (void)changeSelectedGroup;
 - (IBAction)detectFixations:(id)sender;
 @end

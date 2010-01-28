@@ -111,12 +111,12 @@
 		
 		NSColor *color;
 		if ([fixations count] == 1) {
-			color = [NSColor colorWithCalibratedHue:0.75 
+			color = [NSColor colorWithCalibratedHue:1 
 										 saturation:0.5 
 										 brightness:1.0 
 											  alpha:1.0];
 		} else {
-			color = [NSColor colorWithCalibratedHue:0.75 
+			color = [NSColor colorWithCalibratedHue:1 
 										 saturation:(1.0 - ((i / (float)[fixations count]) / 2.0)) 
 										 brightness:(0.5 + ((i / (float)[fixations count]) / 2.0)) 
 											  alpha:1.0];
@@ -188,7 +188,6 @@
 		}
 	}
 	
-	// Draw gazes.
 	[self drawGazes];
 	
 	// Draw fixations
@@ -215,7 +214,12 @@
 - (IBAction)setViewScale:(id)sender
 {
 	sender = (NSComboBox *)sender;
-	viewScale = [[sender objectValueOfSelectedItem] doubleValue] / 100.0;
+	
+	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+	[numberFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+	[numberFormatter setNumberStyle:NSNumberFormatterPercentStyle];
+	
+	viewScale = [[numberFormatter numberFromString:[sender objectValueOfSelectedItem]] doubleValue];
 	VFSession *session = [sessionController content];
 	NSSize originalFrameSize = NSMakeSize([session.screenResolutionWidth floatValue], 
 								   [session.screenResolutionHeight floatValue]);

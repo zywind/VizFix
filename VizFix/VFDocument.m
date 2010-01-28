@@ -70,7 +70,6 @@
 	}
 	
 	[sessionController setContent:session];
-
 	
 	[layoutView setFrameSize:NSMakeSize([session.screenResolutionWidth floatValue] * 0.5,
 										[session.screenResolutionHeight floatValue] * 0.5)];
@@ -98,6 +97,7 @@
 	
 	[splitView setDelegate:splitViewDelegate];
 	
+	// For centering the view in scrollview
 	id docView = [scrollView documentView];
 	id newClipView = [[SBCenteringClipView alloc] initWithFrame:[[scrollView contentView] frame]];
 	[newClipView setBackgroundColor:[NSColor windowBackgroundColor]];
@@ -160,12 +160,6 @@
 			[playButton performClick:self];
 		}
 		
-		if (self.inSummaryMode) {
-			[playButton setEnabled:NO];
-		} else {
-			[playButton setEnabled:YES];
-		}
-		
 		[self updateViewContents];
 	} else if (object == treeController && [keyPath isEqualToString:@"selectionIndexPaths"]) {
 		[self changeSelectedGroup];
@@ -182,7 +176,7 @@
 										  selector:@selector(increaseCurrentTime:) 
 										  userInfo:nil 
 										   repeats:YES];
-		[runloop addTimer:playTimer forMode:NSRunLoopCommonModes];
+		[runloop addTimer:playTimer forMode:NSDefaultRunLoopMode];
 	} else {
 		[playTimer invalidate];
 	}
@@ -211,13 +205,6 @@
 		[playButton performClick:self];
 		self.currentTime = self.viewStartTime;
 	}
-}
-
-- (IBAction)toggleSummaryMode:(id)sender
-{
-	NSArray *menuTitles = [NSArray arrayWithObjects:@"Switch to Summary Mode", @"Switch to Playback Mode", nil];
-	self.inSummaryMode = !self.inSummaryMode;
-	[(NSMenuItem *)sender setTitle:[menuTitles objectAtIndex:inSummaryMode]];
 }
 
 - (void)alertDidEnd:(NSAlert *)alert returnCode:(int)returnCode
@@ -439,6 +426,18 @@
 		self.viewEndTime = [selectedBlock.endTime intValue];
 	}
 	self.currentTime = self.viewStartTime;
+}
+
+- (BOOL)validateUserInterfaceItem:(id < NSValidatedUserInterfaceItem >)anItem
+{
+	SEL theAction = [anItem action];
+	if (theAction == @selector(toggleShowLabel:)) {
+		//NSMenuItem *menuItem = (NSMenuItem *)anItem;
+		//[menuItem setState:NSOffState];
+	}
+	
+	return YES;
+	
 }
 
 - (IBAction)toggleShowLabel:(id)sender
