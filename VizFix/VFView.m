@@ -15,7 +15,7 @@
 	self = [super initWithFrame:frameRect];
     if (self != nil) {
 		imageCacheDict = [NSMutableDictionary dictionaryWithCapacity:10];
-		viewScale = 100.0 / 100.0;
+		viewScale = 50.0 / 100.0;
 		showLabel = YES;
 	}
     return self;
@@ -154,9 +154,7 @@
 {
 	// Save the previous graphics state
 	[NSGraphicsContext saveGraphicsState];
-	
-	[[NSColor grayColor] drawSwatchInRect:rect];
-	
+		
 	VFSession *session = [sessionController content];
 
 //	double viewWidth = [session.screenResolutionWidth floatValue] * viewScale;
@@ -169,7 +167,6 @@
 	NSAffineTransform* xform = [NSAffineTransform transform];
 	[xform scaleXBy:viewScale yBy:viewScale];
 	[xform concat];
-	
 	// Draw background.
 	[self drawVisualStimulusTemplate:session.background];
 	
@@ -222,7 +219,8 @@
 	VFSession *session = [sessionController content];
 	NSSize originalFrameSize = NSMakeSize([session.screenResolutionWidth floatValue], 
 								   [session.screenResolutionHeight floatValue]);
-	[self setFrameSize:NSMakeSize(originalFrameSize.width * viewScale, originalFrameSize.height * viewScale)];
+	[self setFrameSize:NSMakeSize(originalFrameSize.width * viewScale, 
+								  originalFrameSize.height * viewScale)];
 	[self setNeedsDisplay:YES];
 }
 

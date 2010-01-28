@@ -16,6 +16,7 @@
 #import "VFDTFixationAlg.h"
 #import "VFCondition.h"
 #import "VFResponse.h"
+#import "SBCenteringClipView.h"
 
 @class PrioritySplitViewDelegate;
 
@@ -34,6 +35,8 @@
 	IBOutlet NSSplitView *splitView;
 	PrioritySplitViewDelegate *splitViewDelegate;
 	IBOutlet NSButton *playButton;
+	
+	IBOutlet NSScrollView *scrollView;
 	
 	VFSession *session;
 	

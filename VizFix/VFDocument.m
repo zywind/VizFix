@@ -72,7 +72,8 @@
 	[sessionController setContent:session];
 
 	
-	[layoutView setFrameSize:NSMakeSize([session.screenResolutionWidth floatValue], [session.screenResolutionHeight floatValue])];
+	[layoutView setFrameSize:NSMakeSize([session.screenResolutionWidth floatValue] * 0.5,
+										[session.screenResolutionHeight floatValue] * 0.5)];
 	NSUInteger indexArr [] = {0, 0, 0, 0};
 	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndexes:indexArr length:4]];
 	
@@ -96,6 +97,12 @@
 	 forViewAtIndex:RIGHT_VIEW_INDEX];
 	
 	[splitView setDelegate:splitViewDelegate];
+	
+	id docView = [scrollView documentView];
+	id newClipView = [[SBCenteringClipView alloc] initWithFrame:[[scrollView contentView] frame]];
+	[newClipView setBackgroundColor:[NSColor windowBackgroundColor]];
+	[newClipView setDocumentView:docView];
+	[scrollView setContentView:(NSClipView *)newClipView];
 }
 
 //	This returns the sort descriptor (in an array) used

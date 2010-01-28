@@ -25,6 +25,7 @@
 		3BC50480110ADB880004A125 /* VFCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5046F110ADB880004A125 /* VFCustomEvent.m */; };
 		3BC50481110ADB880004A125 /* VFSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50471110ADB880004A125 /* VFSession.m */; };
 		3BC50482110ADB880004A125 /* VFFixation.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50473110ADB880004A125 /* VFFixation.m */; };
+		3BC64F4511113D59006F36CE /* SBCenteringClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC64F4411113D59006F36CE /* SBCenteringClipView.m */; };
 		3BE64ABE110595A1008D8939 /* VFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BE64ABD110595A1008D8939 /* VFAppDelegate.m */; };
 		3BEBF0B811027E3B00E27227 /* PrioritySplitViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BEBF0B711027E3B00E27227 /* PrioritySplitViewDelegate.m */; };
 		3BF011971104FA2B00A309E2 /* VFDTFixationAlg.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BF011961104FA2B00A309E2 /* VFDTFixationAlg.m */; };
@@ -78,6 +79,8 @@
 		3BC50471110ADB880004A125 /* VFSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VFSession.m; path = managedObjects/VFSession.m; sourceTree = "<group>"; };
 		3BC50472110ADB880004A125 /* VFFixation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFFixation.h; path = managedObjects/VFFixation.h; sourceTree = "<group>"; };
 		3BC50473110ADB880004A125 /* VFFixation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VFFixation.m; path = managedObjects/VFFixation.m; sourceTree = "<group>"; };
+		3BC64F4311113D59006F36CE /* SBCenteringClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBCenteringClipView.h; sourceTree = "<group>"; };
+		3BC64F4411113D59006F36CE /* SBCenteringClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBCenteringClipView.m; sourceTree = "<group>"; };
 		3BE64ABC110595A1008D8939 /* VFAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFAppDelegate.h; sourceTree = "<group>"; };
 		3BE64ABD110595A1008D8939 /* VFAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFAppDelegate.m; sourceTree = "<group>"; };
 		3BEBF0B611027E3B00E27227 /* PrioritySplitViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrioritySplitViewDelegate.h; sourceTree = "<group>"; };
@@ -154,6 +157,8 @@
 				3BF011961104FA2B00A309E2 /* VFDTFixationAlg.m */,
 				3BE64ABC110595A1008D8939 /* VFAppDelegate.h */,
 				3BE64ABD110595A1008D8939 /* VFAppDelegate.m */,
+				3BC64F4311113D59006F36CE /* SBCenteringClipView.h */,
+				3BC64F4411113D59006F36CE /* SBCenteringClipView.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -311,6 +316,7 @@
 				3BC50480110ADB880004A125 /* VFCustomEvent.m in Sources */,
 				3BC50481110ADB880004A125 /* VFSession.m in Sources */,
 				3BC50482110ADB880004A125 /* VFFixation.m in Sources */,
+				3BC64F4511113D59006F36CE /* SBCenteringClipView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
