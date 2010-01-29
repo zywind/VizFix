@@ -32,13 +32,11 @@
 - (void)import:(NSURL *)rawDataFileURL
 {
 	session = [NSEntityDescription insertNewObjectForEntityForName:@"Session" inManagedObjectContext:moc];
-	session.distanceToScreen = [NSNumber numberWithInt:6098]; // in mm.
-	session.screenResolutionWidth = [NSNumber numberWithInt:1280]; // in pixel.
-	session.screenResolutionHeight = [NSNumber numberWithInt:1024];
+	session.distanceToScreen = [NSNumber numberWithInt:610]; // in mm.
+	session.screenResolution = NSMakeSize(1280.0, 1024.0); // in pixel.
 	session.experiment = @"NRL Dual Task";
 	session.gazeSampleRate = [NSNumber numberWithInt:120]; // per second.
-	session.screenDimensionWidth = [NSNumber numberWithInt:432]; // in mm.
-	session.screenDimensionHeight = [NSNumber numberWithInt:407]; // in mm.
+	session.screenDimension = NSMakeSize(432.0, 407.0); // in mm.
 	VFVisualStimulusTemplate *backgroundTemplate = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate"
 																				 inManagedObjectContext:moc];
 	backgroundTemplate.imageFilePath = @"img/background.png";

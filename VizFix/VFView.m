@@ -10,52 +10,93 @@
 
 @implementation VFView
 
+@synthesize showLabel;
+@synthesize showAutoAOI;
+@synthesize inSummaryMode;
+@synthesize dataURL;
+@synthesize viewScale;
+@synthesize showGazeSample;
+
 - (id)initWithFrame:(NSRect)frameRect
 {
 	self = [super initWithFrame:frameRect];
     if (self != nil) {
 		imageCacheDict = [NSMutableDictionary dictionaryWithCapacity:10];
-		viewScale = 50.0 / 100.0;
+		viewScale = 100.0 / 100.0;
 		showLabel = YES;
+		showGazeSample = YES;
+		showAutoAOI = NO;
+		[self addObserver:self forKeyPath:@"showLabel" options:NSKeyValueObservingOptionNew context:NULL];
+		[self addObserver:self forKeyPath:@"showAutoAOI" options:NSKeyValueObservingOptionNew context:NULL];
+		[self addObserver:self forKeyPath:@"showGazeSample" options:NSKeyValueObservingOptionNew context:NULL];
+		[self addObserver:self forKeyPath:@"viewScale" options:NSKeyValueObservingOptionNew context:NULL];
 	}
     return self;
 }
 
-- (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate;
+- (void)setSession:(VFSession *)aSession
 {
-	if (visualStimulusTemplate.fillColor != nil) {
-		[visualStimulusTemplate.fillColor setFill];
-		[visualStimulusTemplate.bound fill];
-	} else if (visualStimulusTemplate.imageFilePath != nil) {
-		NSURL *imageURL = [NSURL URLWithString:visualStimulusTemplate.imageFilePath 
-								 relativeToURL:[fileURLController content]];
-		
-		NSImage *stimulusImage = [imageCacheDict valueForKey:visualStimulusTemplate.imageFilePath];
-		if (stimulusImage == nil) {
-			stimulusImage = [[NSImage alloc] initWithContentsOfURL:imageURL];
-			// Cache loaded images.
-			[imageCacheDict setValue:stimulusImage forKey:visualStimulusTemplate.imageFilePath];
-			
-			if (stimulusImage == nil) {
-				NSLog(@"Image file %@ does not exist.", [imageURL path]);
-			}
-		}
-				
-		NSAffineTransform* xform = [NSAffineTransform transform];
-		[xform translateXBy:0.0 yBy:stimulusImage.size.height];
-		[xform scaleXBy:1.0 yBy:-1.0];
-		[xform concat];
-		
-		[stimulusImage drawAtPoint:NSMakePoint(0.0f, 0.0f) 
-						 fromRect:NSZeroRect 
-						operation:NSCompositeSourceOver
-						 fraction:1.0];
-		
-		[xform invert];
-		[xform concat];
-	}
+	session = aSession;
+	DOVConverter = [[VFVisualAngleConverter alloc] initWithDistanceToScreen:[session.distanceToScreen intValue]
+														   screenResolution:session.screenResolution 
+															screenDimension:session.screenDimension];
+	[self setFrameSize:session.screenResolution];
 }
 
+- (BOOL)isFlipped
+{
+	return YES;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	[self setNeedsDisplay:YES];	
+}
+
+- (void)drawRect:(NSRect)rect
+{
+	// Save the previous graphics state
+	[NSGraphicsContext saveGraphicsState];
+	
+	NSAffineTransform* xform = [NSAffineTransform transform];
+	[xform scaleXBy:viewScale yBy:viewScale];
+	[xform concat];
+	// Draw background.
+	[self drawVisualStimulusTemplate:session.background];
+	
+	// Draw screen objects.
+	for (int i = 0; i < [[visualStimuliController arrangedObjects] count]; i++)
+	{
+		[visualStimuliController setSelectionIndex:i];
+		NSArray *frames = [visualStimulusFramesController arrangedObjects];
+		
+		// In summary mode.
+		if (!inSummaryMode) {
+			VFVisualStimulusFrame *frame = [frames objectAtIndex:0];
+			[self drawFrame:frame];
+		} else {
+			// TODO: Make this more general. For example, test the location difference between two frames.
+			for (int j = 0; j < [frames count]; j = j+20) {
+				VFVisualStimulusFrame *eachFrame = [frames objectAtIndex:j];
+				[self drawFrame:eachFrame];
+			}
+		}
+	}
+	
+	if (showGazeSample) {
+		[self drawGazes];
+	}
+	
+	// Draw fixations
+	[self drawFixations];
+	
+	//	Restore the previous graphics state
+	//	saved at the beginning of this method
+	[NSGraphicsContext restoreGraphicsState];	
+}
+
+#pragma mark -
+#pragma mark ---------DRAW HELPER METHODS---------
 - (void)drawFrame:(VFVisualStimulusFrame *)frame
 {
 	NSAffineTransform *transform = [NSAffineTransform transform];
@@ -74,17 +115,71 @@
 	[transform concat];
 }
 
+- (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate
+{
+	NSPoint center;
+	if (visualStimulusTemplate.fillColor != nil) {
+		[visualStimulusTemplate.fillColor setFill];
+		[visualStimulusTemplate.bound fill];
+		center = NSMakePoint(NSMidX([visualStimulusTemplate.bound bounds]), 
+							 NSMidY([visualStimulusTemplate.bound bounds]));
+	} else if (visualStimulusTemplate.imageFilePath != nil) {
+		NSURL *imageURL = [NSURL URLWithString:visualStimulusTemplate.imageFilePath 
+								 relativeToURL:dataURL];
+		
+		NSImage *stimulusImage = [imageCacheDict valueForKey:visualStimulusTemplate.imageFilePath];
+		if (stimulusImage == nil) {
+			stimulusImage = [[NSImage alloc] initWithContentsOfURL:imageURL];
+			// Cache loaded images.
+			[imageCacheDict setValue:stimulusImage forKey:visualStimulusTemplate.imageFilePath];
+			
+			if (stimulusImage == nil) {
+				NSLog(@"Image file %@ does not exist.", [imageURL path]);
+			}
+		}
+		
+		center = NSMakePoint([stimulusImage size].width / 2, [stimulusImage size].height / 2);
+		
+		NSAffineTransform* xform = [NSAffineTransform transform];
+		[xform translateXBy:0.0 yBy:stimulusImage.size.height];
+		[xform scaleXBy:1.0 yBy:-1.0];
+		[xform concat];
+		
+		[stimulusImage drawAtPoint:NSMakePoint(0.0f, 0.0f) 
+						 fromRect:NSZeroRect 
+						operation:NSCompositeSourceOver
+						 fraction:1.0];
+		
+		
+		[xform invert];
+		[xform concat];
+	}
+	
+	// If it's drawing background, there's no need to draw auto-AOI.
+	if (![visualStimulusTemplate.category isEqualToString:@"background"] && showAutoAOI) {
+		double width = [DOVConverter horizontalPixelsFromVisualAngles:1.0];
+		double height = [DOVConverter verticalPixelsFromVisualAngles:1.0];
+		
+		NSRect foveaZoneRect = NSMakeRect(center.x - width/2, center.y - height/2, width, height);
+		
+		NSBezierPath *foveaZonePath = [NSBezierPath bezierPathWithOvalInRect:foveaZoneRect];
+		
+		[[NSColor grayColor] set];
+		[foveaZonePath stroke];
+	}
+}
+
 - (void)drawGazes 
 {
 	int i=0;
 	NSArray *gazes = [gazeSampleController arrangedObjects];
 	for (VFGazeSample *eachGaze in gazes)
 	{
-		//	TEH I should add conditions so that samples outside
-		//	the session screen resolution do not draw.
+		// TEH I should add conditions so that samples outside
+		// the session screen resolution do not draw.
 		if([[eachGaze valueForKey:@"valid"] boolValue])
 		{
-			//	Increase the brightness and decrease saturation as the samples progress
+			// Increase the brightness and decrease saturation as the samples progress
 			[[NSColor colorWithCalibratedHue:0.5 
 								  saturation:(1.0 - ((i / (float)[gazes count]) / 2.0)) 
 								  brightness:(0.5 + ((i / (float)[gazes count]) / 2.0))
@@ -111,19 +206,18 @@
 		
 		NSColor *color;
 		if ([fixations count] == 1) {
-			color = [NSColor colorWithCalibratedHue:1 
+			color = [NSColor colorWithCalibratedHue:0.8 
 										 saturation:0.5 
 										 brightness:1.0 
 											  alpha:1.0];
 		} else {
-			color = [NSColor colorWithCalibratedHue:1 
+			color = [NSColor colorWithCalibratedHue:0.8 
 										 saturation:(1.0 - ((i / (float)[fixations count]) / 2.0)) 
 										 brightness:(0.5 + ((i / (float)[fixations count]) / 2.0)) 
 											  alpha:1.0];
 		}
 		
-		[color setFill];
-		[color setStroke];
+		[color set];
 		NSRect innerRect = NSMakeRect( x - 3.0, y - 3.0, 6.0, 6.0);
 		
 		NSBezierPath *fixLocPath = [NSBezierPath bezierPathWithOvalInRect:innerRect];
@@ -150,68 +244,7 @@
 	}
 }
 
-- (void)drawRect:(NSRect)rect
-{
-	// Save the previous graphics state
-	[NSGraphicsContext saveGraphicsState];
-		
-	VFSession *session = [sessionController content];
-
-//	double viewWidth = [session.screenResolutionWidth floatValue] * viewScale;
-//	double scrollViewWidth = [scrollView.contentView frame].size.width;
-//	if (viewWidth < scrollViewWidth) {
-//		[self setFrame:NSMakeRect((scrollViewWidth - viewWidth)/2.0, 0.0, rect.size.width, rect.size.height)];
-//		[self setNeedsDisplay:YES];
-//	}
-	
-	NSAffineTransform* xform = [NSAffineTransform transform];
-	[xform scaleXBy:viewScale yBy:viewScale];
-	[xform concat];
-	// Draw background.
-	[self drawVisualStimulusTemplate:session.background];
-	
-	// Draw screen objects.
-	for (int i = 0; i < [[visualStimuliController arrangedObjects] count]; i++)
-	{
-		[visualStimuliController setSelectionIndex:i];
-		NSArray *frames = [visualStimulusFramesController arrangedObjects];
-		
-		// In summary mode.
-		if (![viewModeController content]) {
-			VFVisualStimulusFrame *frame = [frames objectAtIndex:0];
-			[self drawFrame:frame];
-		} else {
-			for (int j = 0; j < [frames count]; j = j+20) {
-				VFVisualStimulusFrame *eachFrame = [frames objectAtIndex:j];
-				[self drawFrame:eachFrame];
-			}
-		}
-	}
-	
-	[self drawGazes];
-	
-	// Draw fixations
-	[self drawFixations];
-	
-	//	Restore the previous graphics state
-	//	saved at the beginning of this method
-	[NSGraphicsContext restoreGraphicsState];	
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-	if(object == visualStimuliController && [keyPath isEqualToString:@"filterPredicate"])
-	{
-		[self setNeedsDisplay:YES];
-	}
-}
-
-- (BOOL)isFlipped
-{
-	return YES;
-}
-
-- (IBAction)setViewScale:(id)sender
+- (IBAction)changeViewScale:(id)sender
 {
 	sender = (NSComboBox *)sender;
 	
@@ -219,18 +252,10 @@
 	[numberFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
 	[numberFormatter setNumberStyle:NSNumberFormatterPercentStyle];
 	
-	viewScale = [[numberFormatter numberFromString:[sender objectValueOfSelectedItem]] doubleValue];
-	VFSession *session = [sessionController content];
-	NSSize originalFrameSize = NSMakeSize([session.screenResolutionWidth floatValue], 
-								   [session.screenResolutionHeight floatValue]);
-	[self setFrameSize:NSMakeSize(originalFrameSize.width * viewScale, 
-								  originalFrameSize.height * viewScale)];
-	[self setNeedsDisplay:YES];
+	self.viewScale = [[numberFormatter numberFromString:[sender objectValueOfSelectedItem]] doubleValue];
+	
+	[self setFrameSize:NSMakeSize(session.screenResolution.width * viewScale, 
+								  session.screenResolution.height * viewScale)];
 }
 
-- (void)setShowLabel:(BOOL)value;
-{
-	showLabel = !showLabel;
-	[self setNeedsDisplay:YES];
-}
 @end

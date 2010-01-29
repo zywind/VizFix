@@ -29,6 +29,7 @@
 		3BE64ABE110595A1008D8939 /* VFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BE64ABD110595A1008D8939 /* VFAppDelegate.m */; };
 		3BEBF0B811027E3B00E27227 /* PrioritySplitViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BEBF0B711027E3B00E27227 /* PrioritySplitViewDelegate.m */; };
 		3BF011971104FA2B00A309E2 /* VFDTFixationAlg.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BF011961104FA2B00A309E2 /* VFDTFixationAlg.m */; };
+		3BF776171112175A00061B38 /* VFVisualAngleConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BF776161112175A00061B38 /* VFVisualAngleConverter.m */; };
 		775BDEF1067A8BF0009058FE /* VFModel.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 775BDEF0067A8BF0009058FE /* VFModel.xcdatamodel */; };
 		775DFF38067A968500C5B868 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
@@ -87,6 +88,8 @@
 		3BEBF0B711027E3B00E27227 /* PrioritySplitViewDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrioritySplitViewDelegate.m; sourceTree = "<group>"; };
 		3BF011951104FA2B00A309E2 /* VFDTFixationAlg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFDTFixationAlg.h; sourceTree = "<group>"; };
 		3BF011961104FA2B00A309E2 /* VFDTFixationAlg.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFDTFixationAlg.m; sourceTree = "<group>"; };
+		3BF776151112175A00061B38 /* VFVisualAngleConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFVisualAngleConverter.h; sourceTree = "<group>"; };
+		3BF776161112175A00061B38 /* VFVisualAngleConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFVisualAngleConverter.m; sourceTree = "<group>"; };
 		775BDEF0067A8BF0009058FE /* VFModel.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = VFModel.xcdatamodel; sourceTree = "<group>"; };
 		7788DA0506752A1600599AAD /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -147,8 +150,7 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				3BEBF0B611027E3B00E27227 /* PrioritySplitViewDelegate.h */,
-				3BEBF0B711027E3B00E27227 /* PrioritySplitViewDelegate.m */,
+				3BF777A811125BC300061B38 /* UI Helpers */,
 				3B3D734C11066FBA00C03AEA /* VFDocument.h */,
 				2A37F4ACFDCFA73011CA2CEA /* VFDocument.m */,
 				3BC19E871100FD9B00AD4968 /* VFView.h */,
@@ -157,8 +159,8 @@
 				3BF011961104FA2B00A309E2 /* VFDTFixationAlg.m */,
 				3BE64ABC110595A1008D8939 /* VFAppDelegate.h */,
 				3BE64ABD110595A1008D8939 /* VFAppDelegate.m */,
-				3BC64F4311113D59006F36CE /* SBCenteringClipView.h */,
-				3BC64F4411113D59006F36CE /* SBCenteringClipView.m */,
+				3BF776151112175A00061B38 /* VFVisualAngleConverter.h */,
+				3BF776161112175A00061B38 /* VFVisualAngleConverter.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -197,6 +199,17 @@
 			children = (
 			);
 			name = "Manged Objects";
+			sourceTree = "<group>";
+		};
+		3BF777A811125BC300061B38 /* UI Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				3BEBF0B611027E3B00E27227 /* PrioritySplitViewDelegate.h */,
+				3BEBF0B711027E3B00E27227 /* PrioritySplitViewDelegate.m */,
+				3BC64F4311113D59006F36CE /* SBCenteringClipView.h */,
+				3BC64F4411113D59006F36CE /* SBCenteringClipView.m */,
+			);
+			name = "UI Helpers";
 			sourceTree = "<group>";
 		};
 		E1B74B1A0667B4A90069E3BA /* Models */ = {
@@ -317,6 +330,7 @@
 				3BC50481110ADB880004A125 /* VFSession.m in Sources */,
 				3BC50482110ADB880004A125 /* VFFixation.m in Sources */,
 				3BC64F4511113D59006F36CE /* SBCenteringClipView.m in Sources */,
+				3BF776171112175A00061B38 /* VFVisualAngleConverter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

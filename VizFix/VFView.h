@@ -14,25 +14,40 @@
 #import "VFGazeSample.h"
 #import "VFSession.h"
 #import "VFFixation.h"
+#import "VFVisualAngleConverter.h"
 
 @interface VFView : NSView {
 	IBOutlet NSArrayController *visualStimuliController;
 	IBOutlet NSArrayController *visualStimulusFramesController;
 	IBOutlet NSArrayController *gazeSampleController;
 	IBOutlet NSArrayController *fixationController;
-	IBOutlet NSObjectController *sessionController;
-
-	IBOutlet NSObjectController *fileURLController;
-	IBOutlet NSScrollView *scrollView;
-	double viewScale;
-	
-	IBOutlet NSObjectController *viewModeController;
+	VFSession *session;
+	NSURL *dataURL;
 	
 	NSMutableDictionary *imageCacheDict;
+	
+	double viewScale;
 	BOOL showLabel;
+	BOOL showAutoAOI;
+	BOOL showGazeSample;
+	BOOL inSummaryMode;
+	
+	VFVisualAngleConverter *DOVConverter;
 }
 
+@property BOOL showLabel;
+@property BOOL showAutoAOI;
+@property BOOL showGazeSample;
+@property BOOL inSummaryMode;
+@property double viewScale;
+@property (retain) NSURL *dataURL;
+
+- (void)setSession:(VFSession *)session;
+- (IBAction)changeViewScale:(id)sender;
+
+// Draw helper methods.
+- (void)drawFrame:(VFVisualStimulusFrame *)frame;
 - (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate;
-- (void)setShowLabel:(BOOL)value;
-- (IBAction)setViewScale:(id)sender;
+- (void)drawGazes;
+- (void)drawFixations;
 @end

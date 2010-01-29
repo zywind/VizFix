@@ -46,14 +46,14 @@
 {
     [super windowControllerDidLoadNib:windowController];
 	
-	[fileURLController setContent:[self fileURL]];
+	[visualStimuliController addObserver:layoutView forKeyPath:@"filterPredicate" options:NSKeyValueObservingOptionNew context:NULL];
+	[treeController addObserver:self forKeyPath:@"selectionIndexPaths" options:NSKeyValueObservingOptionNew context:NULL];
 	
-	[visualStimuliController addObserver:layoutView forKeyPath:@"filterPredicate" options:NSKeyValueObservingOptionNew context:nil];
-	[treeController addObserver:self forKeyPath:@"selectionIndexPaths" options:NSKeyValueObservingOptionNew context:nil];
-	
-	[self addObserver:self forKeyPath:@"currentTime" options:NSKeyValueObservingOptionNew context:nil];
-	[self addObserver:self forKeyPath:@"inSummaryMode" options:NSKeyValueObservingOptionNew context:nil];
+	[self addObserver:self forKeyPath:@"currentTime" options:NSKeyValueObservingOptionNew context:NULL];
+	[self addObserver:self forKeyPath:@"inSummaryMode" options:NSKeyValueObservingOptionNew context:NULL];
+	[layoutView bind:@"inSummaryMode" toObject:self withKeyPath:@"inSummaryMode" options:NULL];
 
+	// Retrieve Session.
 	NSError *fetchError = nil;
 	NSArray *fetchResults;
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -70,13 +70,6 @@
 	}
 	
 	[sessionController setContent:session];
-	
-	[layoutView setFrameSize:NSMakeSize([session.screenResolutionWidth floatValue] * 0.5,
-										[session.screenResolutionHeight floatValue] * 0.5)];
-	NSUInteger indexArr [] = {0, 0, 0, 0};
-	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndexes:indexArr length:4]];
-	
-	[playButton setButtonType:NSToggleButton];
 	
 	// Control the resizing of splitView
 	splitViewDelegate =
@@ -103,52 +96,19 @@
 	[newClipView setBackgroundColor:[NSColor windowBackgroundColor]];
 	[newClipView setDocumentView:docView];
 	[scrollView setContentView:(NSClipView *)newClipView];
-}
-
-//	This returns the sort descriptor (in an array) used
-//	for sorting all objects that exists for a time period.
-- (NSArray *)startTimeSortDescriptor
-{
-	NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
-	return [NSArray arrayWithObject:sort];
-}
-
-//	This returns the sort descriptor (in an array) used
-//	for sorting all objects that used time.
-- (NSArray *)timeSortDescriptor
-{
-	NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
-	return [NSArray arrayWithObject:sort];
-}
-
-- (NSArray*)visualStimuliSortDescriptor
-{
-	NSSortDescriptor *zorderSort = [[NSSortDescriptor alloc] initWithKey:@"template.zorder" ascending:YES];
-	NSSortDescriptor *timeSort = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
-	return [NSArray arrayWithObjects:zorderSort, timeSort, nil];
-}
-
-- (void)updateViewContents
-{
-	NSPredicate *predicateForTimePeriod, *timePredicate;
-	if (!self.inSummaryMode) {
-		predicateForTimePeriod = [NSPredicate predicateWithFormat:
-								@"(startTime <= %f AND endTime >= %f)", 
-								currentTime, currentTime];
-		timePredicate = [NSPredicate predicateWithFormat:@"time <= %f AND time >= %f", 
-						 currentTime + 100, currentTime - 100];
-	} else {
-		predicateForTimePeriod = [NSPredicate predicateWithFormat:
-					 @"(startTime <= %f AND endTime >= %f) OR (startTime >= %f AND startTime <= %f)", 
-					 viewStartTime, viewStartTime, viewStartTime, viewEndTime];
-		timePredicate = [NSPredicate predicateWithFormat:@"time <= %f AND time >= %f", 
-						 viewEndTime, viewStartTime];
-	}
 	
-	[visualStimuliController setFilterPredicate:predicateForTimePeriod];
-	[visualStimulusFramesController setFilterPredicate:predicateForTimePeriod];
-	[fixationController setFilterPredicate:predicateForTimePeriod];
-	[gazeSampleController setFilterPredicate:timePredicate];
+	// Initialize layoutView.
+	[layoutView setSession:session];
+	[layoutView setDataURL:[self fileURL]];
+	
+	// draw the layoutView.
+	NSUInteger indexArr [] = {0, 0, 0, 0};
+	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndexes:indexArr length:4]];
+	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndex:0]];
+	
+	[playButton setButtonType:NSToggleButton];
+	
+
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -164,124 +124,6 @@
 	} else if (object == treeController && [keyPath isEqualToString:@"selectionIndexPaths"]) {
 		[self changeSelectedGroup];
 	}
-}
-
-- (IBAction)togglePlayState:(id)sender
-{
-	playing = !playing;
-	if (playing) {
-		NSRunLoop *runloop = [NSRunLoop currentRunLoop];
-		playTimer = [NSTimer timerWithTimeInterval:(1.0/viewRefreshRate)
-											target:self 
-										  selector:@selector(increaseCurrentTime:) 
-										  userInfo:nil 
-										   repeats:YES];
-		[runloop addTimer:playTimer forMode:NSDefaultRunLoopMode];
-	} else {
-		[playTimer invalidate];
-	}
-}
-
-- (IBAction)speedUp:(id)sender
-{
-	if (playbackSpeedModifiersIndex < [playbackSpeedModifiers count] - 1) {
-		playbackSpeedModifiersIndex++;
-	}
-}
-
-- (IBAction)slowDown:(id)sender
-{
-	if (playbackSpeedModifiersIndex > 0) {
-		playbackSpeedModifiersIndex--;
-	}
-}
-
-- (void)increaseCurrentTime:(NSTimer*)theTimer
-{
-	double step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
-	if (self.currentTime <= self.viewEndTime - step)
-		self.currentTime += step;
-	else {
-		[playButton performClick:self];
-		self.currentTime = self.viewStartTime;
-	}
-}
-
-- (void)alertDidEnd:(NSAlert *)alert returnCode:(int)returnCode
-		contextInfo:(void *)contextInfo
-{
-	if (returnCode == NSAlertFirstButtonReturn) {
-		NSManagedObjectContext *importFixationsMoc = [self managedObjectContext];
-		
-		// Delete old fixations
-		NSEntityDescription *fixatinoEntityDescription = [NSEntityDescription
-														  entityForName:@"Fixation" inManagedObjectContext:importFixationsMoc];
-		NSFetchRequest *fixationRequest = [[NSFetchRequest alloc] init];
-		[fixationRequest setEntity:fixatinoEntityDescription];
-		
-		NSError *error;
-		NSArray *fixationArray = [importFixationsMoc executeFetchRequest:fixationRequest error:&error];
-		
-		for (VFFixation *eachFixation in fixationArray) {
-			[importFixationsMoc deleteObject:eachFixation];
-		}
-		
-		// Delete block-fixations relationship.
-		for (VFBlock *eachBlock in session.blocks) {
-			eachBlock.fixations = nil;
-		}
-		fixationArray = nil;
-		
-		// Retrieve gazes
-		NSEntityDescription *entityDescription = [NSEntityDescription
-												  entityForName:@"GazeSample" inManagedObjectContext:importFixationsMoc];
-		NSFetchRequest *request = [[NSFetchRequest alloc] init];
-		[request setEntity:entityDescription];
-		
-		NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
-		[request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
-		
-		NSArray *gazeArray = [importFixationsMoc executeFetchRequest:request error:&error];
-		if (gazeArray == nil)
-		{
-			NSLog(@"Fetch gaze samples failed.\n%@", [error localizedDescription]);
-			return;
-		}
-		
-		VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
-		fixationDetectionAlg.gazeSampleRate = 120;
-		fixationDetectionAlg.radiusThreshold = 30; // TODO:
-		
-		NSMutableArray *fixations = [NSMutableArray arrayWithArray:
-									 [fixationDetectionAlg detectFixation:gazeArray inMOC:importFixationsMoc]];
-		gazeArray = nil;
-		
-		for (VFBlock *eachBlock in session.blocks) {
-			NSMutableArray *tempFixations = [NSMutableArray arrayWithArray:fixations];
-			NSPredicate * predicateForTimePeriod = [NSPredicate predicateWithFormat:
-													@"(startTime <= %@ AND endTime >= %@) OR (startTime >= %@ AND startTime <= %@)", 
-													eachBlock.startTime, eachBlock.startTime, eachBlock.startTime, eachBlock.endTime];
-			[tempFixations filterUsingPredicate:predicateForTimePeriod];
-			[eachBlock addFixations:[NSSet setWithArray:tempFixations]];
-		}
-		fixations = nil;
-    }
-}
-
-- (IBAction)detectFixations:(id)sender
-{
-	// Show alert panel.
-	NSAlert *alert = [[NSAlert alloc] init];
-	[alert addButtonWithTitle:@"Continue"];
-	[alert addButtonWithTitle:@"Cancel"];
-	[alert setMessageText:@"This will delete your old fixations. Continue?"];
-	[alert setInformativeText:@"Detect fixations will delete your old fixations. Continue?"];
-	[alert setAlertStyle:NSWarningAlertStyle];
-	
-	[alert beginSheetModalForWindow:[[[self windowControllers] objectAtIndex:0] window] 
-					  modalDelegate:self 
-					 didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:) 
-						contextInfo:nil];
 }
 
 - (NSError *)willPresentError:(NSError *)inError {
@@ -336,6 +178,31 @@
     NSError *newError = [NSError errorWithDomain:[inError domain] code:[inError code] userInfo:newUserInfo];
 	
     return newError;
+}
+
+#pragma mark -
+#pragma mark ---------BROWSE DATA---------
+- (void)updateViewContents
+{
+	NSPredicate *predicateForTimePeriod, *timePredicate;
+	if (!self.inSummaryMode) {
+		predicateForTimePeriod = [NSPredicate predicateWithFormat:
+								  @"(startTime <= %f AND endTime >= %f)", 
+								  currentTime, currentTime];
+		timePredicate = [NSPredicate predicateWithFormat:@"time <= %f AND time >= %f", 
+						 currentTime, currentTime - 100];
+	} else {
+		predicateForTimePeriod = [NSPredicate predicateWithFormat:
+								  @"(startTime <= %f AND endTime >= %f) OR (startTime >= %f AND startTime <= %f)", 
+								  viewStartTime, viewStartTime, viewStartTime, viewEndTime];
+		timePredicate = [NSPredicate predicateWithFormat:@"time <= %f AND time >= %f", 
+						 viewEndTime, viewStartTime];
+	}
+	
+	[visualStimuliController setFilterPredicate:predicateForTimePeriod];
+	[visualStimulusFramesController setFilterPredicate:predicateForTimePeriod];
+	[fixationController setFilterPredicate:predicateForTimePeriod];
+	[gazeSampleController setFilterPredicate:timePredicate];
 }
 
 - (void)changeSelectedGroup
@@ -428,22 +295,195 @@
 	self.currentTime = self.viewStartTime;
 }
 
+#pragma mark -
+#pragma mark ---------UI UPDATE---------
 - (BOOL)validateUserInterfaceItem:(id < NSValidatedUserInterfaceItem >)anItem
 {
 	SEL theAction = [anItem action];
 	if (theAction == @selector(toggleShowLabel:)) {
-		//NSMenuItem *menuItem = (NSMenuItem *)anItem;
-		//[menuItem setState:NSOffState];
+		NSMenuItem *menuItem = (NSMenuItem *)anItem;
+		[menuItem setState:layoutView.showLabel];
+	} else if (theAction == @selector(toggleShowAutoAOI:)) {
+		NSMenuItem *menuItem = (NSMenuItem *)anItem;
+		[menuItem setState:layoutView.showAutoAOI];
+	} else if (theAction == @selector(toggleShowGazeSample:)) {
+		NSMenuItem *menuItem = (NSMenuItem *)anItem;
+		[menuItem setState:layoutView.showGazeSample];
 	}
 	
 	return YES;
-	
 }
 
 - (IBAction)toggleShowLabel:(id)sender
 {
 	sender = (NSMenuItem *)sender;
-	[layoutView setShowLabel:[sender state]];
 	[sender setState:![sender state]];
+	[layoutView setShowLabel:[sender state]];
+}
+
+- (IBAction)toggleShowAutoAOI:(id)sender
+{
+	sender = (NSMenuItem *)sender;
+	[sender setState:![sender state]];
+	[layoutView setShowAutoAOI:[sender state]];
+}
+
+- (IBAction)toggleShowGazeSample:(id)sender
+{
+	sender = (NSMenuItem *)sender;
+	[sender setState:![sender state]];
+	[layoutView setShowGazeSample:[sender state]];
+}
+
+#pragma mark -
+#pragma mark ---------PLAYBACK CONTROL---------
+- (IBAction)togglePlayState:(id)sender
+{
+	playing = !playing;
+	if (playing) {
+		NSRunLoop *runloop = [NSRunLoop currentRunLoop];
+		playTimer = [NSTimer timerWithTimeInterval:(1.0/viewRefreshRate)
+											target:self 
+										  selector:@selector(increaseCurrentTime:) 
+										  userInfo:nil 
+										   repeats:YES];
+		[runloop addTimer:playTimer forMode:NSDefaultRunLoopMode];
+	} else {
+		[playTimer invalidate];
+	}
+}
+
+- (IBAction)speedUp:(id)sender
+{
+	if (playbackSpeedModifiersIndex < [playbackSpeedModifiers count] - 1) {
+		playbackSpeedModifiersIndex++;
+	}
+}
+
+- (IBAction)slowDown:(id)sender
+{
+	if (playbackSpeedModifiersIndex > 0) {
+		playbackSpeedModifiersIndex--;
+	}
+}
+
+- (void)increaseCurrentTime:(NSTimer*)theTimer
+{
+	double step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
+	if (self.currentTime <= self.viewEndTime - step)
+		self.currentTime += step;
+	else {
+		[playButton performClick:self];
+		self.currentTime = self.viewStartTime;
+	}
+}
+
+#pragma mark -
+#pragma mark ---------DETECT FIXATIONS---------
+- (IBAction)detectFixations:(id)sender
+{
+	// Show alert panel.
+	NSAlert *alert = [[NSAlert alloc] init];
+	[alert addButtonWithTitle:@"Continue"];
+	[alert addButtonWithTitle:@"Cancel"];
+	[alert setMessageText:@"This will delete your old fixations. Continue?"];
+	[alert setInformativeText:@"Detect fixations will delete your old fixations. Continue?"];
+	[alert setAlertStyle:NSWarningAlertStyle];
+	
+	[alert beginSheetModalForWindow:[[[self windowControllers] objectAtIndex:0] window] 
+					  modalDelegate:self 
+					 didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:) 
+						contextInfo:nil];
+}
+
+- (void)alertDidEnd:(NSAlert *)alert returnCode:(int)returnCode
+		contextInfo:(void *)contextInfo
+{
+	if (returnCode == NSAlertFirstButtonReturn) {
+		[self doDetectAndInsertFixations];
+    }
+}
+
+- (void)doDetectAndInsertFixations
+{
+	NSManagedObjectContext *importFixationsMoc = [self managedObjectContext];
+	
+	// Delete old fixations
+	NSEntityDescription *fixatinoEntityDescription = [NSEntityDescription
+													  entityForName:@"Fixation" inManagedObjectContext:importFixationsMoc];
+	NSFetchRequest *fixationRequest = [[NSFetchRequest alloc] init];
+	[fixationRequest setEntity:fixatinoEntityDescription];
+	
+	NSError *error;
+	NSArray *fixationArray = [importFixationsMoc executeFetchRequest:fixationRequest error:&error];
+	
+	for (VFFixation *eachFixation in fixationArray) {
+		[importFixationsMoc deleteObject:eachFixation];
+	}
+	
+	// Delete block-fixations relationship.
+	for (VFBlock *eachBlock in session.blocks) {
+		eachBlock.fixations = nil;
+	}
+	fixationArray = nil;
+	
+	// Retrieve gazes
+	NSEntityDescription *entityDescription = [NSEntityDescription
+											  entityForName:@"GazeSample" inManagedObjectContext:importFixationsMoc];
+	NSFetchRequest *request = [[NSFetchRequest alloc] init];
+	[request setEntity:entityDescription];
+	
+	NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
+	[request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+	
+	NSArray *gazeArray = [importFixationsMoc executeFetchRequest:request error:&error];
+	if (gazeArray == nil)
+	{
+		NSLog(@"Fetch gaze samples failed.\n%@", [error localizedDescription]);
+		return;
+	}
+	
+	VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
+	fixationDetectionAlg.gazeSampleRate = 120;
+	fixationDetectionAlg.radiusThreshold = 30; // TODO:
+	
+	NSMutableArray *fixations = [NSMutableArray arrayWithArray:
+								 [fixationDetectionAlg detectFixation:gazeArray inMOC:importFixationsMoc]];
+	gazeArray = nil;
+	
+	for (VFBlock *eachBlock in session.blocks) {
+		NSMutableArray *tempFixations = [NSMutableArray arrayWithArray:fixations];
+		NSPredicate * predicateForTimePeriod = [NSPredicate predicateWithFormat:
+												@"(startTime <= %@ AND endTime >= %@) OR (startTime >= %@ AND startTime <= %@)", 
+												eachBlock.startTime, eachBlock.startTime, eachBlock.startTime, eachBlock.endTime];
+		[tempFixations filterUsingPredicate:predicateForTimePeriod];
+		[eachBlock addFixations:[NSSet setWithArray:tempFixations]];
+	}
+	fixations = nil;
+}
+
+#pragma mark -
+#pragma mark ---------SORT DESCRIPTORS---------
+//	This returns the sort descriptor (in an array) used
+//	for sorting all objects that exists for a time period.
+- (NSArray *)startTimeSortDescriptor
+{
+	NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
+	return [NSArray arrayWithObject:sort];
+}
+
+//	This returns the sort descriptor (in an array) used
+//	for sorting all objects that used time.
+- (NSArray *)timeSortDescriptor
+{
+	NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
+	return [NSArray arrayWithObject:sort];
+}
+
+- (NSArray*)visualStimuliSortDescriptors
+{
+	NSSortDescriptor *zorderSort = [[NSSortDescriptor alloc] initWithKey:@"template.zorder" ascending:YES];
+	NSSortDescriptor *timeSort = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
+	return [NSArray arrayWithObjects:zorderSort, timeSort, nil];
 }
 @end

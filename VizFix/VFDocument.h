@@ -27,31 +27,28 @@
 	IBOutlet NSArrayController *fixationController;
 	IBOutlet NSObjectController *sessionController;
 	IBOutlet NSArrayController *blockController;
-	
-	IBOutlet NSTreeController *treeController;
-	IBOutlet NSArrayController *tableViewController;
-	IBOutlet NSObjectController *fileURLController;
-
-	IBOutlet NSSplitView *splitView;
-	PrioritySplitViewDelegate *splitViewDelegate;
-	IBOutlet NSButton *playButton;
-	
-	IBOutlet NSScrollView *scrollView;
-	
 	VFSession *session;
 	
-	IBOutlet VFView	*layoutView;
+	// Playback control
 	double viewRefreshRate;
 	NSArray *playbackSpeedModifiers;
 	int playbackSpeedModifiersIndex;
 	double viewStartTime;
 	double viewEndTime;
-	double currentTime;
-		
-	NSTimer *playTimer;
-	
+	double currentTime;	
+	NSTimer *playTimer;	
 	BOOL playing;
 	BOOL inSummaryMode;
+	
+	// UI elements
+	IBOutlet NSSplitView *splitView;
+	PrioritySplitViewDelegate *splitViewDelegate;	
+	IBOutlet NSScrollView *scrollView;
+	IBOutlet NSButton *playButton;
+	IBOutlet VFView	*layoutView;
+	// UI elements data sources.
+	IBOutlet NSTreeController *treeController;
+	IBOutlet NSArrayController *tableViewController;
 }
 
 @property (nonatomic, assign) double currentTime;
@@ -59,19 +56,24 @@
 @property (nonatomic, assign) double viewStartTime;
 @property (nonatomic, assign) BOOL inSummaryMode;
 
+// Sort descriptors.
 - (NSArray *)startTimeSortDescriptor;
-- (NSArray *)visualStimuliSortDescriptor;
+- (NSArray *)visualStimuliSortDescriptors;
 - (NSArray *)timeSortDescriptor;
 
-- (void)updateViewContents;
-
+// Playback control.
 - (IBAction)togglePlayState:(id)sender;
 - (IBAction)speedUp:(id)sender;
 - (IBAction)slowDown:(id)sender;
 - (void)increaseCurrentTime:(NSTimer*)theTimer;
-
-- (IBAction)toggleShowLabel:(id)sender;
-
+// Browse data.
+- (void)updateViewContents;
 - (void)changeSelectedGroup;
+
+// Menu actions.
+- (IBAction)toggleShowLabel:(id)sender;
+- (IBAction)toggleShowAutoAOI:(id)sender;
+- (IBAction)toggleShowGazeSample:(id)sender;
 - (IBAction)detectFixations:(id)sender;
+- (void)doDetectAndInsertFixations;
 @end
