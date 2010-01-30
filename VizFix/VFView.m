@@ -12,10 +12,11 @@
 
 @synthesize showLabel;
 @synthesize showAutoAOI;
-@synthesize inSummaryMode;
 @synthesize dataURL;
 @synthesize viewScale;
 @synthesize showGazeSample;
+@synthesize inSummaryMode;
+@synthesize currentTime;
 
 - (id)initWithFrame:(NSRect)frameRect
 {
@@ -30,6 +31,8 @@
 		[self addObserver:self forKeyPath:@"showAutoAOI" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"showGazeSample" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"viewScale" options:NSKeyValueObservingOptionNew context:NULL];
+		[self addObserver:self forKeyPath:@"inSummaryMode" options:NSKeyValueObservingOptionNew context:NULL];
+		[self addObserver:self forKeyPath:@"currentTime" options:NSKeyValueObservingOptionNew context:NULL];
 	}
     return self;
 }
@@ -50,7 +53,50 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	[self setNeedsDisplay:YES];	
+	if ([keyPath isEqualToString:@"selectionIndexPaths"]) {
+		selectedGroupType = [[[change valueForKey:NSKeyValueChangeNewKey] objectAtIndex:0] length];
+		
+		id selected;
+		switch (selectedGroupType) {
+			case 2:
+				selected = [[blockController selectedObjects] objectAtIndex:0];
+
+				break;
+			case 3:
+				selected = [[trialController selectedObjects] objectAtIndex:1];
+				break;
+			case 4:
+				selected = [[blockController selectedObjects] objectAtIndex:2];
+				break;
+			default:
+				return;
+		}
+		
+		gazesArray = [selected valueForKey:@"gazeSamples"];
+		fixationsArray = [selected valueForKey:@"fixations"];
+		visualStimuliArray = [selected valueForKey:@"visualStimuli"];
+		self.currentTime = [[selected valueForKey:@"startTime"] doubleValue];
+	} else if (object == self && [keyPath isEqualToString:@"currentTime"]) {
+		[self updateFrame];
+	}
+	[self setNeedsDisplay:YES];
+}
+
+- (void)updateFrame
+{
+	NSPredicate *predicateForTimePeriod, *timePredicate;
+	if (!self.inSummaryMode) {
+		predicateForTimePeriod = [NSPredicate predicateWithFormat:
+								  @"(startTime <= %f AND endTime >= %f)", 
+								  currentTime, currentTime];
+		timePredicate = [NSPredicate predicateWithFormat:@"time <= %f AND time >= %f", 
+						 currentTime, currentTime - 100];
+	}
+	
+//	[visualStimuliController setFilterPredicate:predicateForTimePeriod];
+//	[visualStimulusFramesController setFilterPredicate:predicateForTimePeriod];
+//	[fixationController setFilterPredicate:predicateForTimePeriod];
+//	[gazeSampleController setFilterPredicate:timePredicate];
 }
 
 - (void)drawRect:(NSRect)rect
@@ -65,23 +111,23 @@
 	[self drawVisualStimulusTemplate:session.background];
 	
 	// Draw screen objects.
-	for (int i = 0; i < [[visualStimuliController arrangedObjects] count]; i++)
-	{
-		[visualStimuliController setSelectionIndex:i];
-		NSArray *frames = [visualStimulusFramesController arrangedObjects];
-		
-		// In summary mode.
-		if (!inSummaryMode) {
-			VFVisualStimulusFrame *frame = [frames objectAtIndex:0];
-			[self drawFrame:frame];
-		} else {
-			// TODO: Make this more general. For example, test the location difference between two frames.
-			for (int j = 0; j < [frames count]; j = j+20) {
-				VFVisualStimulusFrame *eachFrame = [frames objectAtIndex:j];
-				[self drawFrame:eachFrame];
-			}
-		}
-	}
+//	for (int i = 0; i < [visualStimuliArray count]; i++)
+//	{
+//		NSSet *frames = ((VFVisualStimulus *)[visualStimuliArray objectAtIndex:i]).frames;
+//		// TODO: filter frame;
+//		
+//		// In summary mode.
+//		if (!inSummaryMode) {
+//			VFVisualStimulusFrame *frame = [frames objectAtIndex:0];
+//			[self drawFrame:frame];
+//		} else {
+//			// TODO: Make this more general. For example, test the location difference between two frames.
+//			for (int j = 0; j < [frames count]; j = j+20) {
+//				VFVisualStimulusFrame *eachFrame = [frames objectAtIndex:j];
+//				[self drawFrame:eachFrame];
+//			}
+//		}
+//	}
 	
 	if (showGazeSample) {
 		[self drawGazes];
@@ -172,8 +218,7 @@
 - (void)drawGazes 
 {
 	int i=0;
-	NSArray *gazes = [gazeSampleController arrangedObjects];
-	for (VFGazeSample *eachGaze in gazes)
+	for (VFGazeSample *eachGaze in gazesArray)
 	{
 		// TEH I should add conditions so that samples outside
 		// the session screen resolution do not draw.
@@ -181,8 +226,8 @@
 		{
 			// Increase the brightness and decrease saturation as the samples progress
 			[[NSColor colorWithCalibratedHue:0.5 
-								  saturation:(1.0 - ((i / (float)[gazes count]) / 2.0)) 
-								  brightness:(0.5 + ((i / (float)[gazes count]) / 2.0))
+								  saturation:(1.0 - ((i / (float)[gazesArray count]) / 2.0)) 
+								  brightness:(0.5 + ((i / (float)[gazesArray count]) / 2.0))
 									   alpha:1.0] setFill];
 		} else {
 			[[NSColor blackColor] setFill];
@@ -197,23 +242,22 @@
 
 - (void)drawFixations
 {
-	NSArray *fixations = [fixationController arrangedObjects];
-	
-	for (int i = 0; i < [fixations count]; i++) {
-		VFFixation *currentFixation = [fixations objectAtIndex:i];
+
+	for (int i = 0; i < [fixationsArray count]; i++) {
+		VFFixation *currentFixation = [fixationsArray objectAtIndex:i];
 		double x = currentFixation.location.x;
 		double y = currentFixation.location.y;
 		
 		NSColor *color;
-		if ([fixations count] == 1) {
+		if ([fixationsArray count] == 1) {
 			color = [NSColor colorWithCalibratedHue:0.8 
 										 saturation:0.5 
 										 brightness:1.0 
 											  alpha:1.0];
 		} else {
 			color = [NSColor colorWithCalibratedHue:0.8 
-										 saturation:(1.0 - ((i / (float)[fixations count]) / 2.0)) 
-										 brightness:(0.5 + ((i / (float)[fixations count]) / 2.0)) 
+										 saturation:(1.0 - ((i / (float)[fixationsArray count]) / 2.0)) 
+										 brightness:(0.5 + ((i / (float)[fixationsArray count]) / 2.0)) 
 											  alpha:1.0];
 		}
 		
@@ -234,7 +278,7 @@
 		
 		// Draw a line from last fixation to this one.
 		if (i > 0) {
-			VFFixation *lastFixation = [fixations objectAtIndex:i - 1];
+			VFFixation *lastFixation = [fixationsArray objectAtIndex:i - 1];
 			
 			NSBezierPath *linePath = [NSBezierPath bezierPath];
 			[linePath moveToPoint:lastFixation.location];

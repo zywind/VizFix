@@ -17,10 +17,12 @@
 #import "VFVisualAngleConverter.h"
 
 @interface VFView : NSView {
-	IBOutlet NSArrayController *visualStimuliController;
-	IBOutlet NSArrayController *visualStimulusFramesController;
-	IBOutlet NSArrayController *gazeSampleController;
-	IBOutlet NSArrayController *fixationController;
+	IBOutlet NSArrayController *blockController;
+	IBOutlet NSArrayController *trialController;
+	IBOutlet NSArrayController *subTrialController;
+	NSArray *gazesArray;
+	NSArray *fixationsArray;
+	NSArray *visualStimuliArray;
 	VFSession *session;
 	NSURL *dataURL;
 	
@@ -31,6 +33,9 @@
 	BOOL showAutoAOI;
 	BOOL showGazeSample;
 	BOOL inSummaryMode;
+	double currentTime;
+	
+	NSUInteger selectedGroupType; // 2 for block, 3 for trial, 4 for subtrial
 	
 	VFVisualAngleConverter *DOVConverter;
 }
@@ -40,6 +45,7 @@
 @property BOOL showGazeSample;
 @property BOOL inSummaryMode;
 @property double viewScale;
+@property double currentTime;
 @property (retain) NSURL *dataURL;
 
 - (void)setSession:(VFSession *)session;
@@ -50,4 +56,5 @@
 - (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate;
 - (void)drawGazes;
 - (void)drawFixations;
+- (void)updateFrame;
 @end

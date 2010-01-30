@@ -197,24 +197,6 @@
 		3B46B82911016DBD002DF0C3 /* Manged Objects */ = {
 			isa = PBXGroup;
 			children = (
-			);
-			name = "Manged Objects";
-			sourceTree = "<group>";
-		};
-		3BF777A811125BC300061B38 /* UI Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				3BEBF0B611027E3B00E27227 /* PrioritySplitViewDelegate.h */,
-				3BEBF0B711027E3B00E27227 /* PrioritySplitViewDelegate.m */,
-				3BC64F4311113D59006F36CE /* SBCenteringClipView.h */,
-				3BC64F4411113D59006F36CE /* SBCenteringClipView.m */,
-			);
-			name = "UI Helpers";
-			sourceTree = "<group>";
-		};
-		E1B74B1A0667B4A90069E3BA /* Models */ = {
-			isa = PBXGroup;
-			children = (
 				3BC50456110ADB880004A125 /* VFGazeSample.h */,
 				3BC50457110ADB880004A125 /* VFGazeSample.m */,
 				3BC50458110ADB880004A125 /* VFBlock.h */,
@@ -245,6 +227,24 @@
 				3BC50471110ADB880004A125 /* VFSession.m */,
 				3BC50472110ADB880004A125 /* VFFixation.h */,
 				3BC50473110ADB880004A125 /* VFFixation.m */,
+			);
+			name = "Manged Objects";
+			sourceTree = "<group>";
+		};
+		3BF777A811125BC300061B38 /* UI Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				3BEBF0B611027E3B00E27227 /* PrioritySplitViewDelegate.h */,
+				3BEBF0B711027E3B00E27227 /* PrioritySplitViewDelegate.m */,
+				3BC64F4311113D59006F36CE /* SBCenteringClipView.h */,
+				3BC64F4411113D59006F36CE /* SBCenteringClipView.m */,
+			);
+			name = "UI Helpers";
+			sourceTree = "<group>";
+		};
+		E1B74B1A0667B4A90069E3BA /* Models */ = {
+			isa = PBXGroup;
+			children = (
 				3B46B82911016DBD002DF0C3 /* Manged Objects */,
 				775BDEF0067A8BF0009058FE /* VFModel.xcdatamodel */,
 			);

@@ -46,13 +46,15 @@
 {
     [super windowControllerDidLoadNib:windowController];
 	
-	[visualStimuliController addObserver:layoutView forKeyPath:@"filterPredicate" options:NSKeyValueObservingOptionNew context:NULL];
 	[treeController addObserver:self forKeyPath:@"selectionIndexPaths" options:NSKeyValueObservingOptionNew context:NULL];
-	
-	[self addObserver:self forKeyPath:@"currentTime" options:NSKeyValueObservingOptionNew context:NULL];
 	[self addObserver:self forKeyPath:@"inSummaryMode" options:NSKeyValueObservingOptionNew context:NULL];
-	[layoutView bind:@"inSummaryMode" toObject:self withKeyPath:@"inSummaryMode" options:NULL];
+	
+	[treeController addObserver:layoutView forKeyPath:@"selectionIndexPaths" options:NSKeyValueObservingOptionNew context:NULL];	
+	
+	[layoutView bind:@"inSummaryMode" toObject:self withKeyPath:@"inSummaryMode" options:nil];
+	[layoutView bind:@"currentTime" toObject:self withKeyPath:@"currentTime" options:nil];
 
+	
 	// Retrieve Session.
 	NSError *fetchError = nil;
 	NSArray *fetchResults;
@@ -107,22 +109,17 @@
 	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndex:0]];
 	
 	[playButton setButtonType:NSToggleButton];
-	
-
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (object == self && [keyPath isEqualToString:@"currentTime"]) {
-		[self updateViewContents];
-	} else if (object == self && [keyPath isEqualToString:@"inSummaryMode"]) {
+	if (object == self && [keyPath isEqualToString:@"inSummaryMode"]) {
 		if (self.inSummaryMode && playing) {
 			[playButton performClick:self];
 		}
 		
-		[self updateViewContents];
 	} else if (object == treeController && [keyPath isEqualToString:@"selectionIndexPaths"]) {
-		[self changeSelectedGroup];
+		[self updateTableView];
 	}
 }
 
@@ -182,37 +179,15 @@
 
 #pragma mark -
 #pragma mark ---------BROWSE DATA---------
-- (void)updateViewContents
-{
-	NSPredicate *predicateForTimePeriod, *timePredicate;
-	if (!self.inSummaryMode) {
-		predicateForTimePeriod = [NSPredicate predicateWithFormat:
-								  @"(startTime <= %f AND endTime >= %f)", 
-								  currentTime, currentTime];
-		timePredicate = [NSPredicate predicateWithFormat:@"time <= %f AND time >= %f", 
-						 currentTime, currentTime - 100];
-	} else {
-		predicateForTimePeriod = [NSPredicate predicateWithFormat:
-								  @"(startTime <= %f AND endTime >= %f) OR (startTime >= %f AND startTime <= %f)", 
-								  viewStartTime, viewStartTime, viewStartTime, viewEndTime];
-		timePredicate = [NSPredicate predicateWithFormat:@"time <= %f AND time >= %f", 
-						 viewEndTime, viewStartTime];
-	}
-	
-	[visualStimuliController setFilterPredicate:predicateForTimePeriod];
-	[visualStimulusFramesController setFilterPredicate:predicateForTimePeriod];
-	[fixationController setFilterPredicate:predicateForTimePeriod];
-	[gazeSampleController setFilterPredicate:timePredicate];
-}
 
-- (void)changeSelectedGroup
+
+- (void)updateTableView
 {
 	if ([[treeController selectionIndexPaths] count] == 0)
 		return;
 	
 	VFBlock *selectedBlock = nil;
 	VFTrial *selectedTrial = nil;
-	VFSubTrial *selectedSubTrial = nil;
 	NSDictionary *tempDict;
 
 	[tableViewController removeObjects:[tableViewController arrangedObjects]];
@@ -238,10 +213,8 @@
 		return;
 	}
 	if ([indexPath length] >= 2) {
-		selectedBlock = (VFBlock *)[[[[session blocks] allObjects] 
-									 sortedArrayUsingDescriptors:[self startTimeSortDescriptor]] 
-									objectAtIndex:[indexPath indexAtPosition:1]];
 		[blockController setSelectionIndex:[indexPath indexAtPosition:1]];
+		selectedBlock = [[blockController selectedObjects] objectAtIndex:0];
 		
 		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Conditions:", @"entry", @"", @"value", nil];
 		[tableViewController addObject:tempDict];
@@ -252,9 +225,8 @@
 		}
 	}
 	if ([indexPath length] >= 3) {
-		selectedTrial = [[[[selectedBlock trials] allObjects] 
-						 sortedArrayUsingDescriptors:[self startTimeSortDescriptor]]
-						 objectAtIndex:[indexPath indexAtPosition:2]];
+		[trialController setSelectionIndex:[indexPath indexAtPosition:2]];
+		selectedTrial = [[trialController selectedObjects] objectAtIndex:0];
 				
 		for (VFCondition *eachCondition in selectedTrial.conditions) {
 			tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachCondition.factor, 
@@ -277,22 +249,8 @@
 		}
 	}
 	if ([indexPath length] == 4) {
-		selectedSubTrial = [[[[selectedTrial subTrials] allObjects]
-							sortedArrayUsingDescriptors:[self startTimeSortDescriptor]] 
-							objectAtIndex:[indexPath indexAtPosition:3]];
+		[subTrialController setSelectionIndex:[indexPath indexAtPosition:3]];	
 	}
-	
-	if (selectedSubTrial != nil) {
-		self.viewStartTime = [selectedSubTrial.startTime intValue];
-		self.viewEndTime = [selectedSubTrial.endTime intValue];
-	} else if (selectedTrial != nil) {
-		self.viewStartTime = [selectedTrial.startTime intValue];
-		self.viewEndTime = [selectedTrial.endTime intValue];
-	} else if (selectedBlock != nil) {
-		self.viewStartTime = [selectedBlock.startTime intValue];
-		self.viewEndTime = [selectedBlock.endTime intValue];
-	}
-	self.currentTime = self.viewStartTime;
 }
 
 #pragma mark -
@@ -318,21 +276,21 @@
 {
 	sender = (NSMenuItem *)sender;
 	[sender setState:![sender state]];
-	[layoutView setShowLabel:[sender state]];
+	layoutView.showLabel = [sender state];
 }
 
 - (IBAction)toggleShowAutoAOI:(id)sender
 {
 	sender = (NSMenuItem *)sender;
 	[sender setState:![sender state]];
-	[layoutView setShowAutoAOI:[sender state]];
+	layoutView.showAutoAOI = [sender state];
 }
 
 - (IBAction)toggleShowGazeSample:(id)sender
 {
 	sender = (NSMenuItem *)sender;
 	[sender setState:![sender state]];
-	[layoutView setShowGazeSample:[sender state]];
+	layoutView.showGazeSample = [sender state];
 }
 
 #pragma mark -

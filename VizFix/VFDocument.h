@@ -21,12 +21,10 @@
 @class PrioritySplitViewDelegate;
 
 @interface VFDocument : NSPersistentDocument {
-	IBOutlet NSArrayController *visualStimuliController;
-	IBOutlet NSArrayController *visualStimulusFramesController;
-	IBOutlet NSArrayController *gazeSampleController;
-	IBOutlet NSArrayController *fixationController;
 	IBOutlet NSObjectController *sessionController;
 	IBOutlet NSArrayController *blockController;
+	IBOutlet NSArrayController *trialController;
+	IBOutlet NSArrayController *subTrialController;
 	VFSession *session;
 	
 	// Playback control
@@ -35,7 +33,7 @@
 	int playbackSpeedModifiersIndex;
 	double viewStartTime;
 	double viewEndTime;
-	double currentTime;	
+	double currentTime;
 	NSTimer *playTimer;	
 	BOOL playing;
 	BOOL inSummaryMode;
@@ -67,8 +65,7 @@
 - (IBAction)slowDown:(id)sender;
 - (void)increaseCurrentTime:(NSTimer*)theTimer;
 // Browse data.
-- (void)updateViewContents;
-- (void)changeSelectedGroup;
+- (void)updateTableView;
 
 // Menu actions.
 - (IBAction)toggleShowLabel:(id)sender;
