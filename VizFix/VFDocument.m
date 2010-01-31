@@ -30,8 +30,9 @@
 		playing = NO;
 		viewRefreshRate = 30.0;
 		playbackSpeedModifiers = [NSArray arrayWithObjects:[NSNumber numberWithDouble:0.1/1.0], 
-								  [NSNumber numberWithDouble:0.3/1.0], [NSNumber numberWithDouble:0.5/1.0], 
+								  [NSNumber numberWithDouble:1.0/3.0], [NSNumber numberWithDouble:0.5/1.0], 
 								  [NSNumber numberWithDouble:1.0/1.0], [NSNumber numberWithDouble:2.0/1.0], nil];
+		playbackSpeedLabels = [NSArray arrayWithObjects:@"1/10 x", @"1/3 x", @"1/2 x", @"1 x", @"2 x", nil];
 		playbackSpeedModifiersIndex = 2; // Default speed 0.5/1.0.
     }
     return self;
@@ -46,14 +47,11 @@
 {
     [super windowControllerDidLoadNib:windowController];
 	
-	[treeController addObserver:self forKeyPath:@"selectionIndexPaths" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self forKeyPath:@"inSummaryMode" options:NSKeyValueObservingOptionNew context:NULL];
-	
-	[treeController addObserver:layoutView forKeyPath:@"selectionIndexPaths" options:NSKeyValueObservingOptionNew context:NULL];	
-	
+	[treeController addObserver:self forKeyPath:@"selectionIndexPaths" options:0 context:NULL];
+	[self addObserver:self forKeyPath:@"inSummaryMode" options:0 context:NULL];
+		
 	[layoutView bind:@"inSummaryMode" toObject:self withKeyPath:@"inSummaryMode" options:nil];
 	[layoutView bind:@"currentTime" toObject:self withKeyPath:@"currentTime" options:nil];
-
 	
 	// Retrieve Session.
 	NSError *fetchError = nil;
@@ -109,6 +107,8 @@
 	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndex:0]];
 	
 	[playButton setButtonType:NSToggleButton];
+	
+	speedLabel.stringValue = [playbackSpeedLabels objectAtIndex:playbackSpeedModifiersIndex];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -120,6 +120,7 @@
 		
 	} else if (object == treeController && [keyPath isEqualToString:@"selectionIndexPaths"]) {
 		[self updateTableView];
+		[layoutView updateViewContentsFrom:self.viewStartTime to:self.viewEndTime];
 	}
 }
 
@@ -188,6 +189,7 @@
 	
 	VFBlock *selectedBlock = nil;
 	VFTrial *selectedTrial = nil;
+	VFSubTrial *selectedSubTrial = nil;
 	NSDictionary *tempDict;
 
 	[tableViewController removeObjects:[tableViewController arrangedObjects]];
@@ -249,8 +251,21 @@
 		}
 	}
 	if ([indexPath length] == 4) {
-		[subTrialController setSelectionIndex:[indexPath indexAtPosition:3]];	
+		[subTrialController setSelectionIndex:[indexPath indexAtPosition:3]];
+		selectedSubTrial = [[subTrialController selectedObjects] objectAtIndex:0];
 	}
+	
+	if (selectedSubTrial != nil) {
+		self.viewStartTime = [selectedSubTrial.startTime intValue];
+		self.viewEndTime = [selectedSubTrial.endTime intValue];
+	} else if (selectedTrial != nil) {
+		self.viewStartTime = [selectedTrial.startTime intValue];
+		self.viewEndTime = [selectedTrial.endTime intValue];
+	} else if (selectedBlock != nil) {
+		self.viewStartTime = [selectedBlock.startTime intValue];
+		self.viewEndTime = [selectedBlock.endTime intValue];
+	}
+	self.currentTime = self.viewStartTime;
 }
 
 #pragma mark -
@@ -315,6 +330,7 @@
 {
 	if (playbackSpeedModifiersIndex < [playbackSpeedModifiers count] - 1) {
 		playbackSpeedModifiersIndex++;
+		speedLabel.stringValue = [playbackSpeedLabels objectAtIndex:playbackSpeedModifiersIndex];
 	}
 }
 
@@ -322,6 +338,7 @@
 {
 	if (playbackSpeedModifiersIndex > 0) {
 		playbackSpeedModifiersIndex--;
+		speedLabel.stringValue = [playbackSpeedLabels objectAtIndex:playbackSpeedModifiersIndex];
 	}
 }
 
@@ -359,6 +376,7 @@
 {
 	if (returnCode == NSAlertFirstButtonReturn) {
 		[self doDetectAndInsertFixations];
+		[layoutView updateViewContentsFrom:self.viewStartTime to:self.viewEndTime];
     }
 }
 
@@ -378,13 +396,7 @@
 	for (VFFixation *eachFixation in fixationArray) {
 		[importFixationsMoc deleteObject:eachFixation];
 	}
-	
-	// Delete block-fixations relationship.
-	for (VFBlock *eachBlock in session.blocks) {
-		eachBlock.fixations = nil;
-	}
-	fixationArray = nil;
-	
+		
 	// Retrieve gazes
 	NSEntityDescription *entityDescription = [NSEntityDescription
 											  entityForName:@"GazeSample" inManagedObjectContext:importFixationsMoc];
@@ -405,43 +417,13 @@
 	fixationDetectionAlg.gazeSampleRate = 120;
 	fixationDetectionAlg.radiusThreshold = 30; // TODO:
 	
-	NSMutableArray *fixations = [NSMutableArray arrayWithArray:
-								 [fixationDetectionAlg detectFixation:gazeArray inMOC:importFixationsMoc]];
+	[fixationDetectionAlg detectFixation:gazeArray inMOC:importFixationsMoc];
 	gazeArray = nil;
-	
-	for (VFBlock *eachBlock in session.blocks) {
-		NSMutableArray *tempFixations = [NSMutableArray arrayWithArray:fixations];
-		NSPredicate * predicateForTimePeriod = [NSPredicate predicateWithFormat:
-												@"(startTime <= %@ AND endTime >= %@) OR (startTime >= %@ AND startTime <= %@)", 
-												eachBlock.startTime, eachBlock.startTime, eachBlock.startTime, eachBlock.endTime];
-		[tempFixations filterUsingPredicate:predicateForTimePeriod];
-		[eachBlock addFixations:[NSSet setWithArray:tempFixations]];
-	}
-	fixations = nil;
 }
 
-#pragma mark -
-#pragma mark ---------SORT DESCRIPTORS---------
-//	This returns the sort descriptor (in an array) used
-//	for sorting all objects that exists for a time period.
 - (NSArray *)startTimeSortDescriptor
 {
-	NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
-	return [NSArray arrayWithObject:sort];
+	return [VFUtil startTimeSortDescriptor];
 }
 
-//	This returns the sort descriptor (in an array) used
-//	for sorting all objects that used time.
-- (NSArray *)timeSortDescriptor
-{
-	NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
-	return [NSArray arrayWithObject:sort];
-}
-
-- (NSArray*)visualStimuliSortDescriptors
-{
-	NSSortDescriptor *zorderSort = [[NSSortDescriptor alloc] initWithKey:@"template.zorder" ascending:YES];
-	NSSortDescriptor *timeSort = [[NSSortDescriptor alloc] initWithKey:@"startTime" ascending:YES];
-	return [NSArray arrayWithObjects:zorderSort, timeSort, nil];
-}
 @end

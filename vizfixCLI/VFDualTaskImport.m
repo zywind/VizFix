@@ -309,7 +309,6 @@
 			discardedGazeCount++;
 		} else {
 			((VFGazeSample *)[ongoingGazes objectAtIndex:i]).time = [NSNumber numberWithUnsignedInt:assignTime];
-			[currentBlock addGazeSamplesObject:[ongoingGazes objectAtIndex:i]];
 		}
 	}
 	
@@ -542,9 +541,7 @@
 	blip.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 	blip.label = [currentLineFields objectAtIndex:7];
 	blip.ID = [currentLineFields objectAtIndex:2];
-	
-	[currentBlock addVisualStimuliObject:blip];
-	
+		
 	return blip;
 }
 
@@ -582,7 +579,6 @@
 		[self parseFailureForType:@"key category" unparsed:keyCategory];
 	}
 	keyEvent.time = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
-	[currentBlock addKeyboardEventsObject:keyEvent];
 }
 
 - (void)parseSound

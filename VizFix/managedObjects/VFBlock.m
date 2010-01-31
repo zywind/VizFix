@@ -24,15 +24,9 @@
 @dynamic ID;
 @dynamic startTime;
 @dynamic endTime;
-@dynamic keyboardEvents;
 @dynamic trials;
-@dynamic fixations;
-@dynamic auditoryStimuli;
-@dynamic customEvents;
 @dynamic inSession;
 @dynamic conditions;
-@dynamic gazeSamples;
-@dynamic visualStimuli;
 
 - (BOOL)leaf
 {

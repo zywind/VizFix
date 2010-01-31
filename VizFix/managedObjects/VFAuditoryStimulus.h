@@ -19,7 +19,8 @@
 @property (nonatomic, assign) NSPoint location;
 @property (nonatomic, assign) NSPoint primitiveLocation;
 @property (nonatomic, retain) NSString * locationAsString;
-@property (nonatomic, retain) NSNumber * time;
+@property (nonatomic, retain) NSNumber * startTime;
+@property (nonatomic, readonly) NSNumber * endTime;
 @property (nonatomic, retain) VFAudioSource * audioSource;
 @property (nonatomic, retain) VFTrial * isTargetOfTrial;
 

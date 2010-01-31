@@ -13,7 +13,7 @@
 
 @implementation VFAuditoryStimulus 
 
-@dynamic time;
+@dynamic startTime;
 @dynamic audioSource;
 @dynamic isTargetOfTrial;
 @dynamic locationAsString;
@@ -60,4 +60,8 @@
 	[self setValue:locationAsString forKey:@"locationAsString"]; 
 }
 
+- (NSNumber *)endTime
+{
+	return [NSNumber numberWithInt:[self.startTime intValue] + [self.audioSource.duration intValue]];
+}
 @end

@@ -15,6 +15,7 @@
 #import "VFSession.h"
 #import "VFFixation.h"
 #import "VFVisualAngleConverter.h"
+#import "VFUtil.h"
 
 @interface VFView : NSView {
 	IBOutlet NSArrayController *blockController;
@@ -38,6 +39,12 @@
 	NSUInteger selectedGroupType; // 2 for block, 3 for trial, 4 for subtrial
 	
 	VFVisualAngleConverter *DOVConverter;
+	
+	NSPredicate *playbackPredicateForTimePeriod;
+	NSPredicate *playbackPredicateForTimeStamp;
+
+	
+	IBOutlet NSTreeController *treeController;
 }
 
 @property BOOL showLabel;
@@ -56,5 +63,6 @@
 - (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate;
 - (void)drawGazes;
 - (void)drawFixations;
-- (void)updateFrame;
+- (void)drawFixation:(VFFixation *)currentFixation withColor:(NSColor *)color;
+- (void)updateViewContentsFrom:(double)viewStartTime to:(double)viewEndTime;
 @end

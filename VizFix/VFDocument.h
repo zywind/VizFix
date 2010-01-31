@@ -30,6 +30,7 @@
 	// Playback control
 	double viewRefreshRate;
 	NSArray *playbackSpeedModifiers;
+	NSArray *playbackSpeedLabels;
 	int playbackSpeedModifiersIndex;
 	double viewStartTime;
 	double viewEndTime;
@@ -44,6 +45,7 @@
 	IBOutlet NSScrollView *scrollView;
 	IBOutlet NSButton *playButton;
 	IBOutlet VFView	*layoutView;
+	IBOutlet NSTextField *speedLabel;
 	// UI elements data sources.
 	IBOutlet NSTreeController *treeController;
 	IBOutlet NSArrayController *tableViewController;
@@ -53,11 +55,6 @@
 @property (nonatomic, assign) double viewEndTime;
 @property (nonatomic, assign) double viewStartTime;
 @property (nonatomic, assign) BOOL inSummaryMode;
-
-// Sort descriptors.
-- (NSArray *)startTimeSortDescriptor;
-- (NSArray *)visualStimuliSortDescriptors;
-- (NSArray *)timeSortDescriptor;
 
 // Playback control.
 - (IBAction)togglePlayState:(id)sender;
@@ -73,4 +70,6 @@
 - (IBAction)toggleShowGazeSample:(id)sender;
 - (IBAction)detectFixations:(id)sender;
 - (void)doDetectAndInsertFixations;
+
+- (NSArray *)startTimeSortDescriptor;
 @end

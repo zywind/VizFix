@@ -53,50 +53,40 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if ([keyPath isEqualToString:@"selectionIndexPaths"]) {
-		selectedGroupType = [[[change valueForKey:NSKeyValueChangeNewKey] objectAtIndex:0] length];
-		
-		id selected;
-		switch (selectedGroupType) {
-			case 2:
-				selected = [[blockController selectedObjects] objectAtIndex:0];
-
-				break;
-			case 3:
-				selected = [[trialController selectedObjects] objectAtIndex:1];
-				break;
-			case 4:
-				selected = [[blockController selectedObjects] objectAtIndex:2];
-				break;
-			default:
-				return;
-		}
-		
-		gazesArray = [selected valueForKey:@"gazeSamples"];
-		fixationsArray = [selected valueForKey:@"fixations"];
-		visualStimuliArray = [selected valueForKey:@"visualStimuli"];
-		self.currentTime = [[selected valueForKey:@"startTime"] doubleValue];
-	} else if (object == self && [keyPath isEqualToString:@"currentTime"]) {
-		[self updateFrame];
+	if (object == self && [keyPath isEqualToString:@"currentTime"]) {
+		playbackPredicateForTimePeriod = [NSPredicate predicateWithFormat:
+										  @"(startTime <= %f AND endTime >= %f)", 
+										  currentTime, currentTime];
+		playbackPredicateForTimeStamp = [NSPredicate predicateWithFormat:
+										 @"(time <= %f AND time >= %f)", 
+										 currentTime, currentTime - 100];
 	}
 	[self setNeedsDisplay:YES];
 }
 
-- (void)updateFrame
+- (void)updateViewContentsFrom:(double)viewStartTime to:(double)viewEndTime
 {
-	NSPredicate *predicateForTimePeriod, *timePredicate;
-	if (!self.inSummaryMode) {
-		predicateForTimePeriod = [NSPredicate predicateWithFormat:
-								  @"(startTime <= %f AND endTime >= %f)", 
-								  currentTime, currentTime];
-		timePredicate = [NSPredicate predicateWithFormat:@"time <= %f AND time >= %f", 
-						 currentTime, currentTime - 100];
+	if (session == nil)
+		return;
+	NSManagedObjectContext *moc = [session managedObjectContext];
+	if (showGazeSample) {
+		gazesArray = [VFUtil fetchModelObjectsForName:@"GazeSample" 
+												 from:[NSNumber numberWithDouble:viewStartTime] 
+												   to:[NSNumber numberWithDouble:viewEndTime]
+											  withMOC:moc];
+	} else {
+		gazesArray = nil;
 	}
-	
-//	[visualStimuliController setFilterPredicate:predicateForTimePeriod];
-//	[visualStimulusFramesController setFilterPredicate:predicateForTimePeriod];
-//	[fixationController setFilterPredicate:predicateForTimePeriod];
-//	[gazeSampleController setFilterPredicate:timePredicate];
+	visualStimuliArray = [VFUtil fetchModelObjectsForName:@"VisualStimulus" 
+													 from:[NSNumber numberWithDouble:viewStartTime] 
+													   to:[NSNumber numberWithDouble:viewEndTime]
+												  withMOC:moc];
+	fixationsArray = [VFUtil fetchModelObjectsForName:@"Fixation" 
+											   from:[NSNumber numberWithDouble:viewStartTime] 
+												 to:[NSNumber numberWithDouble:viewEndTime]
+											withMOC:moc];
+
+	[self setNeedsDisplay:YES];
 }
 
 - (void)drawRect:(NSRect)rect
@@ -111,23 +101,26 @@
 	[self drawVisualStimulusTemplate:session.background];
 	
 	// Draw screen objects.
-//	for (int i = 0; i < [visualStimuliArray count]; i++)
-//	{
-//		NSSet *frames = ((VFVisualStimulus *)[visualStimuliArray objectAtIndex:i]).frames;
-//		// TODO: filter frame;
-//		
-//		// In summary mode.
-//		if (!inSummaryMode) {
-//			VFVisualStimulusFrame *frame = [frames objectAtIndex:0];
-//			[self drawFrame:frame];
-//		} else {
-//			// TODO: Make this more general. For example, test the location difference between two frames.
-//			for (int j = 0; j < [frames count]; j = j+20) {
-//				VFVisualStimulusFrame *eachFrame = [frames objectAtIndex:j];
-//				[self drawFrame:eachFrame];
-//			}
-//		}
-//	}
+	for (VFVisualStimulus *vs in visualStimuliArray)
+	{
+		NSSet *frames = vs.frames;
+
+		if (!inSummaryMode) {
+			[self drawFrame:[[frames filteredSetUsingPredicate:playbackPredicateForTimePeriod] anyObject]];
+		} else {
+			NSArray *vsFrames = [[frames allObjects] sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
+			VFVisualStimulusFrame *lastDrawnFrame;
+			for (int i = 0; i < [vsFrames count]; i++) {
+				VFVisualStimulusFrame *thisFrame = [vsFrames objectAtIndex:i];
+				if (i == 0 || i == [vsFrames count] - 1 || 
+					([VFUtil distanceBetweenThisPoint:thisFrame.location 
+										 andThatPoint:lastDrawnFrame.location] >= 16)){
+					[self drawFrame:thisFrame];
+					lastDrawnFrame = thisFrame;
+				}
+			}
+		}
+	}
 	
 	if (showGazeSample) {
 		[self drawGazes];
@@ -217,8 +210,15 @@
 
 - (void)drawGazes 
 {
+	NSArray *gazesToDraw;
+	
+	if (!inSummaryMode)
+		gazesToDraw = [gazesArray filteredArrayUsingPredicate:playbackPredicateForTimeStamp];
+	else
+		gazesToDraw = gazesArray;
+
 	int i=0;
-	for (VFGazeSample *eachGaze in gazesArray)
+	for (VFGazeSample *eachGaze in gazesToDraw)
 	{
 		// TEH I should add conditions so that samples outside
 		// the session screen resolution do not draw.
@@ -226,8 +226,8 @@
 		{
 			// Increase the brightness and decrease saturation as the samples progress
 			[[NSColor colorWithCalibratedHue:0.5 
-								  saturation:(1.0 - ((i / (float)[gazesArray count]) / 2.0)) 
-								  brightness:(0.5 + ((i / (float)[gazesArray count]) / 2.0))
+								  saturation:(1.0 - ((i / (float)[gazesToDraw count]) / 2.0)) 
+								  brightness:(0.5 + ((i / (float)[gazesToDraw count]) / 2.0))
 									   alpha:1.0] setFill];
 		} else {
 			[[NSColor blackColor] setFill];
@@ -242,50 +242,81 @@
 
 - (void)drawFixations
 {
-
-	for (int i = 0; i < [fixationsArray count]; i++) {
-		VFFixation *currentFixation = [fixationsArray objectAtIndex:i];
-		double x = currentFixation.location.x;
-		double y = currentFixation.location.y;
-		
-		NSColor *color;
-		if ([fixationsArray count] == 1) {
-			color = [NSColor colorWithCalibratedHue:0.8 
-										 saturation:0.5 
-										 brightness:1.0 
-											  alpha:1.0];
-		} else {
+	NSColor *color;
+	if (!inSummaryMode) {			
+		color = [NSColor colorWithCalibratedHue:0.8 
+									 saturation:1.0 
+									 brightness:1.0 
+										  alpha:1.0];
+		VFFixation *currentFixation;
+		int i = 0;
+		BOOL foundFixation = NO;
+		for (; i < [fixationsArray count]; i++) {
+			currentFixation = [fixationsArray objectAtIndex:i];
+			if (([currentFixation.startTime doubleValue] <= currentTime) 
+				&& ([currentFixation.endTime doubleValue] >= currentTime)) {
+				foundFixation = YES;
+				break;
+			} else if ([currentFixation.startTime doubleValue] >= currentTime) {
+				foundFixation = NO;
+				break;
+			}
+		}
+		if (foundFixation) {
+			if (i > 0) {
+				[color set];
+				VFFixation *previousFixation = [fixationsArray objectAtIndex:i-1];
+				
+				NSBezierPath *linePath = [NSBezierPath bezierPath];
+				[linePath moveToPoint:previousFixation.location];
+				[linePath lineToPoint:currentFixation.location];
+				[linePath stroke];
+			}
+			[self drawFixation:currentFixation withColor:color];
+		}
+	} else {
+		for (int i = 0; i < [fixationsArray count]; i++) {
+			VFFixation *currentFixation = [fixationsArray objectAtIndex:i];
+			
 			color = [NSColor colorWithCalibratedHue:0.8 
 										 saturation:(1.0 - ((i / (float)[fixationsArray count]) / 2.0)) 
 										 brightness:(0.5 + ((i / (float)[fixationsArray count]) / 2.0)) 
 											  alpha:1.0];
-		}
-		
-		[color set];
-		NSRect innerRect = NSMakeRect( x - 3.0, y - 3.0, 6.0, 6.0);
-		
-		NSBezierPath *fixLocPath = [NSBezierPath bezierPathWithOvalInRect:innerRect];
-		[fixLocPath fill];
-		
-		double radius = log([currentFixation.endTime intValue] - [currentFixation.startTime intValue]) * 2;
-		NSRect durationRect = NSMakeRect(x - radius , y - radius, 2 * radius, 2 * radius);
-		NSBezierPath *durationPath = [NSBezierPath bezierPathWithOvalInRect:durationRect];	
-		[durationPath setLineWidth:2];
-		
-		[durationPath stroke];
-		[[color colorWithAlphaComponent:0.4] setFill];
-		[durationPath fill];
-		
-		// Draw a line from last fixation to this one.
-		if (i > 0) {
-			VFFixation *lastFixation = [fixationsArray objectAtIndex:i - 1];
+						
+			[self drawFixation:currentFixation withColor:color];
 			
-			NSBezierPath *linePath = [NSBezierPath bezierPath];
-			[linePath moveToPoint:lastFixation.location];
-			[linePath lineToPoint:currentFixation.location];
-			[linePath stroke];
+			
+			// Draw a line from last fixation to this one.
+			if (i > 0) {
+				VFFixation *lastFixation = [fixationsArray objectAtIndex:i - 1];
+				
+				NSBezierPath *linePath = [NSBezierPath bezierPath];
+				[linePath moveToPoint:lastFixation.location];
+				[linePath lineToPoint:currentFixation.location];
+				[linePath stroke];
+			}
 		}
 	}
+}
+
+- (void)drawFixation:(VFFixation *)aFixation withColor:(NSColor *)color
+{
+	[color set];
+	double x = aFixation.location.x;
+	double y = aFixation.location.y;
+	NSRect innerRect = NSMakeRect( x - 3.0, y - 3.0, 6.0, 6.0);
+	
+	NSBezierPath *fixLocPath = [NSBezierPath bezierPathWithOvalInRect:innerRect];
+	[fixLocPath fill];
+	
+	double radius = log([aFixation.endTime intValue] - [aFixation.startTime intValue]) * 2;
+	NSRect durationRect = NSMakeRect(x - radius , y - radius, 2 * radius, 2 * radius);
+	NSBezierPath *durationPath = [NSBezierPath bezierPathWithOvalInRect:durationRect];	
+	[durationPath setLineWidth:2];
+	
+	[durationPath stroke];
+	[[color colorWithAlphaComponent:0.4] setFill];
+	[durationPath fill];
 }
 
 - (IBAction)changeViewScale:(id)sender
@@ -301,5 +332,7 @@
 	[self setFrameSize:NSMakeSize(session.screenResolution.width * viewScale, 
 								  session.screenResolution.height * viewScale)];
 }
+
+
 
 @end

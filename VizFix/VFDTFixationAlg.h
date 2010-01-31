@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "VFGazeSample.h"
 #import "VFFixation.h"
+#import "VFUtil.h"
 
 @interface VFDTFixationAlg : NSObject {
 	NSUInteger radiusThreshold;
@@ -18,11 +19,9 @@
 @property (nonatomic, assign) NSUInteger gazeSampleRate;
 @property (nonatomic, assign) NSUInteger radiusThreshold;
 
-- (NSArray *)detectFixation:(NSArray *)gazeArray inMOC:(NSManagedObjectContext *)moc;
+- (void)detectFixation:(NSArray *)gazeArray inMOC:(NSManagedObjectContext *)moc;
 - (NSUInteger)thresholdOfNumConsecutiveInvalidSamples;
 - (NSUInteger)minNumInFixation;
-- (float)distanceBetweenThisPoint:(NSPoint)center andThatPoint:(NSPoint)point;
 - (NSArray *)dispersionOfGazes:(NSArray *)gazes;
 - (NSPoint)centroidOfGazes:(NSArray *)gazes;
-- (NSArray *)timeSortDescriptor;
 @end
