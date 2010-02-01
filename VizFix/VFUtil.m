@@ -60,7 +60,7 @@ static NSArray *visualStimuliSort = nil;
 		predicate = [NSPredicate predicateWithFormat:
 					 @"(time <= %@ AND time >= %@)", endTime, startTime];
 		[fetchRequest setSortDescriptors:[VFUtil timeSortDescriptor]];
-	} else {
+	} else {// TODO: constrian the entityName to only a few.
 		predicate = [NSPredicate predicateWithFormat:
 					 @"(startTime <= %@ AND endTime >= %@) OR (startTime >= %@ AND startTime <= %@)", 
 					 startTime, startTime, startTime, endTime];
@@ -81,6 +81,25 @@ static NSArray *visualStimuliSort = nil;
 	} else {
 		// TODO: refine error
 		NSLog(@"Fetch %@ failed.\n%@", entityName, [fetchError localizedDescription]);
+		return nil;
+	}
+}
+
++ (VFSession *)fetchSessionWithMOC:(NSManagedObjectContext *)moc
+{
+	NSError *fetchError = nil;
+	NSArray *fetchResults;
+	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+	
+	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Session"
+											  inManagedObjectContext:moc];
+	[fetchRequest setEntity:entity];
+	
+	fetchResults = [moc executeFetchRequest:fetchRequest error:&fetchError];
+	if ((fetchResults != nil) && ([fetchResults count] == 1) && (fetchError == nil)) {
+		return [fetchResults objectAtIndex:0];
+	} else {
+		NSLog(@"Fetch session failed!\n%@", [fetchError localizedDescription]);
 		return nil;
 	}
 }

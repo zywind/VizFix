@@ -54,21 +54,7 @@
 	[layoutView bind:@"currentTime" toObject:self withKeyPath:@"currentTime" options:nil];
 	
 	// Retrieve Session.
-	NSError *fetchError = nil;
-	NSArray *fetchResults;
-	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-	
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Session"
-											  inManagedObjectContext:[self managedObjectContext]];
-	[fetchRequest setEntity:entity];
-	
-	fetchResults = [[self managedObjectContext] executeFetchRequest:fetchRequest error:&fetchError];
-	if ((fetchResults != nil) && ([fetchResults count] == 1) && (fetchError == nil)) {
-		session = [fetchResults objectAtIndex:0];
-	} else {
-		[self presentError:fetchError];
-	}
-	
+	session = [VFUtil fetchSessionWithMOC:[self managedObjectContext]];
 	[sessionController setContent:session];
 	
 	// Control the resizing of splitView

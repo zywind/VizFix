@@ -14,6 +14,7 @@
 @dynamic startTime;
 @dynamic endTime;
 @dynamic locationAsString;
+@dynamic fixatedAOI;
 
 - (NSPoint)primitiveLocation
 {

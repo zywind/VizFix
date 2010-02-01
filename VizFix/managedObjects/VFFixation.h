@@ -19,6 +19,7 @@
 @property (nonatomic, retain) NSString * locationAsString;
 @property (nonatomic, retain) NSNumber * startTime;
 @property (nonatomic, retain) NSNumber * endTime;
+@property (nonatomic, retain) NSString * fixatedAOI;
 
 @end
 

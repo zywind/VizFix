@@ -47,40 +47,6 @@
 {
 	[self reset];
 	
-	NSString *storePath = [[[rawDataFileURL path] stringByDeletingPathExtension] 
-						   stringByAppendingString:@".vizfixsql"];
-	
-	NSFileManager *fileManager = [[NSFileManager alloc] init];
-	if ([fileManager fileExistsAtPath:storePath]) {
-		NSLog(@"The store file %@ already exists.", storePath);
-		return;
-	}
-	
-	// remove old store.
-	NSError *error = nil;
-	NSPersistentStoreCoordinator *coordinator = [moc persistentStoreCoordinator];
-	NSArray *oldStores = [coordinator persistentStores];
-	if ([oldStores count] != 0) {
-		[coordinator removePersistentStore:[oldStores objectAtIndex:0]
-									 error:&error];
-		if (error != nil) {
-			NSLog(@"Cannot remove previous store.");
-			exit(1);
-		}
-	}
-	// add new store.
-	NSPersistentStore *newStore = [coordinator addPersistentStoreWithType:NSSQLiteStoreType
-															configuration:nil
-																	  URL:[NSURL fileURLWithPath:storePath]
-																  options:nil
-																	error:&error];
-    if (newStore == nil) {
-        NSLog(@"Store Configuration Failure\n%@",
-			  ([error localizedDescription] != nil) ?
-			  [error localizedDescription] : @"Unknown Error");
-		return;
-    }
-	
 	NSLog(@"Starting to import file %@.", [rawDataFileURL path]);
 	
 	session = [NSEntityDescription insertNewObjectForEntityForName:@"Session" inManagedObjectContext:moc];
@@ -117,7 +83,8 @@
 	gazeCondition.factor = @"gaze";
 	// Get the position of the initial character of the gaze condition.
 	gazeCondition.level = [[matchArray objectAtIndex:0] objectAtIndex:2];
-		
+	
+	NSError *error;
 	// Read raw data file.	
 	NSString *fileContents = [NSString stringWithContentsOfURL:rawDataFileURL encoding:NSUTF8StringEncoding 
 														 error:&error];

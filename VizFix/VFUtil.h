@@ -7,7 +7,16 @@
 //
 
 #import <Cocoa/Cocoa.h>
-
+#import "VFSession.h"
+#import "VFCondition.h"
+#import "VFResponse.h"
+#import "VFView.h"
+#import "VFSession.h"
+#import "VFBlock.h"
+#import "VFTrial.h"
+#import "VFSubTrial.h"
+#import "VFFixation.h"
+#import "VFVisualStimulus.h"
 
 @interface VFUtil : NSObject {
 
@@ -21,4 +30,5 @@
 								   to:(NSNumber *)endTime 
 							  withMOC:(NSManagedObjectContext *)moc;
 + (float)distanceBetweenThisPoint:(NSPoint)center andThatPoint:(NSPoint)point;
++ (VFSession *)fetchSessionWithMOC:(NSManagedObjectContext *)moc;
 @end

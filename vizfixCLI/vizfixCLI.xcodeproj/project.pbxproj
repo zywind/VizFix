@@ -27,6 +27,7 @@
 		3BC50579110AE3640004A125 /* VFVisualStimulusTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50574110AE3640004A125 /* VFVisualStimulusTemplate.m */; };
 		3BED3E66111668800000547D /* VFDTFixationAlg.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BED3E63111668800000547D /* VFDTFixationAlg.m */; };
 		3BED3E67111668800000547D /* VFUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BED3E65111668800000547D /* VFUtil.m */; };
+		3BED3EDF1116723E0000547D /* VFDualTaskAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BED3EDE1116723E0000547D /* VFDualTaskAnalyzer.m */; };
 		3BFC653310FF3BE900D4258A /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BFC653210FF3BE900D4258A /* libicucore.dylib */; };
 		3BFC653710FF3C0A00D4258A /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BFC653610FF3C0A00D4258A /* RegexKitLite.m */; };
 		8DD76F9A0486AA7600D96B5E /* vizfixCLI.m in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* vizfixCLI.m */; settings = {ATTRIBUTES = (); }; };
@@ -89,6 +90,8 @@
 		3BED3E63111668800000547D /* VFDTFixationAlg.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VFDTFixationAlg.m; path = ../VizFix/VFDTFixationAlg.m; sourceTree = SOURCE_ROOT; };
 		3BED3E64111668800000547D /* VFUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFUtil.h; path = ../VizFix/VFUtil.h; sourceTree = SOURCE_ROOT; };
 		3BED3E65111668800000547D /* VFUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VFUtil.m; path = ../VizFix/VFUtil.m; sourceTree = SOURCE_ROOT; };
+		3BED3EDD1116723E0000547D /* VFDualTaskAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFDualTaskAnalyzer.h; sourceTree = "<group>"; };
+		3BED3EDE1116723E0000547D /* VFDualTaskAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFDualTaskAnalyzer.m; sourceTree = "<group>"; };
 		3BF07E1E10FFDE78004E5CAF /* outputSpec.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = outputSpec.txt; sourceTree = "<group>"; };
 		3BFC653210FF3BE900D4258A /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		3BFC653510FF3C0A00D4258A /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RegexKitLite.h; path = RegexKitLite/RegexKitLite.h; sourceTree = "<group>"; };
@@ -138,6 +141,8 @@
 				08FB7796FE84155DC02AAC07 /* vizfixCLI.m */,
 				3B8A263510FF0E9600DBFA0C /* VFDualTaskImport.h */,
 				3B8A263610FF0E9600DBFA0C /* VFDualTaskImport.m */,
+				3BED3EDD1116723E0000547D /* VFDualTaskAnalyzer.h */,
+				3BED3EDE1116723E0000547D /* VFDualTaskAnalyzer.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -280,6 +285,7 @@
 				3BC50579110AE3640004A125 /* VFVisualStimulusTemplate.m in Sources */,
 				3BED3E66111668800000547D /* VFDTFixationAlg.m in Sources */,
 				3BED3E67111668800000547D /* VFUtil.m in Sources */,
+				3BED3EDF1116723E0000547D /* VFDualTaskAnalyzer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
