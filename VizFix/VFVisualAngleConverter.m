@@ -15,8 +15,8 @@
 @synthesize screenDimension;
 @synthesize distanceToScreen;
 
-#define RADIANS( degrees ) ( degrees * M_PI / 180 )
-#define DEGREES( radians) (radians * 180 / M_PI)
+#define RADIANS(degrees) (degrees * M_PI / 180)
+#define DEGREES(radians) (radians * 180 / M_PI)
 
 - (id)initWithDistanceToScreen:(NSUInteger)distance 
 			  screenResolution:(NSSize)resolution 

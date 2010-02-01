@@ -59,4 +59,14 @@
 	[self setValue:locationAsString forKey:@"locationAsString"]; 
 }
 
+- (void)setNilValueForKey:(NSString *)key 
+{
+	if ([key isEqualToString:@"location"]) {
+		location = NSMakePoint(0.0f, 0.0f);
+    }
+    else {
+        [super setNilValueForKey:key];
+    }
+}
+
 @end

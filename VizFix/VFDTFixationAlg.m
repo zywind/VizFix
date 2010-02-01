@@ -20,20 +20,44 @@
 	
 	if (self != nil)
 	{	
-
+		
 	}
 	
 	return self;
 }
 
-- (void)detectFixation:(NSArray *)gazeArray inMOC:(NSManagedObjectContext *)moc
+- (void)detectAllFixationsInMOC:(NSManagedObjectContext *)moc
+{
+	// Retrieve gazes
+	NSEntityDescription *entityDescription = [NSEntityDescription
+											  entityForName:@"GazeSample" inManagedObjectContext:moc];
+	NSFetchRequest *request = [[NSFetchRequest alloc] init];
+	[request setEntity:entityDescription];
+	
+	[request setSortDescriptors:[VFUtil timeSortDescriptor]];
+	
+	NSError *error;
+	NSArray *gazeArray = [moc executeFetchRequest:request error:&error];
+	if (gazeArray == nil)
+	{
+		NSLog(@"Fetch gaze samples failed.\n%@", [error localizedDescription]);
+		return;
+	}
+	
+	[self detectFixation:gazeArray];
+	gazeArray = nil;
+}
+
+- (void)detectFixation:(NSArray *)gazeArray
 {	
 	BOOL FLAG = NO;
 	NSUInteger numConsecutiveInvalidSamples = 0;
-
+	
 	NSMutableArray *ongoingFixationGazes = [NSMutableArray arrayWithCapacity:20];
 	NSMutableArray *previousFixationGazes = [NSMutableArray arrayWithCapacity:20];
-		
+	
+	NSManagedObjectContext * moc = [[gazeArray objectAtIndex:0] managedObjectContext];
+	
 	for (int i = 0; i < [gazeArray count]; i++)
 	{
 		VFGazeSample *gaze = [gazeArray objectAtIndex:i];
@@ -58,8 +82,7 @@
 			continue;
 		}
 		
-		NSArray *dispersionParams = [self dispersionOfGazes:ongoingFixationGazes];
-		float dispersion = [[dispersionParams objectAtIndex:0] floatValue];
+		float dispersion = [self dispersionOfGazes:ongoingFixationGazes];
 		NSPoint curCentroid = [self centroidOfGazes:ongoingFixationGazes];
 		[ongoingFixationGazes sortUsingDescriptors:[VFUtil timeSortDescriptor]];
 		VFGazeSample *earliestGaze = [ongoingFixationGazes objectAtIndex:0];
@@ -104,7 +127,7 @@
 				{
 					// Make the ongoing fixatin.
 					VFFixation *ongoingFixation = [NSEntityDescription 
-												insertNewObjectForEntityForName:@"Fixation" inManagedObjectContext:moc];
+												   insertNewObjectForEntityForName:@"Fixation" inManagedObjectContext:moc];
 					
 					[ongoingFixationGazes sortUsingDescriptors:[VFUtil timeSortDescriptor]];
 					
@@ -125,7 +148,7 @@
 			
 			numConsecutiveInvalidSamples = 0;
 			if ([VFUtil distanceBetweenThisPoint:gaze.location 
-								  andThatPoint:curCentroid] >= self.radiusThreshold) {
+									andThatPoint:curCentroid] >= self.radiusThreshold) {
 				numSuccessiveOutsideGaze++;
 				if (numSuccessiveOutsideGaze == 1) {
 					firstOutsideGaze = gaze;
@@ -136,7 +159,7 @@
 					centroidOfOutsideGazes.y = (firstOutsideGaze.location.y + gaze.location.y) / 2;
 					
 					if ([VFUtil distanceBetweenThisPoint:centroidOfOutsideGazes
-										  andThatPoint:curCentroid] >= self.radiusThreshold) {
+											andThatPoint:curCentroid] >= self.radiusThreshold) {
 						[previousFixationGazes addObjectsFromArray:ongoingFixationGazes];
 						[ongoingFixationGazes removeAllObjects];
 						
@@ -162,7 +185,7 @@
 		VFFixation *prevFixation = [NSEntityDescription 
 									insertNewObjectForEntityForName:@"Fixation" inManagedObjectContext:moc];
 		NSPoint prevCentroid = [self centroidOfGazes:previousFixationGazes];
-				
+		
 		[previousFixationGazes sortUsingDescriptors:[VFUtil timeSortDescriptor]];
 		prevFixation.startTime = ((VFGazeSample *)[previousFixationGazes objectAtIndex:0]).time;
 		prevFixation.endTime = ((VFGazeSample *)[previousFixationGazes lastObject]).time;
@@ -175,15 +198,13 @@
 		VFFixation *ongoingFixation = [NSEntityDescription 
 									   insertNewObjectForEntityForName:@"Fixation" inManagedObjectContext:moc];
 		NSPoint curCentroid = [self centroidOfGazes:ongoingFixationGazes];
-				
+		
 		[ongoingFixationGazes sortUsingDescriptors:[VFUtil timeSortDescriptor]];
 		ongoingFixation.startTime = ((VFGazeSample *)[ongoingFixationGazes objectAtIndex:0]).time;
 		ongoingFixation.endTime = ((VFGazeSample *)[ongoingFixationGazes lastObject]).time;
 		
 		ongoingFixation.location = curCentroid;
-		
 	}
-	
 }
 
 - (NSUInteger)thresholdOfNumConsecutiveInvalidSamples
@@ -206,29 +227,25 @@
 	}
 	centroid.x = centroid.x / [gazes count];
 	centroid.y = centroid.y / [gazes count];
-		
+	
 	return centroid;
 }
 
-- (NSArray *)dispersionOfGazes:(NSArray *)gazes
+- (float)dispersionOfGazes:(NSArray *)gazes
 {
 	NSPoint centroid = [self centroidOfGazes:gazes];
 	
 	float dispersion = 0;
-	VFGazeSample *deviantGaze;
 	for (VFGazeSample *eachGaze in gazes)
 	{
 		float distance = [VFUtil distanceBetweenThisPoint:centroid 
-										   andThatPoint:eachGaze.location];
+											 andThatPoint:eachGaze.location];
 		if (distance > dispersion) {
 			dispersion = distance;
-			deviantGaze = eachGaze;
 		}
 	}
 	
-	return [NSArray arrayWithObjects:[NSNumber numberWithFloat:dispersion], deviantGaze, nil];
+	return dispersion;
 }
-
-
 
 @end

@@ -20,6 +20,7 @@
 #import "VFVisualStimulusTemplate.h"
 #import "VFKeyboardEvent.h"
 #import "VFAuditoryStimulus.h"
+#import "VFDTFixationAlg.h"
 
 #import "RegexKitLite.h"
 

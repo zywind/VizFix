@@ -18,19 +18,71 @@
 {	
 	if (self = [super init]) {
 		moc = anMOC;
-		[moc setUndoManager:nil];
-		lineNum = 0;
-		discardedGazeCount = 0;
-		
-		lastGazeTimeStamp = 0;
-		startAccumulateTimeStamp = 0;
-		consolidateState = 0;
+		blipColorCodes = [NSArray arrayWithObjects:@"0", @"1", @"2", @"5", @"7", nil];
     }
     return self;
 }
 
+- (void)reset
+{
+	lines = nil;
+	lineNum = 0;
+	currentLineFields = nil;
+	
+	discardedGazeCount = 0;
+	lastGazeTimeStamp = 0;
+	startAccumulateTimeStamp = 0;
+	consolidateState = 0;
+	blockEndTime = 0;
+	
+	// Initialize temporary containers.
+	session = nil;
+	currentBlock = nil;
+	ongoingBlips = [NSMutableDictionary dictionaryWithCapacity:10];
+	ongoingTrials = [NSMutableDictionary dictionaryWithCapacity:10];
+	ongoingGazes = [NSMutableArray arrayWithCapacity:10];
+}
+
 - (void)import:(NSURL *)rawDataFileURL
 {
+	[self reset];
+	
+	NSString *storePath = [[[rawDataFileURL path] stringByDeletingPathExtension] 
+						   stringByAppendingString:@".vizfixsql"];
+	
+	NSFileManager *fileManager = [[NSFileManager alloc] init];
+	if ([fileManager fileExistsAtPath:storePath]) {
+		NSLog(@"The store file %@ already exists.", storePath);
+		return;
+	}
+	
+	// remove old store.
+	NSError *error = nil;
+	NSPersistentStoreCoordinator *coordinator = [moc persistentStoreCoordinator];
+	NSArray *oldStores = [coordinator persistentStores];
+	if ([oldStores count] != 0) {
+		[coordinator removePersistentStore:[oldStores objectAtIndex:0]
+									 error:&error];
+		if (error != nil) {
+			NSLog(@"Cannot remove previous store.");
+			exit(1);
+		}
+	}
+	// add new store.
+	NSPersistentStore *newStore = [coordinator addPersistentStoreWithType:NSSQLiteStoreType
+															configuration:nil
+																	  URL:[NSURL fileURLWithPath:storePath]
+																  options:nil
+																	error:&error];
+    if (newStore == nil) {
+        NSLog(@"Store Configuration Failure\n%@",
+			  ([error localizedDescription] != nil) ?
+			  [error localizedDescription] : @"Unknown Error");
+		return;
+    }
+	
+	NSLog(@"Starting to import file %@.", [rawDataFileURL path]);
+	
 	session = [NSEntityDescription insertNewObjectForEntityForName:@"Session" inManagedObjectContext:moc];
 	session.distanceToScreen = [NSNumber numberWithInt:610]; // in mm.
 	session.screenResolution = NSMakeSize(1280.0, 1024.0); // in pixel.
@@ -67,7 +119,6 @@
 	gazeCondition.level = [[matchArray objectAtIndex:0] objectAtIndex:2];
 		
 	// Read raw data file.	
-	NSError *error;
 	NSString *fileContents = [NSString stringWithContentsOfURL:rawDataFileURL encoding:NSUTF8StringEncoding 
 														 error:&error];
 	if (fileContents == nil) {
@@ -111,7 +162,6 @@
 	// Main loop.	
 	// The next line must contains at least 2 columns.
 	BOOL readyToEndBlock = NO;
-	blockEndTime = 0;
 	while(([currentLineFields = [[lines objectAtIndex:lineNum++] componentsSeparatedByString:@"\t"] 
 			count] > 1) && lineNum < [lines count])
 	{
@@ -150,16 +200,31 @@
 			continue;
 		} else if ([eventType isEqualToString:@"TrackingError"]) {
 			continue;
+		} else if ([eventType isEqualToString:@"ScenarioFile"]
+				   || [eventType isEqualToString:@"ScreenResolution"]
+				   || [eventType isEqualToString:@"GazeContingent"]
+				   || [eventType isEqualToString:@"Tracking payment"]
+				   || [eventType isEqualToString:@"Tactical payment"]
+				   || [eventType isEqualToString:@"AdditionalErrorData"]
+				   || [eventType isEqualToString:@"ClassifyData"]) {
+			continue;
+			
 		} else {
 			[self parseFailureForType:@"event type" unparsed:eventType];
 		}
 	}
 	
 	[self consolidateGazesToIndex:[ongoingGazes count] - 1];
-	NSLog(@"Discarded %d gaze samples.", discardedGazeCount);
 	
+	VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
+	fixationDetectionAlg.gazeSampleRate = 120;
+	fixationDetectionAlg.radiusThreshold = 30;
+	[fixationDetectionAlg detectAllFixationsInMOC:moc];
+
+	NSLog(@"Discarded %d gaze samples.", discardedGazeCount);
 	// Import completed. Save.
 	[self saveData];
+	NSLog(@"Import file %@ succeeded.\n\n", [rawDataFileURL path]);
 }
 
 - (void)saveData
@@ -252,13 +317,6 @@
 	}
 	
 	visualStimuliTemplates = [NSArray arrayWithArray:tempTemplates];
-	
-	blipColorCodes = [NSArray arrayWithObjects:@"0", @"1", @"2", @"5", @"7", nil];
-	
-	// Initialize temporary containers.
-	ongoingBlips = [NSMutableDictionary dictionaryWithCapacity:10];
-	ongoingTrials = [NSMutableDictionary dictionaryWithCapacity:10];
-	ongoingGazes = [NSMutableArray arrayWithCapacity:10];
 }
 
 #pragma mark -
@@ -375,6 +433,19 @@
 	// Consolidate ongoing gaze samples.
 	[self consolidateGazesToIndex:[ongoingGazes count] - 1];
 	
+	// Sanity check
+	int wavesize = 0;
+	for (VFCondition *condition in currentBlock.conditions) {
+		if ([condition.factor isEqualToString:@"wave size"]) {
+			wavesize = [condition.level intValue];
+		}
+	}
+	
+	if ([currentBlock.trials count] != wavesize) {
+		NSLog(@"The block does not contain the same number of trials as indicated by its wave size. \
+			  The wave size is %d, but the number of trials is %d", wavesize, [currentBlock.trials count]);
+	}
+	
 	currentBlock = nil;
 	[self saveData];
 }
@@ -384,6 +455,9 @@
 - (void)startTrial
 {
 	VFTrial *trial = [NSEntityDescription insertNewObjectForEntityForName:@"Trial" inManagedObjectContext:moc];
+	if (currentBlock == nil) {
+		NSLog(@"A trial was started before a block start comment was parsed.");
+	}
 	[currentBlock addTrialsObject:trial];
 	trial.ID = [@"blip " stringByAppendingString:[currentLineFields objectAtIndex:2]];
 	trial.order = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:2] intValue]];

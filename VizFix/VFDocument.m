@@ -382,43 +382,26 @@
 
 - (void)doDetectAndInsertFixations
 {
-	NSManagedObjectContext *importFixationsMoc = [self managedObjectContext];
+	NSManagedObjectContext *moc = [self managedObjectContext];
 	
 	// Delete old fixations
 	NSEntityDescription *fixatinoEntityDescription = [NSEntityDescription
-													  entityForName:@"Fixation" inManagedObjectContext:importFixationsMoc];
+													  entityForName:@"Fixation" inManagedObjectContext:moc];
 	NSFetchRequest *fixationRequest = [[NSFetchRequest alloc] init];
 	[fixationRequest setEntity:fixatinoEntityDescription];
 	
 	NSError *error;
-	NSArray *fixationArray = [importFixationsMoc executeFetchRequest:fixationRequest error:&error];
+	NSArray *fixationArray = [moc executeFetchRequest:fixationRequest error:&error];
 	
 	for (VFFixation *eachFixation in fixationArray) {
-		[importFixationsMoc deleteObject:eachFixation];
+		[moc deleteObject:eachFixation];
 	}
+	fixationArray = nil;
 		
-	// Retrieve gazes
-	NSEntityDescription *entityDescription = [NSEntityDescription
-											  entityForName:@"GazeSample" inManagedObjectContext:importFixationsMoc];
-	NSFetchRequest *request = [[NSFetchRequest alloc] init];
-	[request setEntity:entityDescription];
-	
-	NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
-	[request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
-	
-	NSArray *gazeArray = [importFixationsMoc executeFetchRequest:request error:&error];
-	if (gazeArray == nil)
-	{
-		NSLog(@"Fetch gaze samples failed.\n%@", [error localizedDescription]);
-		return;
-	}
-	
 	VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
 	fixationDetectionAlg.gazeSampleRate = 120;
-	fixationDetectionAlg.radiusThreshold = 30; // TODO:
-	
-	[fixationDetectionAlg detectFixation:gazeArray inMOC:importFixationsMoc];
-	gazeArray = nil;
+	fixationDetectionAlg.radiusThreshold = 30;
+	[fixationDetectionAlg detectAllFixationsInMOC:moc];
 }
 
 - (NSArray *)startTimeSortDescriptor

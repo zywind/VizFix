@@ -19,9 +19,10 @@
 @property (nonatomic, assign) NSUInteger gazeSampleRate;
 @property (nonatomic, assign) NSUInteger radiusThreshold;
 
-- (void)detectFixation:(NSArray *)gazeArray inMOC:(NSManagedObjectContext *)moc;
+- (void)detectAllFixationsInMOC:(NSManagedObjectContext *)moc;
+- (void)detectFixation:(NSArray *)gazeArray;
 - (NSUInteger)thresholdOfNumConsecutiveInvalidSamples;
 - (NSUInteger)minNumInFixation;
-- (NSArray *)dispersionOfGazes:(NSArray *)gazes;
+- (float)dispersionOfGazes:(NSArray *)gazes;
 - (NSPoint)centroidOfGazes:(NSArray *)gazes;
 @end

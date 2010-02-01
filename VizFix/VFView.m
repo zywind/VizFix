@@ -174,6 +174,7 @@
 			
 			if (stimulusImage == nil) {
 				NSLog(@"Image file %@ does not exist.", [imageURL path]);
+				return;
 			}
 		}
 		

@@ -7,55 +7,38 @@ NSManagedObjectContext *managedObjectContext(NSURL *storeURL);
 int main (int argc, const char * argv[]) {
 	objc_startCollectorThread();
 
-	
-    NSURL *storeURL = [NSURL fileURLWithPath:[NSString stringWithUTF8String:argv[2]]];
-	NSManagedObjectContext *moc = managedObjectContext(storeURL);
-
-	VFDualTaskImport *importer = [[VFDualTaskImport alloc] initWithMOC:moc];
-	[importer import:[NSURL fileURLWithPath:[NSString stringWithUTF8String:argv[1]]]];
-	
-    return 0;
-}
-
-NSManagedObjectContext *managedObjectContext(NSURL *storeURL)
-{
-    static NSManagedObjectContext *moc = nil;
-    if (moc != nil) {
-        return moc;
-    }
-	
-    moc = [[NSManagedObjectContext alloc] init];
 	// load model
-	NSManagedObjectModel *mom = [[NSManagedObjectModel alloc] initWithContentsOfURL:[NSURL fileURLWithPath:@"VFModel.mom"]];
-	
+	NSManagedObjectModel *mom = [[NSManagedObjectModel alloc] 
+								 initWithContentsOfURL:[NSURL fileURLWithPath:@"VFModel.mom"]];
 	NSPersistentStoreCoordinator *coordinator =
-		[[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: mom];
+	[[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: mom];
+	
+	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
     [moc setPersistentStoreCoordinator: coordinator];
+	[moc setUndoManager:nil];
 	
-    NSString *STORE_TYPE = NSSQLiteStoreType;
+	VFDualTaskImport *importer = [[VFDualTaskImport alloc] initWithMOC:moc];
 	
-    NSError *error;
-	
+	NSURL *importURL = [NSURL fileURLWithPath:[NSString stringWithUTF8String:argv[1]]];
 	NSFileManager *fileManager = [[NSFileManager alloc] init];
-	if ([fileManager fileExistsAtPath:[storeURL path]]) {
-		if (![fileManager removeItemAtPath:[storeURL path] error:&error]) {
-			NSLog(@"Cannot remove the previous store.\n%@",
-				  ([error localizedDescription] != nil) ?
-				  [error localizedDescription] : @"Unknown Error");
+	BOOL isDir;
+	
+	if ([fileManager fileExistsAtPath:[importURL path] isDirectory:&isDir]) {
+		if (isDir) {
+			NSArray *filePaths = [fileManager contentsOfDirectoryAtPath:[importURL path] error:NULL];
+			for (NSString *eachPath in filePaths) {
+				// import all text files.
+				if ([[eachPath pathExtension] isEqualToString:@"txt"]) {
+					NSURL *aURL = [NSURL fileURLWithPath:eachPath];
+					[importer import:aURL];
+				}
+			}
+		} else {// Just one file to import.
+			[importer import:importURL];
 		}
+	} else {
+		NSLog(@"The file %@ does not exist.", [importURL path]);
 	}
 	
-    NSPersistentStore *newStore = [coordinator addPersistentStoreWithType:STORE_TYPE
-															configuration:nil
-																	  URL:storeURL
-																  options:nil
-																	error:&error];
-	
-    if (newStore == nil) {
-        NSLog(@"Store Configuration Failure\n%@",
-			  ([error localizedDescription] != nil) ?
-			  [error localizedDescription] : @"Unknown Error");
-    }
-	
-    return moc;
+	return 0;
 }
