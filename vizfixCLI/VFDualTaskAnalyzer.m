@@ -30,31 +30,24 @@
 		NSArray *trials = [[eachBlock.trials allObjects] 
 						   sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
 		for (VFTrial *eachTrial in trials) {
-			NSString *blipID = [eachTrial.ID substringFromIndex:5];
-			NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ID LIKE %@", blipID];
-			
-			NSArray *blipsOfCurrentTrial = [blipsOfCurrentWave filteredArrayUsingPredicate:predicate];
+//			NSString *blipID = [eachTrial.ID substringFromIndex:5];
+//			NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ID LIKE %@ *Classify", blipID];
+//			
+//			NSArray *blipsOfCurrentTrial = [blipsOfCurrentWave filteredArrayUsingPredicate:predicate];
 			
 			NSArray *subTrials = [[eachTrial.subTrials allObjects] 
 								  sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
 			for (VFSubTrial *subTrial in subTrials) {
-				predicate = [NSPredicate predicateWithFormat:@"startTime >= %@ AND endTime <= %@", 
-							 subTrial.startTime, subTrial.endTime];
-				targetBlip = [[blipsOfCurrentTrial filteredArrayUsingPredicate:predicate] 
-							  objectAtIndex:0];
+				NSArray *fixations = [fixationsOfCurrentWave filteredArrayUsingPredicate:
+									  [VFUtil predicateForObjectsWithStartTime:subTrial.startTime 
+																	   endTime:subTrial.endTime]];
 				
-				predicate = [NSPredicate predicateWithFormat:
-							 @"(startTime <= %@ AND endTime >= %@) OR \
-							 (startTime >= %@ AND startTime <= %@)", 
-							 subTrial.startTime, subTrial.startTime, 
-							 subTrial.startTime, subTrial.endTime];
-				
-				NSArray *fixations = [fixationsOfCurrentWave filteredArrayUsingPredicate:predicate];
-				
+				NSMutableString *scanPath = [NSMutableString stringWithString:@""];
 				for (VFFixation *eachFixation in fixations) {
-					[self findFixatedAOIForFixations:eachFixation];
-					// TODO scan path.
+					[scanPath appendFormat:@"%@,", eachFixation.fixatedAOI];
 				}
+				
+				NSLog(@"%@", scanPath);
 			}
 		}
 	}
