@@ -11,23 +11,18 @@
 
 @implementation VFDTFixationAlg
 
-@synthesize gazeSampleRate;
-@synthesize radiusThreshold;
-
-- (id) init
+- (void)detectAllFixationsInMOC:(NSManagedObjectContext *)moc withRadiusThresholdInDOV:(double)aRadius
 {
-	self = [super init];
+	VFSession *session = [VFUtil fetchSessionWithMOC:moc];
+	VFVisualAngleConverter *DOVConverter = 
+	[[VFVisualAngleConverter alloc] initWithDistanceToScreen:[session.distanceToScreen intValue]
+											screenResolution:session.screenResolution 
+											 screenDimension:session.screenDimension];	
+	gazeSampleRate = [session.gazeSampleRate doubleValue];
 	
-	if (self != nil)
-	{	
-		
-	}
+	radiusThreshold = sqrt([DOVConverter horizontalPixelsFromVisualAngles:aRadius] 
+						   * [DOVConverter verticalPixelsFromVisualAngles:aRadius]);
 	
-	return self;
-}
-
-- (void)detectAllFixationsInMOC:(NSManagedObjectContext *)moc
-{
 	// Retrieve gazes
 	NSEntityDescription *entityDescription = [NSEntityDescription
 											  entityForName:@"GazeSample" inManagedObjectContext:moc];
@@ -87,7 +82,7 @@
 		[ongoingFixationGazes sortUsingDescriptors:[VFUtil timeSortDescriptor]];
 		VFGazeSample *earliestGaze = [ongoingFixationGazes objectAtIndex:0];
 		
-		if (dispersion >= self.radiusThreshold) {
+		if (dispersion >= radiusThreshold) {
 			// I took the other method described in Karsh. Because I found removing the most deviant gaze sometiems has problem.
 			[ongoingFixationGazes removeObject:earliestGaze];
 			continue;
@@ -97,7 +92,7 @@
 			FLAG = NO;
 			NSPoint prevCentroid = [self centroidOfGazes:previousFixationGazes];
 			
-			if ([VFUtil distanceBetweenThisPoint:prevCentroid andThatPoint:curCentroid] < self.radiusThreshold) {
+			if ([VFUtil distanceBetweenThisPoint:prevCentroid andThatPoint:curCentroid] < radiusThreshold) {
 				[ongoingFixationGazes addObjectsFromArray:previousFixationGazes];
 				// Go to 2.
 			} else {
@@ -148,7 +143,7 @@
 			
 			numConsecutiveInvalidSamples = 0;
 			if ([VFUtil distanceBetweenThisPoint:gaze.location 
-									andThatPoint:curCentroid] >= self.radiusThreshold) {
+									andThatPoint:curCentroid] >= radiusThreshold) {
 				numSuccessiveOutsideGaze++;
 				if (numSuccessiveOutsideGaze == 1) {
 					firstOutsideGaze = gaze;
@@ -159,7 +154,7 @@
 					centroidOfOutsideGazes.y = (firstOutsideGaze.location.y + gaze.location.y) / 2;
 					
 					if ([VFUtil distanceBetweenThisPoint:centroidOfOutsideGazes
-											andThatPoint:curCentroid] >= self.radiusThreshold) {
+											andThatPoint:curCentroid] >= radiusThreshold) {
 						[previousFixationGazes addObjectsFromArray:ongoingFixationGazes];
 						[ongoingFixationGazes removeAllObjects];
 						
@@ -207,11 +202,13 @@
 	}
 }
 
+// 330.0 ms is estimated from Karsh's 12 consecutive invalid samples, in which their sample rate is 60 HZ.
 - (NSUInteger)thresholdOfNumConsecutiveInvalidSamples
 {
 	return round(330.0 / (1000.0 / (float)gazeSampleRate));
 }
 
+// Assuming the minimum fixation duration is 100.0 ms.
 - (NSUInteger)minNumInFixation
 {
 	return round(100.0 / (1000.0 / (float)gazeSampleRate));

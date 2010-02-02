@@ -54,11 +54,12 @@
 	session.screenResolution = NSMakeSize(1280.0, 1024.0); // in pixel.
 	session.experiment = @"NRL Dual Task";
 	session.gazeSampleRate = [NSNumber numberWithInt:120]; // per second.
-	session.screenDimension = NSMakeSize(432.0, 407.0); // in mm.
+	session.screenDimension = NSMakeSize(432.0, 407.0); // in mm. Taken from http://www.aurora.se/neovo/neovo-x174.htm .
 	VFVisualStimulusTemplate *backgroundTemplate = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate"
 																				 inManagedObjectContext:moc];
 	backgroundTemplate.imageFilePath = @"img/background.png";
 	backgroundTemplate.category = @"background";
+	backgroundTemplate.outline = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 0, 1280, 1024)];
 	
 	session.background = backgroundTemplate;
 		
@@ -182,16 +183,26 @@
 	}
 	
 	[self consolidateGazesToIndex:[ongoingGazes count] - 1];
+	session.duration = [NSNumber numberWithInt:startAccumulateTimeStamp];
 	
-	VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
-	fixationDetectionAlg.gazeSampleRate = 120;
-	fixationDetectionAlg.radiusThreshold = 30;
-	[fixationDetectionAlg detectAllFixationsInMOC:moc];
-
 	NSLog(@"Discarded %d gaze samples.", discardedGazeCount);
 	// Import completed. Save.
 	[self saveData];
-	NSLog(@"Import file %@ succeeded.\n\n", [rawDataFileURL path]);
+	NSLog(@"Import file %@ succeeded.", [rawDataFileURL path]);
+	
+	NSLog(@"Start to detect fixations.");
+	VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
+	[fixationDetectionAlg detectAllFixationsInMOC:moc withRadiusThresholdInDOV:0.5];
+	NSLog(@"Detecting fixations succeeded.");
+	[self saveData];
+	
+	// Register fixations to AOIs.
+	NSBezierPath *radarAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 180, 710, 512)];
+	NSBezierPath *trackingAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(740, 242, 540, 540)];
+	NSDictionary *customAOIs = [NSDictionary dictionaryWithObjectsAndKeys:radarAOI, @"Radar Display", 
+								trackingAOI, @"Tracking Display", nil];
+	[VFUtil registerFixationsToAOIs:customAOIs inMOC:moc withAutoAOIDOV:2.5];
+	[self saveData];
 }
 
 - (void)saveData
@@ -278,6 +289,7 @@
 			
 			aBlipTemplate.imageFilePath = [NSString stringWithFormat:@"img/%d-%d.png", i, j];
 			aBlipTemplate.category = @"blip";
+			aBlipTemplate.outline = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 0, 32, 32)];
 			
 			[tempTemplates addObject:aBlipTemplate];
 		}
@@ -471,15 +483,17 @@
 	[trial addSubTrialsObject:subTrial];
 	
 	// Parse screen object.
-	VFVisualStimulus *blip = [self makeBlip];
+	VFVisualStimulus *blip = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulus" 
+														   inManagedObjectContext:moc];
+	blip.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
+	blip.ID = [[currentLineFields objectAtIndex:2] stringByAppendingString:@" PreClassify"];
 	blip.label = [currentLineFields objectAtIndex:10];
 	// Black blip.
 	blip.template = [visualStimuliTemplates objectAtIndex:[[currentLineFields objectAtIndex:5] intValue] - 1];
 	
 	[ongoingBlips setObject:blip forKey:blip.ID];
 	
-	VFVisualStimulusFrame *aFrame = [self makeBlipFrame];
-	[blip addFramesObject:aFrame];
+	[blip addFramesObject:[self makeBlipFrame]];
 }
 
 - (void)endTrial
@@ -524,18 +538,21 @@
 #pragma mark -------PARSE BLIP EVENTS-------
 - (void)parseBlipMoved
 {
-	VFVisualStimulus *blip = [ongoingBlips objectForKey:[currentLineFields objectAtIndex:2]];
-	[self endBlipFrameForBlip:blip];
-	
-	[blip addFramesObject:[self makeBlipFrame]];
+	// Sometimes a BlipMoved message for a new color appears before BlipChangeColor message.
+	// If so, ignore this frame.
+	VFVisualStimulus *blip = [ongoingBlips objectForKey:[self getBlipID]];
+	if (blip != nil) {
+		[self endBlipFrameForBlip:blip];
+		[blip addFramesObject:[self makeBlipFrame]];
+	}
 }
 
 - (void)parseBlipChangedColor
 {
-	VFVisualStimulus *blip = [ongoingBlips objectForKey:[currentLineFields objectAtIndex:2]];
+	VFVisualStimulus *blip = [ongoingBlips objectForKey:[self getLastBlipID]];
 	[self endBlipFrameForBlip:blip];
 	blip.endTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue] - 1];
-	[ongoingBlips removeObjectForKey:[currentLineFields objectAtIndex:2]];
+	[ongoingBlips removeObjectForKey:blip.ID];
 	
 	int colorIndex = [blipColorCodes indexOfObject:[currentLineFields objectAtIndex:6]];
 	int typeIndex = [[currentLineFields objectAtIndex:5] intValue] - 1;
@@ -552,15 +569,9 @@
 	
 	// Start new subTrial
 	VFSubTrial *subTrial = [NSEntityDescription insertNewObjectForEntityForName:@"SubTrial" inManagedObjectContext:moc];
-	if (![[currentLineFields objectAtIndex:6] isEqualToString:@"5"]) // It's not changing to white.
-	{
-		// Add target stimulus.
-		[trial addTargetVisualStimuliObject:newBlip];
 		
-		subTrial.ID = @"InClassify";
-	} else {
-		subTrial.ID = @"PostClassify";
-	}
+	subTrial.ID = [self getBlipStatus];
+	
 	subTrial.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 	// Add it to trial's subTrials list.
 	[trial addSubTrialsObject:subTrial];
@@ -569,7 +580,7 @@
 
 - (void)parseBlipDisappeared
 {
-	VFVisualStimulus *blip = [ongoingBlips objectForKey:[currentLineFields objectAtIndex:2]];
+	VFVisualStimulus *blip = [ongoingBlips objectForKey:[self getBlipID]];
 	// End blip frame.
 	[self endBlipFrameForBlip:blip];
 	// End blip.
@@ -578,12 +589,55 @@
 
 - (VFVisualStimulus *)makeBlip
 {
-	VFVisualStimulus *blip = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulus" inManagedObjectContext:moc];
+	VFVisualStimulus *blip = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulus" 
+														   inManagedObjectContext:moc];
 	blip.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 	blip.label = [currentLineFields objectAtIndex:7];
-	blip.ID = [currentLineFields objectAtIndex:2];
+	blip.ID = [self getBlipID];
 		
 	return blip;
+}
+
+- (NSString *)getBlipStatus
+{
+	NSString *blipColor = [currentLineFields objectAtIndex:6];
+	if ([blipColor isEqualToString:@"0"])
+		return @"PreClassify";
+	else if ([blipColor isEqualToString:@"5"])
+		return @"PostClassify";
+	else if ([blipColor isEqualToString:@"1"]
+			 || [blipColor isEqualToString:@"2"]
+			 || [blipColor isEqualToString:@"7"])
+		return @"InClassify";
+	else {
+		[self parseFailureForType:@"Unexpected blip color." unparsed:blipColor];
+		return nil;
+	}
+}
+
+- (NSString *)getBlipID
+{
+	NSString *ID = [currentLineFields objectAtIndex:2];
+	NSString *status = [self getBlipStatus];	
+	
+	return [NSString stringWithFormat:@"%@ %@", ID, status];
+}
+
+- (NSString *)getLastBlipID
+{
+	NSString *ID = [currentLineFields objectAtIndex:2];
+	NSString *status = nil;
+	NSString *blipColor = [currentLineFields objectAtIndex:6];
+	if ([blipColor isEqualToString:@"5"])
+		status = @"InClassify";
+	else if ([blipColor isEqualToString:@"1"]
+			 || [blipColor isEqualToString:@"2"]
+			 || [blipColor isEqualToString:@"7"])
+		status = @"PreClassify";
+	else
+		[self parseFailureForType:@"Unexpected blip color." unparsed:blipColor];
+	
+	return [NSString stringWithFormat:@"%@ %@", ID, status];
 }
 
 - (VFVisualStimulusFrame *)makeBlipFrame

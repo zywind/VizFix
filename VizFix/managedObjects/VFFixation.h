@@ -21,6 +21,8 @@
 @property (nonatomic, retain) NSNumber * endTime;
 @property (nonatomic, retain) NSString * fixatedAOI;
 
+- (void)registerOnAOI:(NSString *)aoiID;
+
 @end
 
 

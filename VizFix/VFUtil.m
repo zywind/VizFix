@@ -61,9 +61,7 @@ static NSArray *visualStimuliSort = nil;
 					 @"(time <= %@ AND time >= %@)", endTime, startTime];
 		[fetchRequest setSortDescriptors:[VFUtil timeSortDescriptor]];
 	} else {// TODO: constrian the entityName to only a few.
-		predicate = [NSPredicate predicateWithFormat:
-					 @"(startTime <= %@ AND endTime >= %@) OR (startTime >= %@ AND startTime <= %@)", 
-					 startTime, startTime, startTime, endTime];
+		predicate = [VFUtil predicateForObjectsWithStartTime:startTime endTime:endTime];
 		
 		// sort visual stimulus array based on zorder before return;
 		if ([entityName isEqualToString:@"VisualStimulus"])
@@ -104,8 +102,78 @@ static NSArray *visualStimuliSort = nil;
 	}
 }
 
++ (NSArray *)fetchAllObjectsForName:(NSString *)entityName fromMOC:(NSManagedObjectContext *)moc
+{
+	VFSession *session = [VFUtil fetchSessionWithMOC:moc];
+	
+	return [VFUtil fetchModelObjectsForName:entityName
+									   from:[NSNumber numberWithInt:0] 
+										 to:session.duration 
+									withMOC:moc];
+}
+
 + (float)distanceBetweenThisPoint:(NSPoint)center andThatPoint:(NSPoint)point
 {
 	return sqrt(pow(point.x - center.x, 2.0) + pow(point.y - center.y, 2.0));
 }
+
++ (NSPredicate *)predicateForObjectsWithStartTime:(NSNumber *)startTime endTime:(NSNumber *)endTime
+{
+	return [NSPredicate predicateWithFormat:
+			 @"(startTime <= %@ AND endTime >= %@) OR (startTime >= %@ AND startTime <= %@)", 
+			 startTime, startTime, startTime, endTime];
+}
+
++ (NSBezierPath *)autoAOIAroundCenter:(NSPoint)center withSize:(NSSize)aoiSize
+{
+	NSRect aoiRect = NSMakeRect(center.x - aoiSize.width/2, center.y - aoiSize.height/2, 
+								aoiSize.width, aoiSize.height);
+	
+	return [NSBezierPath bezierPathWithOvalInRect:aoiRect];
+}
+
++ (void)registerFixationsToAOIs:(NSDictionary *)customAOIs inMOC:(NSManagedObjectContext *)moc withAutoAOIDOV:(double)DOV
+{
+	NSArray *fixationArray = [VFUtil fetchAllObjectsForName:@"Fixation" fromMOC:moc];
+	NSArray *visualStimuliArray = [VFUtil fetchAllObjectsForName:@"VisualStimulus" fromMOC:moc];
+	
+	VFVisualAngleConverter *converter = [[VFVisualAngleConverter alloc] initWithMOC:moc];
+	
+	for (VFFixation *eachFixation in fixationArray) {
+		NSArray *onScreenStimuli = [visualStimuliArray filteredArrayUsingPredicate:
+									[VFUtil predicateForObjectsWithStartTime:eachFixation.startTime endTime:eachFixation.endTime]];
+		for (VFVisualStimulus *eachStimulus in onScreenStimuli) {
+			NSSet *onScreenFrames = [eachStimulus.frames filteredSetUsingPredicate:
+									   [VFUtil predicateForObjectsWithStartTime:eachFixation.startTime endTime:eachFixation.endTime]];
+			
+			for (VFVisualStimulusFrame *eachFrame in onScreenFrames) {
+				NSPoint center = NSMakePoint(eachFrame.location.x + eachStimulus.template.center.x, 
+											 eachFrame.location.y + eachStimulus.template.center.y);
+				
+				NSSize autoAOISize = NSMakeSize([converter horizontalPixelsFromVisualAngles:DOV], 
+												[converter verticalPixelsFromVisualAngles:DOV]);
+				NSBezierPath *aoiPath = [VFUtil autoAOIAroundCenter:center withSize:autoAOISize];
+				if ([aoiPath containsPoint:eachFixation.location]) {
+					[eachFixation registerOnAOI:eachStimulus.ID];
+					break;
+				}
+			}
+		}
+		
+		// If the fixation is not fixated on any on screen stimulus, then see if it is on custom AOIs.
+		if (eachFixation.fixatedAOI == nil) {
+			for (id key in customAOIs) {
+				NSBezierPath *aoiPath = [customAOIs objectForKey:key];
+				if ([aoiPath containsPoint:eachFixation.location]) {
+					[eachFixation registerOnAOI:key];
+				}
+			}
+			// If it's still nil, it's on "Other" area.
+			if (eachFixation.fixatedAOI == nil) {
+				[eachFixation registerOnAOI:@"Other"];
+			}
+		}
+	}
+}
+
 @end

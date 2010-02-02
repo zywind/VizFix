@@ -14,11 +14,8 @@
 	NSManagedObjectContext *managedObjectContext;
 	VFVisualStimulus *targetBlip;
 	NSArray *blipsOfCurrentWave;
-	NSBezierPath *trackingAOI;
-	NSBezierPath *radarAOI;
 }
 
 @property (retain) NSManagedObjectContext * managedObjectContext;
 - (void)analyze:(NSURL *)storeFileURL;
-- (NSString *)findFixatedAOIForFixations:(VFFixation *)fixation;
 @end

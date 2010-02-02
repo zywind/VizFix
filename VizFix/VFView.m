@@ -3,7 +3,7 @@
 //  VizFix
 //
 //  Created by Yunfeng Zhang on 1/15/10.
-//  Copyright 2010 __MyCompanyName__. All rights reserved.
+//  Copyright 2010 University of Oregon. All rights reserved.
 //
 
 #import "VFView.h"
@@ -143,9 +143,12 @@
 	[transform translateXBy:frame.location.x yBy:frame.location.y];	
 	[transform concat];
 	
-	[self drawVisualStimulusTemplate:frame.ofVisualStimulus.template];
+	VFVisualStimulus *theStimulus = frame.ofVisualStimulus;
+	[self drawVisualStimulusTemplate:theStimulus.template];
+	// Depends on the label font size.
+	NSPoint labelPoint = NSMakePoint(theStimulus.template.center.x - 3.0, theStimulus.template.center.y - 6.0);
 	if (showLabel) {
-		[frame.ofVisualStimulus.label drawAtPoint:NSMakePoint(0, 0)
+		[theStimulus.label drawAtPoint:labelPoint
 		 withAttributes:[NSDictionary dictionaryWithObject:[NSColor whiteColor] 
 													forKey:NSForegroundColorAttributeName]];
 	}
@@ -156,12 +159,9 @@
 
 - (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate
 {
-	NSPoint center;
-	if (visualStimulusTemplate.fillColor != nil) {
-		[visualStimulusTemplate.fillColor setFill];
-		[visualStimulusTemplate.bound fill];
-		center = NSMakePoint(NSMidX([visualStimulusTemplate.bound bounds]), 
-							 NSMidY([visualStimulusTemplate.bound bounds]));
+	if (visualStimulusTemplate.color != nil) {
+		[visualStimulusTemplate.color setFill];
+		[visualStimulusTemplate.outline fill];
 	} else if (visualStimulusTemplate.imageFilePath != nil) {
 		NSURL *imageURL = [NSURL URLWithString:visualStimulusTemplate.imageFilePath 
 								 relativeToURL:dataURL];
@@ -170,16 +170,14 @@
 		if (stimulusImage == nil) {
 			stimulusImage = [[NSImage alloc] initWithContentsOfURL:imageURL];
 			// Cache loaded images.
-			[imageCacheDict setValue:stimulusImage forKey:visualStimulusTemplate.imageFilePath];
+			[imageCacheDict setObject:stimulusImage forKey:visualStimulusTemplate.imageFilePath];
 			
 			if (stimulusImage == nil) {
 				NSLog(@"Image file %@ does not exist.", [imageURL path]);
 				return;
 			}
 		}
-		
-		center = NSMakePoint([stimulusImage size].width / 2, [stimulusImage size].height / 2);
-		
+	
 		NSAffineTransform* xform = [NSAffineTransform transform];
 		[xform translateXBy:0.0 yBy:stimulusImage.size.height];
 		[xform scaleXBy:1.0 yBy:-1.0];
@@ -197,12 +195,9 @@
 	
 	// If it's drawing background, there's no need to draw auto-AOI.
 	if (![visualStimulusTemplate.category isEqualToString:@"background"] && showAutoAOI) {
-		double width = [DOVConverter horizontalPixelsFromVisualAngles:1.0];
-		double height = [DOVConverter verticalPixelsFromVisualAngles:1.0];
-		
-		NSRect foveaZoneRect = NSMakeRect(center.x - width/2, center.y - height/2, width, height);
-		
-		NSBezierPath *foveaZonePath = [NSBezierPath bezierPathWithOvalInRect:foveaZoneRect];
+		NSSize autoAOISize = NSMakeSize([DOVConverter horizontalPixelsFromVisualAngles:2.5], 
+										[DOVConverter verticalPixelsFromVisualAngles:2.5]);
+		NSBezierPath *foveaZonePath = [VFUtil autoAOIAroundCenter:visualStimulusTemplate.center withSize:autoAOISize];
 		
 		[[NSColor grayColor] set];
 		[foveaZonePath stroke];

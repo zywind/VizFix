@@ -17,6 +17,7 @@
 #import "VFSubTrial.h"
 #import "VFFixation.h"
 #import "VFVisualStimulus.h"
+#import "VFVisualAngleConverter.h"
 
 @interface VFUtil : NSObject {
 
@@ -31,4 +32,8 @@
 							  withMOC:(NSManagedObjectContext *)moc;
 + (float)distanceBetweenThisPoint:(NSPoint)center andThatPoint:(NSPoint)point;
 + (VFSession *)fetchSessionWithMOC:(NSManagedObjectContext *)moc;
++ (NSArray *)fetchAllObjectsForName:(NSString *)entityName fromMOC:(NSManagedObjectContext *)moc;
++ (void)registerFixationsToAOIs:(NSDictionary *)customAOIs inMOC:(NSManagedObjectContext *)moc withAutoAOIDOV:(double)DOV;
++ (NSPredicate *)predicateForObjectsWithStartTime:(NSNumber *)startTime endTime:(NSNumber *)endTime;
++ (NSBezierPath *)autoAOIAroundCenter:(NSPoint)center withSize:(NSSize)aoiSize;
 @end

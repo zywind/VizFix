@@ -3,19 +3,26 @@
 //  VizFix
 //
 //  Created by Yunfeng Zhang on 1/15/10.
-//  Copyright 2010 __MyCompanyName__. All rights reserved.
+//  Copyright 2010 University of Oregon. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
+#import "VFSession.h"
+#import "VFCondition.h"
+#import "VFResponse.h"
+#import "VFView.h"
+#import "VFSession.h"
+#import "VFBlock.h"
+#import "VFTrial.h"
 #import "VFSubTrial.h"
+#import "VFFixation.h"
 #import "VFVisualStimulus.h"
 #import "VFVisualStimulusTemplate.h"
 #import "VFVisualStimulusFrame.h"
 #import "VFGazeSample.h"
-#import "VFSession.h"
-#import "VFFixation.h"
-#import "VFVisualAngleConverter.h"
 #import "VFUtil.h"
+
+@class VFVisualAngleConverter;
 
 @interface VFView : NSView {
 	IBOutlet NSArrayController *blockController;

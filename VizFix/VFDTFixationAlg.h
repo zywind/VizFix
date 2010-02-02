@@ -12,14 +12,11 @@
 #import "VFUtil.h"
 
 @interface VFDTFixationAlg : NSObject {
-	NSUInteger radiusThreshold;
-	NSUInteger gazeSampleRate;
+	double radiusThreshold;
+	double gazeSampleRate;
 }
 
-@property (nonatomic, assign) NSUInteger gazeSampleRate;
-@property (nonatomic, assign) NSUInteger radiusThreshold;
-
-- (void)detectAllFixationsInMOC:(NSManagedObjectContext *)moc;
+- (void)detectAllFixationsInMOC:(NSManagedObjectContext *)moc withRadiusThresholdInDOV:(double)aRadius;
 - (void)detectFixation:(NSArray *)gazeArray;
 - (NSUInteger)thresholdOfNumConsecutiveInvalidSamples;
 - (NSUInteger)minNumInFixation;

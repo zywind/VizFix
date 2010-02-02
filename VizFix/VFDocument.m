@@ -369,25 +369,17 @@
 - (void)doDetectAndInsertFixations
 {
 	NSManagedObjectContext *moc = [self managedObjectContext];
-	
-	// Delete old fixations
-	NSEntityDescription *fixatinoEntityDescription = [NSEntityDescription
-													  entityForName:@"Fixation" inManagedObjectContext:moc];
-	NSFetchRequest *fixationRequest = [[NSFetchRequest alloc] init];
-	[fixationRequest setEntity:fixatinoEntityDescription];
-	
-	NSError *error;
-	NSArray *fixationArray = [moc executeFetchRequest:fixationRequest error:&error];
+	NSArray *fixationArray = [VFUtil fetchAllObjectsForName:@"Fixation" fromMOC:moc];
 	
 	for (VFFixation *eachFixation in fixationArray) {
 		[moc deleteObject:eachFixation];
 	}
+	
 	fixationArray = nil;
 		
 	VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
-	fixationDetectionAlg.gazeSampleRate = 120;
-	fixationDetectionAlg.radiusThreshold = 30;
-	[fixationDetectionAlg detectAllFixationsInMOC:moc];
+
+	[fixationDetectionAlg detectAllFixationsInMOC:moc withRadiusThresholdInDOV:0.5];
 }
 
 - (NSArray *)startTimeSortDescriptor

@@ -23,6 +23,7 @@
 @dynamic date;
 @dynamic blocks;
 @dynamic background;
+@dynamic duration;
 
 - (NSSize)primitiveScreenResolution
 {

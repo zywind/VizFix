@@ -31,6 +31,14 @@
     return self;
 }
 
+- (id)initWithMOC:(NSManagedObjectContext *)moc
+{
+	VFSession *session = [VFUtil fetchSessionWithMOC:moc];
+	return [self initWithDistanceToScreen:[session.distanceToScreen intValue]
+						 screenResolution:session.screenResolution 
+						  screenDimension:session.screenDimension];
+}
+
 - (double)horizontalPixelsFromVisualAngles:(double)DOV
 {
 	return tan(RADIANS(DOV/2))*2*distanceToScreen*screenResolution.width/screenDimension.width;

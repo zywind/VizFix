@@ -7,7 +7,10 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "VFUtil.h"
 
+@class VFUtil;
+@class VFSession;
 
 @interface VFVisualAngleConverter : NSObject {
 	NSSize screenResolution;
@@ -31,6 +34,7 @@
 - (id)initWithDistanceToScreen:(NSUInteger)distance 
 			  screenResolution:(NSSize)resolution 
 			   screenDimension:(NSSize)dimension;
+- (id)initWithMOC:(NSManagedObjectContext *)moc;
 
 - (double)horizontalPixelsFromVisualAngles:(double)DOV;
 - (double)horizontalVisualAnglesFromPixels:(double)pixels;

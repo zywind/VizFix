@@ -36,6 +36,7 @@
 @property (nonatomic, readonly) BOOL leaf;
 @property (nonatomic, readonly) NSSet* children;
 @property (nonatomic, readonly) NSString* ID;
+@property (nonatomic, retain) NSNumber * duration;
 
 @end
 

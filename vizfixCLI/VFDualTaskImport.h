@@ -84,6 +84,9 @@
 - (void)parseBlipMoved;
 - (void)parseBlipChangedColor;
 - (void)parseBlipDisappeared;
+- (NSString *)getBlipStatus;
+- (NSString *)getBlipID;
+- (NSString *)getLastBlipID;
 - (void)parseKeyEvent;
 - (void)parseSound;
 - (void)parseFailureForType:(NSString *)failureType unparsed:(NSString *)unparsedString;

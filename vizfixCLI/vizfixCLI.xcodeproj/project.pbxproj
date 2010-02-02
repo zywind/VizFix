@@ -17,6 +17,7 @@
 		3B46B85711016DE7002DF0C3 /* VFSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B84411016DE7002DF0C3 /* VFSession.m */; };
 		3B46B85811016DE7002DF0C3 /* VFSubTrial.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B84611016DE7002DF0C3 /* VFSubTrial.m */; };
 		3B46B85A11016DE7002DF0C3 /* VFTrial.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B46B84A11016DE7002DF0C3 /* VFTrial.m */; };
+		3B532FF311176B97002AB496 /* VFVisualAngleConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B532FF211176B97002AB496 /* VFVisualAngleConverter.m */; };
 		3B8A24A010FEFFCB00DBFA0C /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B8A249F10FEFFCB00DBFA0C /* CoreData.framework */; };
 		3B8A263710FF0E9600DBFA0C /* VFDualTaskImport.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8A263610FF0E9600DBFA0C /* VFDualTaskImport.m */; };
 		3B8A26A510FF0FDA00DBFA0C /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B8A26A410FF0FDA00DBFA0C /* AppKit.framework */; };
@@ -72,6 +73,8 @@
 		3B46B84611016DE7002DF0C3 /* VFSubTrial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFSubTrial.m; sourceTree = "<group>"; };
 		3B46B84911016DE7002DF0C3 /* VFTrial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFTrial.h; sourceTree = "<group>"; };
 		3B46B84A11016DE7002DF0C3 /* VFTrial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFTrial.m; sourceTree = "<group>"; };
+		3B532FF111176B97002AB496 /* VFVisualAngleConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFVisualAngleConverter.h; path = ../VizFix/VFVisualAngleConverter.h; sourceTree = SOURCE_ROOT; };
+		3B532FF211176B97002AB496 /* VFVisualAngleConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VFVisualAngleConverter.m; path = ../VizFix/VFVisualAngleConverter.m; sourceTree = SOURCE_ROOT; };
 		3B8A249F10FEFFCB00DBFA0C /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3B8A263510FF0E9600DBFA0C /* VFDualTaskImport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFDualTaskImport.h; sourceTree = "<group>"; };
 		3B8A263610FF0E9600DBFA0C /* VFDualTaskImport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFDualTaskImport.m; sourceTree = "<group>"; };
@@ -133,12 +136,14 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				32A70AAB03705E1F00C91783 /* vizfixCLI_Prefix.pch */,
+				08FB7796FE84155DC02AAC07 /* vizfixCLI.m */,
+				3B532FF111176B97002AB496 /* VFVisualAngleConverter.h */,
+				3B532FF211176B97002AB496 /* VFVisualAngleConverter.m */,
 				3BED3E62111668800000547D /* VFDTFixationAlg.h */,
 				3BED3E63111668800000547D /* VFDTFixationAlg.m */,
 				3BED3E64111668800000547D /* VFUtil.h */,
 				3BED3E65111668800000547D /* VFUtil.m */,
-				32A70AAB03705E1F00C91783 /* vizfixCLI_Prefix.pch */,
-				08FB7796FE84155DC02AAC07 /* vizfixCLI.m */,
 				3B8A263510FF0E9600DBFA0C /* VFDualTaskImport.h */,
 				3B8A263610FF0E9600DBFA0C /* VFDualTaskImport.m */,
 				3BED3EDD1116723E0000547D /* VFDualTaskAnalyzer.h */,
@@ -286,6 +291,7 @@
 				3BED3E66111668800000547D /* VFDTFixationAlg.m in Sources */,
 				3BED3E67111668800000547D /* VFUtil.m in Sources */,
 				3BED3EDF1116723E0000547D /* VFDualTaskAnalyzer.m in Sources */,
+				3B532FF311176B97002AB496 /* VFVisualAngleConverter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

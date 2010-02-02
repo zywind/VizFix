@@ -9,16 +9,8 @@
 #import "VFDualTaskAnalyzer.h"
 
 @implementation VFDualTaskAnalyzer
-@synthesize managedObjectContext;
 
-- (id)init
-{	
-	if (self = [super init]) {
-		radarAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 180, 710, 512)];
-		trackingAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(740, 242, 540, 540)];
-    }
-    return self;
-}
+@synthesize managedObjectContext;
 
 - (void)analyze:(NSURL *)storeFileURL
 {
@@ -65,17 +57,6 @@
 				}
 			}
 		}
-	}
-}
-
-- (NSString *)findFixatedAOIForFixations:(VFFixation *)fixation
-{
-	if ([trackingAOI containsPoint:fixation.location]) {
-		return @"T";
-	} else if ([radarAOI containsPoint:fixation.location]) {
-		return @"R";
-	} else {
-		return @"O";
 	}
 }
 
