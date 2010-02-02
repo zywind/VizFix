@@ -200,13 +200,16 @@
 		[tableViewController addObject:tempDict];
 		return;
 	}
+	NSArray *factorSortDesc = [NSArray arrayWithObject:
+							   [[NSSortDescriptor alloc] initWithKey:@"factor" ascending:YES]];
 	if ([indexPath length] >= 2) {
 		[blockController setSelectionIndex:[indexPath indexAtPosition:1]];
 		selectedBlock = [[blockController selectedObjects] objectAtIndex:0];
 		
 		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Conditions:", @"entry", @"", @"value", nil];
 		[tableViewController addObject:tempDict];
-		for (VFCondition *eachCondition in selectedBlock.conditions) {
+		for (VFCondition *eachCondition in [[selectedBlock.conditions allObjects] 
+											sortedArrayUsingDescriptors:factorSortDesc]) {
 			tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachCondition.factor, 
 					@"entry", eachCondition.level, @"value", nil];
 			[tableViewController addObject:tempDict];
@@ -216,7 +219,8 @@
 		[trialController setSelectionIndex:[indexPath indexAtPosition:2]];
 		selectedTrial = [[trialController selectedObjects] objectAtIndex:0];
 				
-		for (VFCondition *eachCondition in selectedTrial.conditions) {
+		for (VFCondition *eachCondition in [[selectedTrial.conditions allObjects] 
+											sortedArrayUsingDescriptors:factorSortDesc]) {
 			tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachCondition.factor, 
 					@"entry", eachCondition.level, @"value", nil];
 			[tableViewController addObject:tempDict];
@@ -225,15 +229,20 @@
 		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"", @"entry", @"", @"value", nil];
 		[tableViewController addObject:tempDict];
 		
+		NSArray *measureSortDesc = [NSArray arrayWithObject:
+									[[NSSortDescriptor alloc] initWithKey:@"measure" ascending:YES]];
 		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Responses:", @"entry", @"", @"value", nil];
 		[tableViewController addObject:tempDict];
-		for (VFResponse *eachResponse in selectedTrial.responses) {
+		for (VFResponse *eachResponse in [[selectedTrial.responses allObjects] 
+										  sortedArrayUsingDescriptors:measureSortDesc]) {
 			tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachResponse.measure, 
 						@"entry", eachResponse.value, @"value", nil];
 			[tableViewController addObject:tempDict];
-			tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"error", 
-						@"entry", eachResponse.error, @"value", nil];
-			[tableViewController addObject:tempDict];
+			if (eachResponse.error != nil) {
+				tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"error", 
+							@"entry", eachResponse.error, @"value", nil];
+				[tableViewController addObject:tempDict];
+			}
 		}
 	}
 	if ([indexPath length] == 4) {
