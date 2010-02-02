@@ -14,8 +14,13 @@
 @dynamic imageFilePath;
 @dynamic zorder;
 @dynamic category;
-@dynamic bound;
-@dynamic fillColor;
+@dynamic outline;
+@dynamic color;
 @dynamic ofVisualStimuli;
 
+- (NSPoint)center
+{
+	NSRect bounds = [self.outline bounds];
+	return NSMakePoint(NSMidX(bounds), NSMidY(bounds));
+}
 @end

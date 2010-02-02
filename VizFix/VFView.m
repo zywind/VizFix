@@ -146,9 +146,8 @@
 	VFVisualStimulus *theStimulus = frame.ofVisualStimulus;
 	[self drawVisualStimulusTemplate:theStimulus.template];
 	// Depends on the label font size.
-	NSPoint labelPoint = NSMakePoint(theStimulus.template.center.x - 3.0, theStimulus.template.center.y - 6.0);
 	if (showLabel) {
-		[theStimulus.label drawAtPoint:labelPoint
+		[theStimulus.label drawAtPoint:NSMakePoint(0.0f, 0.0f)
 		 withAttributes:[NSDictionary dictionaryWithObject:[NSColor whiteColor] 
 													forKey:NSForegroundColorAttributeName]];
 	}
