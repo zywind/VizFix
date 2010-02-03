@@ -60,9 +60,10 @@ int main (int argc, const char * argv[]) {
 		}
 	}
 	
+	NSArray *bundlesToSearch = [NSArray arrayWithObject:[NSBundle mainBundle]];
+
 	// load model
-	NSManagedObjectModel *mom = [[NSManagedObjectModel alloc] 
-								 initWithContentsOfURL:[NSURL fileURLWithPath:@"VFModel.mom"]];
+	NSManagedObjectModel *mom = [NSManagedObjectModel mergedModelFromBundles:bundlesToSearch];
 	NSPersistentStoreCoordinator *coordinator =
 	[[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: mom];
 	

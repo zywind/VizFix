@@ -133,7 +133,9 @@
 	while(([currentLineFields = [[lines objectAtIndex:lineNum++] componentsSeparatedByString:@"\t"] 
 			count] > 1) && lineNum < [lines count])
 	{
-		if (readyToEndBlock && [[currentLineFields objectAtIndex:0] intValue] > blockEndTime+1) {
+		// Sometimes wave end comment appears before a blip disppears. So we delay the end time by
+		// 5 ms.
+		if (readyToEndBlock && [[currentLineFields objectAtIndex:0] intValue] > blockEndTime+5) {
 			[self endBlock];
 			readyToEndBlock = NO;
 		}
@@ -193,9 +195,10 @@
 	NSLog(@"Start to detect fixations.");
 	VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
 	[fixationDetectionAlg detectAllFixationsInMOC:moc withRadiusThresholdInDOV:0.5];
-	NSLog(@"Detecting fixations succeeded.");
 	[self saveData];
+	NSLog(@"Detecting fixations succeeded.");
 	
+	NSLog(@"Start to register fixations to AOIs.");
 	// Register fixations to AOIs.
 	NSBezierPath *radarAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 180, 710, 512)];
 	NSBezierPath *trackingAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(740, 242, 540, 540)];
@@ -203,6 +206,7 @@
 								trackingAOI, @"Tracking Display", nil];
 	[VFUtil registerFixationsToAOIs:customAOIs inMOC:moc withAutoAOIDOV:2.5];
 	[self saveData];
+	NSLog(@"Registering fixations completed.\nImport completed.\n\n\n");
 }
 
 - (void)saveData
