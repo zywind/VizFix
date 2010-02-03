@@ -40,23 +40,29 @@
 						   sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
 				
 		for (VFTrial *eachTrial in trials) {
-//			NSString *blipID = [eachTrial.ID substringFromIndex:5];
-//			NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ID LIKE %@ *Classify", blipID];
-//			
-//			NSArray *blipsOfCurrentTrial = [blipsOfCurrentWave filteredArrayUsingPredicate:predicate];
+			NSString *blipID = [eachTrial.ID substringFromIndex:5];
+			
+			for (VFResponse *eachResponse in eachTrial.responses) {
+				if ([eachResponse.measure isEqualToString:@"First Fixation On Radar RT"]
+					|| [eachResponse.measure isEqualToString:@"First Fixation On Target RT"]
+					|| [eachResponse.measure isEqualToString:@"Last Fixation To Tracking RT"]
+					|| [eachResponse.measure isEqualToString:@"Inclassify Dwell Duration"]
+					|| [eachResponse.measure isEqualToString:@"Preclassify Dwell Duration"])
+					[managedObjectContext deleteObject:eachResponse];
+			}
 			
 			NSArray *subTrials = [[eachTrial.subTrials allObjects] 
 								  sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
 			
-			NSNumber *timeOfFirstFixationOnRadar = nil;
-			NSNumber *timeOfFirstFixationOnTarget = nil;
-			NSNumber *timeOfLastFixationBackToTracking = nil;
+			int timeOfFirstFixationOnRadar = -1;
+			int timeOfFirstFixationOnTarget = -1;
+			int timeOfLastFixationBackToTracking = -1;
 			BOOL hasLookedAtRadar = NO;
 			int inClassifyDuration = 0;
 			int preClassifyDuration = 0;
 			
 			for (VFSubTrial *subTrial in subTrials) {	
-				if ([subTrial.ID hasSuffix:@"PostClassify"])
+				if ([subTrial.ID isEqualToString:@"PostClassify"])
 					continue;
 				
 				NSArray *fixations = [fixationsOfCurrentWave filteredArrayUsingPredicate:
@@ -70,31 +76,41 @@
 						lastFixatedAOI = eachFixation.fixatedAOI;
 					}
 					
+					BOOL fixatedOnTarget = NO;
+					NSArray *fixatedAOIs = [eachFixation.fixatedAOI componentsSeparatedByString:@"&"];
+					for (NSString *eachFixatedAOI in fixatedAOIs) {
+						if ([eachFixatedAOI isEqualToString:[NSString stringWithFormat:@"%@ %@", blipID, subTrial.ID]]) {
+							fixatedOnTarget = YES;
+							break;
+						}
+					}
 					// Accumulate fixation duration on target blip.
-					if ([eachFixation.fixatedAOI rangeOfString:subTrial.ID].location != NSNotFound) {
-						if ([subTrial.ID hasSuffix:@"InClassify"])
+					if (fixatedOnTarget) {
+						if ([subTrial.ID isEqualToString:@"InClassify"])
 							inClassifyDuration += [eachFixation.endTime intValue] - [eachFixation.startTime intValue];
 						else
 							preClassifyDuration += [eachFixation.endTime intValue] - [eachFixation.startTime intValue];
 					}
 					
-					if ([subTrial.ID hasSuffix:@"InClassify"]) {
-						if ((timeOfFirstFixationOnTarget == nil) // First time on the target
-							&& [eachFixation.fixatedAOI rangeOfString:subTrial.ID].location != NSNotFound) {
+					if ([subTrial.ID isEqualToString:@"InClassify"]) {
+						// First time on the target
+						if ((timeOfFirstFixationOnTarget == -1) && fixatedOnTarget) {
 							hasLookedAtRadar = YES;
 							timeOfFirstFixationOnTarget = 
-							([subTrial.startTime intValue] <= [eachFixation.startTime intValue]) ? eachFixation.startTime : subTrial.startTime;
-							if (timeOfFirstFixationOnRadar == nil)
+							([subTrial.startTime intValue] <= [eachFixation.startTime intValue]) 
+							? [eachFixation.startTime intValue] - [subTrial.startTime intValue] : 0;
+							if (timeOfFirstFixationOnRadar == -1)
 								timeOfFirstFixationOnRadar = timeOfFirstFixationOnTarget;
-						} else if ((timeOfFirstFixationOnTarget == nil) // First time on the radar display
-								   && (timeOfFirstFixationOnRadar == nil)
+						} else if ((timeOfFirstFixationOnTarget == -1) // First time on the radar display
+								   && (timeOfFirstFixationOnRadar == -1)
 								   && ![eachFixation.fixatedAOI isEqualToString:@"Tracking Display"]
 								   && ![eachFixation.fixatedAOI isEqualToString:@"Other"]) {
 							hasLookedAtRadar = YES;
 							timeOfFirstFixationOnRadar =
-							([subTrial.startTime intValue] <= [eachFixation.startTime intValue]) ? eachFixation.startTime : subTrial.startTime;
+							([subTrial.startTime intValue] <= [eachFixation.startTime intValue]) 
+							? [eachFixation.startTime intValue] - [subTrial.startTime intValue] : 0;
 						} else if (hasLookedAtRadar && [eachFixation.fixatedAOI isEqualToString:@"Tracking Display"]) {
-							timeOfLastFixationBackToTracking = eachFixation.startTime;
+							timeOfLastFixationBackToTracking = [eachFixation.startTime intValue] - [subTrial.startTime intValue];
 						}
 					}
 				}
@@ -104,18 +120,18 @@
 			
 			VFResponse *r1 = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
 														   inManagedObjectContext:managedObjectContext];
-			r1.measure = @"First Fixation On Radar Time";
-			r1.value = [timeOfFirstFixationOnRadar stringValue];
+			r1.measure = @"First Fixation On Radar RT";
+			r1.value = [[NSNumber numberWithInt:timeOfFirstFixationOnRadar] stringValue];
 			
 			VFResponse *r2 = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
 														   inManagedObjectContext:managedObjectContext];
-			r2.measure = @"First Fixation On Target Time";
-			r2.value = [timeOfFirstFixationOnTarget stringValue];
+			r2.measure = @"First Fixation On Target RT";
+			r2.value = [[NSNumber numberWithInt:timeOfFirstFixationOnTarget] stringValue];
 			
 			VFResponse *r3 = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
 														   inManagedObjectContext:managedObjectContext];
-			r3.measure = @"Last Fixation To Tracking Time";
-			r3.value = [timeOfLastFixationBackToTracking stringValue];
+			r3.measure = @"Last Fixation To Tracking RT";
+			r3.value = [[NSNumber numberWithInt:timeOfLastFixationBackToTracking] stringValue];
 			
 			VFResponse *r4 = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
 														   inManagedObjectContext:managedObjectContext];
