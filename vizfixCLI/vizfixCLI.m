@@ -37,18 +37,21 @@ int main (int argc, const char * argv[]) {
 	objc_startCollectorThread();
 
 	int ch;
-	BOOL importMode = NO;
+	int mode = 0;
 	
 	// This piece of code is taken from here:
 	// http://www.gnu.org/software/libtool/manual/libc/Example-of-Getopt.html#Example-of-Getopt
-	while((ch = getopt(argc, argv, "a:i:")) != -1)
+	while((ch = getopt(argc, argv, "a:i:o")) != -1)
 	{
 		switch (ch) {
 			case 'i':
-				importMode = YES;
+				mode = 1;
 				break;
 			case 'a':
-				importMode = NO;
+				mode = 2;
+				break;
+			case 'o':
+				mode = 3;
 				break;
 			case '?':
 			default:
@@ -70,7 +73,7 @@ int main (int argc, const char * argv[]) {
 	VFDualTaskImport *importer = nil;
 	VFDualTaskAnalyzer *analyzer = nil;
 	
-	if (importMode) {
+	if (mode == 1) {
 		importer = [[VFDualTaskImport alloc] initWithMOC:moc];
 	}
 	else {
@@ -87,7 +90,7 @@ int main (int argc, const char * argv[]) {
 			NSArray *filePaths = [fileManager contentsOfDirectoryAtPath:[argURL path] error:NULL];
 			for (NSString *eachPath in filePaths) {
 				// import all text files.
-				if (importMode && [[eachPath pathExtension] isEqualToString:@"txt"]) {
+				if (mode == 1 && [[eachPath pathExtension] isEqualToString:@"txt"]) {
 					NSString *storePath = [[eachPath stringByDeletingPathExtension] 
 										   stringByAppendingString:@".vizfixsql"];
 					if ([fileManager fileExistsAtPath:storePath]) {
@@ -99,20 +102,29 @@ int main (int argc, const char * argv[]) {
 					changeStore(coordinator, storeURL);
 					
 					[importer import:[NSURL fileURLWithPath:eachPath]];
-				} else if (!importMode // Or analyze all vizfixsql files.
+				} else if (mode != 1 // Or analyze all vizfixsql files.
 						   && [[eachPath pathExtension] isEqualToString:@"vizfixsql"]) {
 					changeStore(coordinator, [NSURL fileURLWithPath:eachPath]);
-					[analyzer analyze:[NSURL fileURLWithPath:eachPath]];
+					if (mode == 2)
+						[analyzer analyze:[NSURL fileURLWithPath:eachPath]];
+					else {
+						[analyzer output:[NSURL fileURLWithPath:eachPath]];
+					}
+
 				}
 			}
 		} else {// Just one file to import.
-			if (importMode) {
+			if (mode == 1) {
 				changeStore(coordinator, argURL);
 				[importer import:argURL];
 			}
 			else {
 				changeStore(coordinator, argURL);
-				[analyzer analyze:argURL];
+				if (mode == 2)
+					[analyzer analyze:argURL];
+				else {
+					[analyzer output:argURL];
+				}
 			}
 		}
 	} else {

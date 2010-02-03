@@ -18,4 +18,5 @@
 
 @property (retain) NSManagedObjectContext * managedObjectContext;
 - (void)analyze:(NSURL *)storeFileURL;
+- (void)output:(NSURL *)storeFileURL;
 @end
