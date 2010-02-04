@@ -78,7 +78,7 @@
 @property (nonatomic, retain) NSManagedObjectContext * moc;
 @property NSUInteger lineNum;
 
-- (VFDualTaskImport *)initWithMOC:(NSManagedObjectContext *)anMOC;
+- (id)initWithMOC:(NSManagedObjectContext *)anMOC;
 - (void)import:(NSURL *)rawDataFileURL;
 - (void)prepareImport;
 - (void)saveData;

@@ -20,6 +20,7 @@
 #import "VFVisualAngleConverter.h"
 #import "VFCustomEvent.h"
 #import "VFKeyboardEvent.h"
+#import "VFFixationRegister.h"
 
 @interface VFUtil : NSObject {
 
@@ -35,7 +36,6 @@
 + (float)distanceBetweenThisPoint:(NSPoint)center andThatPoint:(NSPoint)point;
 + (VFSession *)fetchSessionWithMOC:(NSManagedObjectContext *)moc;
 + (NSArray *)fetchAllObjectsForName:(NSString *)entityName fromMOC:(NSManagedObjectContext *)moc;
-+ (void)registerFixationsToAOIs:(NSDictionary *)customAOIs inMOC:(NSManagedObjectContext *)moc withAutoAOIDOV:(double)DOV;
 + (NSPredicate *)predicateForObjectsWithStartTime:(NSNumber *)startTime endTime:(NSNumber *)endTime;
 + (NSBezierPath *)autoAOIAroundCenter:(NSPoint)center withSize:(NSSize)aoiSize;
 @end

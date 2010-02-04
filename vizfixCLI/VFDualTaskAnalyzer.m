@@ -26,20 +26,7 @@
 - (void)analyze:(NSURL *)storeFileURL
 {
 	NSLog(@"Start to process file %@.", [storeFileURL path]);
-	NSLog(@"Start to register fixations to AOIs.");
-	// Register fixations to AOIs.
-	NSBezierPath *radarAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 180, 710, 512)];
-	NSBezierPath *trackingAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(740, 242, 540, 540)];
-	NSDictionary *customAOIs = [NSDictionary dictionaryWithObjectsAndKeys:radarAOI, @"Radar Display", 
-								trackingAOI, @"Tracking Display", nil];
-	[VFUtil registerFixationsToAOIs:customAOIs inMOC:managedObjectContext withAutoAOIDOV:2.5];
-	NSError *error;
-	if (![managedObjectContext save:&error]) {
-		NSLog(@"Register fixations failed at %@\n%@", [storeFileURL path], [error localizedFailureReason]);
-		return;
-	}
-	NSLog(@"Registering fixations completed.");
-	
+
 	VFSession *session = [VFUtil fetchSessionWithMOC:managedObjectContext];
 	NSArray *blocks = [[session.blocks allObjects]
 					   sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
@@ -57,6 +44,60 @@
 																	  from:eachBlock.startTime 
 																		to:eachBlock.endTime 
 																   withMOC:managedObjectContext];
+		
+		
+		for (VFCondition *eachCondition in eachBlock.conditions) {
+			if ([eachCondition.factor isEqualToString:@"tracking duration"]
+				|| [eachCondition.factor isEqualToString:@"radar duration"]
+				|| [eachCondition.factor isEqualToString:@"number of transitions"]) {
+				[managedObjectContext deleteObject:eachCondition];
+			}
+		}
+		
+		int trackingDuration = 0;
+		int radarDuration = 0;
+		int numTransitions = 0;
+		int lastFixated = 0; // 0 means other, 1 means radar, 2 means tracking.
+		
+		for (VFFixation *eachFix in fixationsOfCurrentWave) {
+			double fixDuration = [eachFix.endTime intValue] - [eachFix.startTime intValue];
+			if ([eachFix.fixatedAOI isEqualToString:@"Tracking Display"]) {
+				trackingDuration += fixDuration;
+				
+				if (lastFixated == 1) {
+					numTransitions++;
+				}
+				lastFixated = 2;
+			} else if (![eachFix.fixatedAOI isEqualToString:@"Other"]) {
+				radarDuration += fixDuration;
+				
+				if (lastFixated == 2) {
+					numTransitions++;
+				}
+				lastFixated = 1;
+			} else {
+				lastFixated = 0;
+			}
+		}
+		
+		VFCondition *trackingDurationCondition = [NSEntityDescription insertNewObjectForEntityForName:@"Condition" 
+																			   inManagedObjectContext:managedObjectContext];
+		trackingDurationCondition.factor = @"tracking duration";
+		trackingDurationCondition.level = [[NSNumber numberWithInt:trackingDuration] stringValue];
+		
+		VFCondition *radarDurationCondition = [NSEntityDescription insertNewObjectForEntityForName:@"Condition" 
+																			inManagedObjectContext:managedObjectContext];
+		radarDurationCondition.factor = @"radar duration";
+		radarDurationCondition.level = [[NSNumber numberWithInt:radarDuration] stringValue];
+		
+		VFCondition *transitionsCondition = [NSEntityDescription insertNewObjectForEntityForName:@"Condition" 
+																		  inManagedObjectContext:managedObjectContext];
+		transitionsCondition.factor = @"number of transitions";
+		transitionsCondition.level = [[NSNumber numberWithInt:numTransitions] stringValue];
+		
+		[eachBlock addConditions:[NSSet setWithObjects:trackingDurationCondition, radarDurationCondition, 
+								  transitionsCondition, nil]];
+		
 		
 		NSArray *trials = [[eachBlock.trials allObjects] 
 						   sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
@@ -184,17 +225,19 @@
 					trackingErrorsOfInclassifySubTrial = [trackingErrorsOfInclassifySubTrial
 														  filteredArrayUsingPredicate:filterPredicate];
 					
-					double teWhenKeyIn = [((VFCustomEvent *)[trackingErrorsOfInclassifySubTrial lastObject]).desc doubleValue];
-					double teWhenBackToTracking = [((VFCustomEvent *)[trackingErrorsOfInclassifySubTrial objectAtIndex:0]).desc doubleValue];
-					
-					te.value = [decimalFormatter stringFromNumber:[NSNumber numberWithDouble:teWhenKeyIn - teWhenBackToTracking]];
-				} else {
-					te.value = @"NA";
+					if ([trackingErrorsOfInclassifySubTrial count] != 0) {
+						double teWhenKeyIn = [((VFCustomEvent *)[trackingErrorsOfInclassifySubTrial lastObject]).desc doubleValue];
+						double teWhenBackToTracking = [((VFCustomEvent *)[trackingErrorsOfInclassifySubTrial objectAtIndex:0]).desc doubleValue];
+						
+						te.value = [decimalFormatter stringFromNumber:[NSNumber numberWithDouble:teWhenKeyIn - teWhenBackToTracking]];
+					}
 				}
 			} else {
 				r3.value = @"NA";
-				te.value = @"NA";
 			}
+			
+			if (te.value == nil)
+				te.value = @"NA";
 			
 			VFResponse *r4 = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
 														   inManagedObjectContext:managedObjectContext];
@@ -215,6 +258,7 @@
 		}
 	}
 	
+	NSError *error;
 	if (![managedObjectContext save:&error]) {
 		NSLog(@"Save data failed at %@\n%@", [storeFileURL path], [error localizedFailureReason]);
 	}
@@ -272,7 +316,7 @@
 	
 	NSError *error;
 	if (![output writeToURL:outputFileURL atomically:YES
-				   encoding:NSUnicodeStringEncoding error:&error]) {
+				   encoding:NSUTF8StringEncoding error:&error]) {
 		// an error occurred
 		NSLog(@"Error writing file at %@\n%@",
               [outputFileURL path], [error localizedFailureReason]);

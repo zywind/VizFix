@@ -26,6 +26,7 @@
 		3BC50577110AE3640004A125 /* VFVisualStimulus.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50570110AE3640004A125 /* VFVisualStimulus.m */; };
 		3BC50578110AE3640004A125 /* VFVisualStimulusFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50572110AE3640004A125 /* VFVisualStimulusFrame.m */; };
 		3BC50579110AE3640004A125 /* VFVisualStimulusTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50574110AE3640004A125 /* VFVisualStimulusTemplate.m */; };
+		3BE9E9C8111A77DE005A64B7 /* VFFixationRegister.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BE9E9C7111A77DE005A64B7 /* VFFixationRegister.m */; };
 		3BED3E66111668800000547D /* VFDTFixationAlg.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BED3E63111668800000547D /* VFDTFixationAlg.m */; };
 		3BED3E67111668800000547D /* VFUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BED3E65111668800000547D /* VFUtil.m */; };
 		3BED3EDF1116723E0000547D /* VFDualTaskAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BED3EDE1116723E0000547D /* VFDualTaskAnalyzer.m */; };
@@ -89,6 +90,8 @@
 		3BC50572110AE3640004A125 /* VFVisualStimulusFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFVisualStimulusFrame.m; sourceTree = "<group>"; };
 		3BC50573110AE3640004A125 /* VFVisualStimulusTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFVisualStimulusTemplate.h; sourceTree = "<group>"; };
 		3BC50574110AE3640004A125 /* VFVisualStimulusTemplate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFVisualStimulusTemplate.m; sourceTree = "<group>"; };
+		3BE9E9C6111A77DE005A64B7 /* VFFixationRegister.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFFixationRegister.h; sourceTree = "<group>"; };
+		3BE9E9C7111A77DE005A64B7 /* VFFixationRegister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFFixationRegister.m; sourceTree = "<group>"; };
 		3BED3E62111668800000547D /* VFDTFixationAlg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFDTFixationAlg.h; path = ../VizFix/VFDTFixationAlg.h; sourceTree = SOURCE_ROOT; };
 		3BED3E63111668800000547D /* VFDTFixationAlg.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VFDTFixationAlg.m; path = ../VizFix/VFDTFixationAlg.m; sourceTree = SOURCE_ROOT; };
 		3BED3E64111668800000547D /* VFUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFUtil.h; path = ../VizFix/VFUtil.h; sourceTree = SOURCE_ROOT; };
@@ -148,6 +151,8 @@
 				3B8A263610FF0E9600DBFA0C /* VFDualTaskImport.m */,
 				3BED3EDD1116723E0000547D /* VFDualTaskAnalyzer.h */,
 				3BED3EDE1116723E0000547D /* VFDualTaskAnalyzer.m */,
+				3BE9E9C6111A77DE005A64B7 /* VFFixationRegister.h */,
+				3BE9E9C7111A77DE005A64B7 /* VFFixationRegister.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -292,6 +297,7 @@
 				3BED3E67111668800000547D /* VFUtil.m in Sources */,
 				3BED3EDF1116723E0000547D /* VFDualTaskAnalyzer.m in Sources */,
 				3B532FF311176B97002AB496 /* VFVisualAngleConverter.m in Sources */,
+				3BE9E9C8111A77DE005A64B7 /* VFFixationRegister.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
