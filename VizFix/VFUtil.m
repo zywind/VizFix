@@ -140,6 +140,7 @@ static NSArray *visualStimuliSort = nil;
 	VFVisualAngleConverter *converter = [[VFVisualAngleConverter alloc] initWithMOC:moc];
 	
 	for (VFFixation *eachFixation in fixationArray) {
+		eachFixation.fixatedAOI = nil;
 		NSArray *onScreenStimuli = [visualStimuliArray filteredArrayUsingPredicate:
 									[VFUtil predicateForObjectsWithStartTime:eachFixation.startTime endTime:eachFixation.endTime]];
 		for (VFVisualStimulus *eachStimulus in onScreenStimuli) {

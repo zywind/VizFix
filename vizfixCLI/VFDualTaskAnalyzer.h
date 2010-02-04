@@ -14,6 +14,8 @@
 	NSManagedObjectContext *managedObjectContext;
 	VFVisualStimulus *targetBlip;
 	NSArray *blipsOfCurrentWave;
+	
+	NSNumberFormatter *decimalFormatter;
 }
 
 @property (retain) NSManagedObjectContext * managedObjectContext;

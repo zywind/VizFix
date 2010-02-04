@@ -20,7 +20,6 @@
 
 @implementation VFBlock 
 
-@dynamic order;
 @dynamic ID;
 @dynamic startTime;
 @dynamic endTime;

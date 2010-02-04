@@ -59,7 +59,7 @@
 										  currentTime, currentTime];
 		playbackPredicateForTimeStamp = [NSPredicate predicateWithFormat:
 										 @"(time <= %f AND time >= %f)", 
-										 currentTime, currentTime - 100];
+										 currentTime + 100, currentTime];
 	}
 	[self setNeedsDisplay:YES];
 }
@@ -69,22 +69,29 @@
 	if (session == nil)
 		return;
 	NSManagedObjectContext *moc = [session managedObjectContext];
+	
+	NSNumber *startTime = [NSNumber numberWithDouble:viewStartTime];
+	NSNumber *endTime = [NSNumber numberWithDouble:viewEndTime];
 	if (showGazeSample) {
 		gazesArray = [VFUtil fetchModelObjectsForName:@"GazeSample" 
-												 from:[NSNumber numberWithDouble:viewStartTime] 
-												   to:[NSNumber numberWithDouble:viewEndTime]
+												 from:startTime 
+												   to:endTime
 											  withMOC:moc];
 	} else {
 		gazesArray = nil;
 	}
 	visualStimuliArray = [VFUtil fetchModelObjectsForName:@"VisualStimulus" 
-													 from:[NSNumber numberWithDouble:viewStartTime] 
-													   to:[NSNumber numberWithDouble:viewEndTime]
+													 from:startTime 
+													   to:endTime
 												  withMOC:moc];
 	fixationsArray = [VFUtil fetchModelObjectsForName:@"Fixation" 
-											   from:[NSNumber numberWithDouble:viewStartTime] 
-												 to:[NSNumber numberWithDouble:viewEndTime]
+											   from:startTime 
+												 to:endTime
 											withMOC:moc];
+	keyEventsArray = [VFUtil fetchModelObjectsForName:@"KeyboardEvent" 
+												 from:startTime
+												   to:endTime 
+											  withMOC:moc];
 
 	[self setNeedsDisplay:YES];
 }
@@ -128,6 +135,11 @@
 	
 	// Draw fixations
 	[self drawFixations];
+	
+	if (!inSummaryMode) {
+		// Show keyboad events
+		[self showKeyEvents];
+	}
 	
 	//	Restore the previous graphics state
 	//	saved at the beginning of this method
@@ -232,7 +244,18 @@
 		
 		i++;
 	}
+}
+
+- (void)showKeyEvents 
+{
+	NSArray *tempKeys = [keyEventsArray filteredArrayUsingPredicate:playbackPredicateForTimeStamp];
 	
+	if ([tempKeys count] > 0) {
+		VFKeyboardEvent *key = [tempKeys objectAtIndex:0];
+		keyLabel.stringValue = key.key;
+	} else {
+		keyLabel.stringValue = @"";
+	}
 }
 
 - (void)drawFixations

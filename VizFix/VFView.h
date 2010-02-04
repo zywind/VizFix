@@ -28,9 +28,11 @@
 	IBOutlet NSArrayController *blockController;
 	IBOutlet NSArrayController *trialController;
 	IBOutlet NSArrayController *subTrialController;
+	IBOutlet NSTextField *keyLabel;
 	NSArray *gazesArray;
 	NSArray *fixationsArray;
 	NSArray *visualStimuliArray;
+	NSArray *keyEventsArray;
 	VFSession *session;
 	NSURL *dataURL;
 	
@@ -69,6 +71,7 @@
 - (void)drawFrame:(VFVisualStimulusFrame *)frame;
 - (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate;
 - (void)drawGazes;
+- (void)showKeyEvents;
 - (void)drawFixations;
 - (void)drawFixation:(VFFixation *)currentFixation withColor:(NSColor *)color;
 - (void)updateViewContentsFrom:(double)viewStartTime to:(double)viewEndTime;

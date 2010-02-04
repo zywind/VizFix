@@ -12,13 +12,43 @@
 
 @synthesize managedObjectContext;
 
+- (id)init
+{	
+	if (self = [super init]) {
+		decimalFormatter = [[NSNumberFormatter alloc] init];
+		[decimalFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+		[decimalFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
+		[decimalFormatter setMaximumFractionDigits:2];
+    }
+    return self;
+}
+
 - (void)analyze:(NSURL *)storeFileURL
 {
+	NSLog(@"Start to process file %@.", [storeFileURL path]);
+	NSLog(@"Start to register fixations to AOIs.");
+	// Register fixations to AOIs.
+	NSBezierPath *radarAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 180, 710, 512)];
+	NSBezierPath *trackingAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(740, 242, 540, 540)];
+	NSDictionary *customAOIs = [NSDictionary dictionaryWithObjectsAndKeys:radarAOI, @"Radar Display", 
+								trackingAOI, @"Tracking Display", nil];
+	[VFUtil registerFixationsToAOIs:customAOIs inMOC:managedObjectContext withAutoAOIDOV:2.5];
+	NSError *error;
+	if (![managedObjectContext save:&error]) {
+		NSLog(@"Register fixations failed at %@\n%@", [storeFileURL path], [error localizedFailureReason]);
+		return;
+	}
+	NSLog(@"Registering fixations completed.");
+	
 	VFSession *session = [VFUtil fetchSessionWithMOC:managedObjectContext];
 	NSArray *blocks = [[session.blocks allObjects]
 					   sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
 		
 	for (VFBlock *eachBlock in blocks) {
+		if ([eachBlock.ID isEqualToString:@"pause"]) {
+			continue;
+		}
+		
 		blipsOfCurrentWave = [VFUtil fetchModelObjectsForName:@"VisualStimulus" 
 														 from:eachBlock.startTime 
 														   to:eachBlock.endTime 
@@ -33,15 +63,20 @@
 				
 		for (VFTrial *eachTrial in trials) {
 			NSString *blipID = [eachTrial.ID substringFromIndex:5];
+			int firstKeyRT = 0;
 			
 			for (VFResponse *eachResponse in eachTrial.responses) {
 				if ([eachResponse.measure isEqualToString:@"First Fixation On Radar RT"]
 					|| [eachResponse.measure isEqualToString:@"First Fixation On Target RT"]
-					|| [eachResponse.measure isEqualToString:@"Last Fixation To Tracking RT"]
+					|| [eachResponse.measure isEqualToString:@"Eyes On Tracking to Keypress"]
 					|| [eachResponse.measure isEqualToString:@"Inclassify Dwell Duration"]
 					|| [eachResponse.measure isEqualToString:@"Preclassify Dwell Duration"]
-					|| [eachResponse.measure isEqualToString:@"Inclassify Scan Path"])
+					|| [eachResponse.measure isEqualToString:@"Inclassify Scan Path"]
+					|| [eachResponse.measure isEqualToString:@"Tracking Error Change"]) {
 					[managedObjectContext deleteObject:eachResponse];
+				} else if ([eachResponse.measure isEqualToString:@"First key RT"]) {
+					firstKeyRT = [eachResponse.value intValue];
+				}
 			}
 			
 			NSArray *subTrials = [[eachTrial.subTrials allObjects] 
@@ -51,10 +86,10 @@
 			int timeOfFirstFixationOnRadar = -1;
 			int timeOfFirstFixationOnTarget = -1;
 			int timeOfLastFixationBackToTracking = -1;
-			BOOL hasLookedAtRadar = NO;
+			BOOL previousOnTracking = NO;
 			NSMutableString *scanpath = [NSMutableString stringWithString:@""];
 			NSString *lastFixatedAOI = nil;
-			
+	
 			for (int i = 0; i < 2; i++) {
 				VFSubTrial *subTrial = [subTrials objectAtIndex:i];
 				
@@ -77,12 +112,11 @@
 					if (i == 1) {
 						// Record scan path.
 						if (![lastFixatedAOI isEqualToString:eachFixation.fixatedAOI]) {
-							[scanpath appendFormat:@"%@,", eachFixation.fixatedAOI];
+							[scanpath appendFormat:@"%@, ", eachFixation.fixatedAOI];
 							lastFixatedAOI = eachFixation.fixatedAOI;
 						}
 						// First time on the target
 						if ((timeOfFirstFixationOnTarget == -1) && fixatedOnTarget) {
-							hasLookedAtRadar = YES;
 							timeOfFirstFixationOnTarget = 
 							([subTrial.startTime intValue] <= [eachFixation.startTime intValue]) 
 							? [eachFixation.startTime intValue] - [subTrial.startTime intValue] : 0;
@@ -92,17 +126,23 @@
 								   && (timeOfFirstFixationOnRadar == -1)
 								   && ![eachFixation.fixatedAOI isEqualToString:@"Tracking Display"]
 								   && ![eachFixation.fixatedAOI isEqualToString:@"Other"]) {
-							hasLookedAtRadar = YES;
 							timeOfFirstFixationOnRadar =
 							([subTrial.startTime intValue] <= [eachFixation.startTime intValue]) 
 							? [eachFixation.startTime intValue] - [subTrial.startTime intValue] : 0;
-						} else if (hasLookedAtRadar && [eachFixation.fixatedAOI isEqualToString:@"Tracking Display"]) {
-							timeOfLastFixationBackToTracking = [eachFixation.startTime intValue] - [subTrial.startTime intValue];
+						} else if ([eachFixation.fixatedAOI isEqualToString:@"Tracking Display"]) {
+							if (!previousOnTracking) {
+								timeOfLastFixationBackToTracking = [eachFixation.startTime intValue];
+							}
+							previousOnTracking = YES;
 						}
+						
+						if (![eachFixation.fixatedAOI isEqualToString:@"Tracking Display"])
+							previousOnTracking = NO;
 					}
 				}
 			}
-			[scanpath deleteCharactersInRange:NSMakeRange([scanpath length] - 1, 1)];
+			if([scanpath length] != 0)
+				[scanpath deleteCharactersInRange:NSMakeRange([scanpath length] - 2, 2)];
 			
 			VFResponse *r1 = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
 														   inManagedObjectContext:managedObjectContext];
@@ -112,7 +152,6 @@
 			} else {
 				r1.value = @"NA";
 			}
-
 			
 			VFResponse *r2 = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
 														   inManagedObjectContext:managedObjectContext];
@@ -125,11 +164,36 @@
 			
 			VFResponse *r3 = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
 														   inManagedObjectContext:managedObjectContext];
-			r3.measure = @"Last Fixation To Tracking RT";
-			if (timeOfLastFixationBackToTracking != -1) {
-				r3.value = [[NSNumber numberWithInt:timeOfLastFixationBackToTracking] stringValue];
+			r3.measure = @"Eyes On Tracking to Keypress";
+			VFResponse *te = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
+														   inManagedObjectContext:managedObjectContext];
+			te.measure = @"Tracking Error Change";
+			if (firstKeyRT != 0 && timeOfLastFixationBackToTracking != -1) {
+				VFSubTrial *inclassifySubTrial = [subTrials objectAtIndex:1];
+				r3.value = [[NSNumber numberWithInt:firstKeyRT - 
+							 (timeOfLastFixationBackToTracking - [inclassifySubTrial.startTime intValue])] stringValue];
+				
+				if ([r3.value intValue] > 0) {
+					// Get the tracking error relative change.
+					NSArray *trackingErrorsOfInclassifySubTrial = [VFUtil fetchModelObjectsForName:@"CustomEvent" 
+																							  from:[NSNumber numberWithInt:timeOfLastFixationBackToTracking]
+																								to:[NSNumber numberWithInt:[inclassifySubTrial.endTime intValue] - 100]
+																						   withMOC:managedObjectContext];
+					
+					NSPredicate *filterPredicate = [NSPredicate predicateWithFormat:@"category LIKE 'tracking error'"];
+					trackingErrorsOfInclassifySubTrial = [trackingErrorsOfInclassifySubTrial
+														  filteredArrayUsingPredicate:filterPredicate];
+					
+					double teWhenKeyIn = [((VFCustomEvent *)[trackingErrorsOfInclassifySubTrial lastObject]).desc doubleValue];
+					double teWhenBackToTracking = [((VFCustomEvent *)[trackingErrorsOfInclassifySubTrial objectAtIndex:0]).desc doubleValue];
+					
+					te.value = [decimalFormatter stringFromNumber:[NSNumber numberWithDouble:teWhenKeyIn - teWhenBackToTracking]];
+				} else {
+					te.value = @"NA";
+				}
 			} else {
-				r3. value = @"NA";
+				r3.value = @"NA";
+				te.value = @"NA";
 			}
 			
 			VFResponse *r4 = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
@@ -147,18 +211,21 @@
 			r6.measure = @"Inclassify Scan Path";
 			r6.value = scanpath;
 			
-			[eachTrial addResponses:[NSSet setWithObjects:r1, r2, r3, r4, r5, r6, nil]];
+			[eachTrial addResponses:[NSSet setWithObjects:r1, r2, r3, r4, r5, r6, te, nil]];
 		}
 	}
-	NSError *error;
+	
 	if (![managedObjectContext save:&error]) {
 		NSLog(@"Save data failed at %@\n%@", [storeFileURL path], [error localizedFailureReason]);
 	}
+	
+	NSLog(@"Process completed.\n\n\n");
 }
 
 - (void)output:(NSURL *)storeFileURL
 {
-	NSURL *outputFileURL = [[storeFileURL URLByDeletingPathExtension] URLByAppendingPathExtension:@"output"];
+	NSURL *outputFileURL = [NSURL fileURLWithPath:
+							[[[storeFileURL path] stringByDeletingPathExtension] stringByAppendingPathExtension:@"output"]];
 	NSMutableString *output = [NSMutableString stringWithString:@""];
 	
 	NSArray *factorSortDesc = [NSArray arrayWithObject:

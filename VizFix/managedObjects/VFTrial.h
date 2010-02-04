@@ -19,7 +19,6 @@
 {
 }
 
-@property (nonatomic, retain) NSNumber * order;
 @property (nonatomic, retain) NSNumber * startTime;
 @property (nonatomic, retain) NSNumber * endTime;
 @property (nonatomic, retain) NSString * ID;

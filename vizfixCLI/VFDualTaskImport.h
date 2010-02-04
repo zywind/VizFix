@@ -21,6 +21,7 @@
 #import "VFKeyboardEvent.h"
 #import "VFAuditoryStimulus.h"
 #import "VFDTFixationAlg.h"
+#import "VFCustomEvent.h"
 
 #import "RegexKitLite.h"
 
@@ -57,13 +58,21 @@
 	NSMutableDictionary *ongoingBlips;
 	NSMutableDictionary *ongoingTrials;
 	NSMutableArray *ongoingGazes;
+	NSMutableArray *ongoingTEs;
 	
 	int discardedGazeCount;
 	int lastGazeTimeStamp;
 	int startAccumulateTimeStamp;
 	int consolidateState;
+	int numValidGazes;
+	int numInvalidGazes;
 	
 	NSUInteger blockEndTime;
+	
+	NSNumberFormatter *percentFormatter;
+	NSNumberFormatter *decimalFormatter;
+	
+	BOOL pauseOn;
 }
 
 @property (nonatomic, retain) NSManagedObjectContext * moc;
@@ -79,6 +88,7 @@
 
 - (void)startBlock;
 - (void)endBlock;
+- (void)parsePauseBlock;
 - (void)startTrial;
 - (void)endTrial;
 - (void)parseBlipMoved;
@@ -90,6 +100,8 @@
 - (void)parseKeyEvent;
 - (void)parseSound;
 - (void)parseFailureForType:(NSString *)failureType unparsed:(NSString *)unparsedString;
+- (void)parseTrackingError;
+- (double)calculateRMSTRackingError;
 
 - (VFVisualStimulusFrame *)makeBlipFrame;
 - (void)endBlipFrameForBlip:(VFVisualStimulus *)vs;

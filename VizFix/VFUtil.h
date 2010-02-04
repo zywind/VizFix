@@ -18,6 +18,8 @@
 #import "VFFixation.h"
 #import "VFVisualStimulus.h"
 #import "VFVisualAngleConverter.h"
+#import "VFCustomEvent.h"
+#import "VFKeyboardEvent.h"
 
 @interface VFUtil : NSObject {
 

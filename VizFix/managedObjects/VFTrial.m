@@ -17,7 +17,6 @@
 
 @implementation VFTrial 
 
-@dynamic order;
 @dynamic startTime;
 @dynamic endTime;
 @dynamic ID;

@@ -19,6 +19,15 @@
 	if (self = [super init]) {
 		moc = anMOC;
 		blipColorCodes = [NSArray arrayWithObjects:@"0", @"1", @"2", @"5", @"7", nil];
+		
+		percentFormatter = [[NSNumberFormatter alloc] init];
+		[percentFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+		[percentFormatter setNumberStyle:NSNumberFormatterPercentStyle];
+		
+		decimalFormatter = [[NSNumberFormatter alloc] init];
+		[decimalFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+		[decimalFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
+		[decimalFormatter setMaximumFractionDigits:2];
     }
     return self;
 }
@@ -34,6 +43,9 @@
 	startAccumulateTimeStamp = 0;
 	consolidateState = 0;
 	blockEndTime = 0;
+	numValidGazes = 0;
+	numInvalidGazes = 0;
+	pauseOn = NO;
 	
 	// Initialize temporary containers.
 	session = nil;
@@ -41,6 +53,7 @@
 	ongoingBlips = [NSMutableDictionary dictionaryWithCapacity:10];
 	ongoingTrials = [NSMutableDictionary dictionaryWithCapacity:10];
 	ongoingGazes = [NSMutableArray arrayWithCapacity:10];
+	ongoingTEs = [NSMutableArray arrayWithCapacity:10];
 }
 
 - (void)import:(NSURL *)rawDataFileURL
@@ -135,9 +148,12 @@
 	{
 		// Sometimes wave end comment appears before a blip disppears. So we delay the end time by
 		// 5 ms.
-		if (readyToEndBlock && [[currentLineFields objectAtIndex:0] intValue] > blockEndTime+5) {
+		if (readyToEndBlock && [[currentLineFields objectAtIndex:0] intValue] > blockEndTime + 5) {
 			[self endBlock];
 			readyToEndBlock = NO;
+			if (pauseOn) {
+				[self parsePauseBlock];
+			}
 		}
 		NSString *eventType = [currentLineFields objectAtIndex:1];
 		if ([eventType isEqualToString:@"EyeGaze"]) {
@@ -151,6 +167,8 @@
 					blockEndTime = [[currentLineFields objectAtIndex:0] intValue];
 					readyToEndBlock = YES;
 				}
+			} else if ([commentType isEqualToString:@"pause"]) {
+				pauseOn = YES;
 			} else {
 				[self parseFailureForType:@"comment type" unparsed:commentType];
 			}
@@ -169,7 +187,7 @@
 		} else if ([eventType isEqualToString:@"Sound"]) {
 			continue;
 		} else if ([eventType isEqualToString:@"TrackingError"]) {
-			continue;
+			[self parseTrackingError];
 		} else if ([eventType isEqualToString:@"ScenarioFile"]
 				   || [eventType isEqualToString:@"ScreenResolution"]
 				   || [eventType isEqualToString:@"GazeContingent"]
@@ -194,19 +212,9 @@
 	
 	NSLog(@"Start to detect fixations.");
 	VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
-	[fixationDetectionAlg detectAllFixationsInMOC:moc withRadiusThresholdInDOV:0.5];
+	[fixationDetectionAlg detectAllFixationsInMOC:moc withRadiusThresholdInDOV:0.7];
 	[self saveData];
-	NSLog(@"Detecting fixations succeeded.");
-	
-	NSLog(@"Start to register fixations to AOIs.");
-	// Register fixations to AOIs.
-	NSBezierPath *radarAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 180, 710, 512)];
-	NSBezierPath *trackingAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(740, 242, 540, 540)];
-	NSDictionary *customAOIs = [NSDictionary dictionaryWithObjectsAndKeys:radarAOI, @"Radar Display", 
-								trackingAOI, @"Tracking Display", nil];
-	[VFUtil registerFixationsToAOIs:customAOIs inMOC:moc withAutoAOIDOV:2.5];
-	[self saveData];
-	NSLog(@"Registering fixations completed.\nImport completed.\n\n\n");
+	NSLog(@"Detecting fixations succeeded.\nImport completed.\n\n\n");
 }
 
 - (void)saveData
@@ -344,12 +352,17 @@
 	// Assign time backwards.
 	for (int i = index; i >= 0; i--) {
 		int assignTime = consolidateEndTimeStamp - (NSUInteger) (timePerGaze * (index - i));
-		if (assignTime <= startAccumulateTimeStamp || assignTime > [((VFGazeSample *)[ongoingGazes objectAtIndex:i]).time intValue]  + 10) {
+		VFGazeSample *currentGaze = [ongoingGazes objectAtIndex:i];
+		if (assignTime <= startAccumulateTimeStamp || assignTime > [currentGaze.time intValue]  + 10) {
 			//NSLog(@"Discard the gaze sample of time stamp %d for it is less than %d", assignTime, startAccumulateTimeStamp);
-			[moc deleteObject:[ongoingGazes objectAtIndex:i]];
+			if ([currentGaze.valid boolValue])
+				numValidGazes--;
+			else
+				numInvalidGazes--;
+			[moc deleteObject:currentGaze];
 			discardedGazeCount++;
 		} else {
-			((VFGazeSample *)[ongoingGazes objectAtIndex:i]).time = [NSNumber numberWithUnsignedInt:assignTime];
+			currentGaze.time = [NSNumber numberWithUnsignedInt:assignTime];
 		}
 	}
 	
@@ -367,17 +380,36 @@
 	gaze.valid = [NSNumber numberWithBool:([[currentLineFields objectAtIndex:5] isEqualToString:@"1"]) ? YES : NO];
 	gaze.time = [NSNumber numberWithUnsignedInt:[[currentLineFields objectAtIndex:0] intValue]];
 	
+	if ([gaze.valid boolValue])
+		numValidGazes++;
+	else
+		numInvalidGazes++;
+	
 	return gaze;
 }
 #pragma mark -
 #pragma mark -------PARSE BLOCK-------
 - (void)startBlock
 {
+	if (pauseOn) {
+		currentBlock.endTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue] - 1];
+		VFTrial *pauseTrial = [currentBlock.trials anyObject];
+		pauseTrial.endTime = currentBlock.endTime;
+		VFSubTrial *subTrial = [pauseTrial.subTrials anyObject];
+		subTrial.endTime = currentBlock.endTime;
+		pauseOn = NO;
+		
+		VFCondition *RMSTrackingError = [NSEntityDescription insertNewObjectForEntityForName:@"Condition" 
+																	  inManagedObjectContext:moc];
+		RMSTrackingError.factor = @"RMS Tracking Error";
+		RMSTrackingError.level = [decimalFormatter stringFromNumber:[NSNumber numberWithDouble:[self calculateRMSTRackingError]]];
+		[currentBlock addConditionsObject:RMSTrackingError];
+		[ongoingTEs removeAllObjects];
+	}
 	currentBlock = [NSEntityDescription insertNewObjectForEntityForName:@"Block" inManagedObjectContext:moc];	
 	[session addBlocksObject:currentBlock];
 	
 	currentBlock.ID = [@"wave " stringByAppendingString:[currentLineFields objectAtIndex:3]];
-	currentBlock.order = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:3] intValue]];
 	currentBlock.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 	
 	[currentBlock addConditionsObject:gazeCondition];
@@ -411,26 +443,51 @@
 
 - (void)endBlock
 {
-	currentBlock.endTime = [NSNumber numberWithInt:blockEndTime];
+	currentBlock.endTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue] - 1];
 	
 	// Consolidate ongoing gaze samples.
 	[self consolidateGazesToIndex:[ongoingGazes count] - 1];
 	
-	// Sanity check
-	int wavesize = 0;
-	for (VFCondition *condition in currentBlock.conditions) {
-		if ([condition.factor isEqualToString:@"wave size"]) {
-			wavesize = [condition.level intValue];
-		}
-	}
+	VFCondition *validGazeRate = [NSEntityDescription insertNewObjectForEntityForName:@"Condition" 
+															   inManagedObjectContext:moc];
+	validGazeRate.factor = @"valid gaze rate";
+	validGazeRate.level = [percentFormatter stringFromNumber:
+						   [NSNumber numberWithFloat:(float)numValidGazes / (float)(numValidGazes+numInvalidGazes)]];
+	[currentBlock addConditionsObject:validGazeRate];
 	
-	if ([currentBlock.trials count] != wavesize) {
-		NSLog(@"The block does not contain the same number of trials as indicated by its wave size. \
-			  The wave size is %d, but the number of trials is %d", wavesize, [currentBlock.trials count]);
-	}
+	VFCondition *RMSTrackingError = [NSEntityDescription insertNewObjectForEntityForName:@"Condition" 
+																  inManagedObjectContext:moc];
+	RMSTrackingError.factor = @"RMS Tracking Error";
+	RMSTrackingError.level = [decimalFormatter stringFromNumber:[NSNumber numberWithDouble:[self calculateRMSTRackingError]]];
+	[currentBlock addConditionsObject:RMSTrackingError];
+	[ongoingTEs removeAllObjects];
 	
+	numValidGazes = 0;
+	numInvalidGazes = 0;	
 	currentBlock = nil;
 	[self saveData];
+}
+
+- (void)parsePauseBlock
+{
+	currentBlock = [NSEntityDescription insertNewObjectForEntityForName:@"Block" inManagedObjectContext:moc];	
+	[session addBlocksObject:currentBlock];
+	
+	currentBlock.ID = @"pause";
+	currentBlock.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
+	
+	[currentBlock addConditionsObject:gazeCondition];
+	[currentBlock addConditionsObject:soundCondition];
+	
+	VFTrial *pauseTrial = [NSEntityDescription insertNewObjectForEntityForName:@"Trial" inManagedObjectContext:moc];
+	pauseTrial.ID = @"pause";
+	pauseTrial.startTime = currentBlock.startTime;
+	[currentBlock addTrialsObject:pauseTrial];
+	
+	VFSubTrial *subTrial = [NSEntityDescription insertNewObjectForEntityForName:@"SubTrial" inManagedObjectContext:moc];
+	subTrial.ID = @"pause";
+	subTrial.startTime = currentBlock.startTime;
+	[pauseTrial addSubTrialsObject:subTrial];
 }
 
 #pragma mark -
@@ -438,12 +495,9 @@
 - (void)startTrial
 {
 	VFTrial *trial = [NSEntityDescription insertNewObjectForEntityForName:@"Trial" inManagedObjectContext:moc];
-	if (currentBlock == nil) {
-		NSLog(@"A trial was started before a block start comment was parsed.");
-	}
+
 	[currentBlock addTrialsObject:trial];
 	trial.ID = [@"blip " stringByAppendingString:[currentLineFields objectAtIndex:2]];
-	trial.order = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:2] intValue]];
 	trial.startTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 
 	[ongoingTrials setObject:trial forKey:trial.ID];
@@ -678,6 +732,28 @@
 		[self parseFailureForType:@"key category" unparsed:keyCategory];
 	}
 	keyEvent.time = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
+}
+
+- (void)parseTrackingError
+{
+	VFCustomEvent *trackingEvent = [NSEntityDescription insertNewObjectForEntityForName:@"CustomEvent" inManagedObjectContext:moc];
+	trackingEvent.category = @"tracking error";
+	trackingEvent.desc = [currentLineFields objectAtIndex:4];
+	trackingEvent.time = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
+	
+	if (currentBlock != nil) {
+		[ongoingTEs addObject:trackingEvent];
+	}
+}
+
+- (double)calculateRMSTRackingError
+{
+	double sumOfSquares = 0;
+	for (VFCustomEvent *eachTE in ongoingTEs) {
+		double te = [eachTE.desc doubleValue];
+		sumOfSquares += te * te;
+	}
+	return sqrt(sumOfSquares / [ongoingTEs count]);
 }
 
 - (void)parseSound

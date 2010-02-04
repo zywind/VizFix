@@ -23,10 +23,6 @@
 }
 
 /*!
- Indicates the position index of this block in the session's block list.
- */
-@property (nonatomic, retain) NSNumber * order;
-/*!
  A string for identifying the block. This string will be displayed in the tree view.
  */
 @property (nonatomic, retain) NSString * ID;

@@ -88,8 +88,8 @@
 	[layoutView setDataURL:[self fileURL]];
 	
 	// draw the layoutView.
-	NSUInteger indexArr [] = {0, 0, 0, 0};
-	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndexes:indexArr length:4]];
+	NSUInteger indexArr [] = {0, 0};
+	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndexes:indexArr length:2]];
 	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndex:0]];
 	
 	[playButton setButtonType:NSToggleButton];
@@ -197,6 +197,8 @@
 		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Subject", @"entry", session.subjectID, @"value", nil];
 		[tableViewController addObject:tempDict];
 		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Session", @"entry", session.sessionID, @"value", nil];
+		[tableViewController addObject:tempDict];
+		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Duration (seconds)", @"entry", [NSNumber numberWithInt:[session.duration intValue] / 1000], @"value", nil];
 		[tableViewController addObject:tempDict];
 		return;
 	}
@@ -388,7 +390,7 @@
 		
 	VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
 
-	[fixationDetectionAlg detectAllFixationsInMOC:moc withRadiusThresholdInDOV:0.5];
+	[fixationDetectionAlg detectAllFixationsInMOC:moc withRadiusThresholdInDOV:0.7];
 }
 
 - (NSArray *)startTimeSortDescriptor
