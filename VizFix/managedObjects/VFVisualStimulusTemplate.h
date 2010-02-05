@@ -18,7 +18,8 @@
 @property (nonatomic, retain) NSNumber * zorder;
 @property (nonatomic, retain) NSString * category;
 @property (nonatomic, retain) NSBezierPath * outline;
-@property (nonatomic, retain) NSColor * color;
+@property (nonatomic, retain) NSColor * fillColor;
+@property (nonatomic, retain) NSColor * strokeColor;
 @property (nonatomic, retain) NSSet* ofVisualStimuli;
 
 - (NSPoint)center;

@@ -54,6 +54,8 @@
 	numInvalidGazes = 0;
 	numTrackingEvent = 0;
 	pauseOn = NO;
+	lastTrackingTargetFrame = nil;
+	lastTrackingCursorFrame = nil;
 	
 	// Initialize temporary containers.
 	session = nil;
@@ -229,6 +231,11 @@
 	[self consolidateGazesToIndex:[ongoingGazes count] - 1];
 	session.duration = [NSNumber numberWithInt:startAccumulateTimeStamp];
 	
+	lastTrackingTargetFrame.endTime = session.duration;
+	lastTrackingCursorFrame.endTime = session.duration;
+	trackingTarget.endTime = session.duration;
+	trackingCursor.endTime = session.duration;
+	
 	NSLog(@"Discarded %d gaze samples.", discardedGazeCount);
 	// Import completed. Save.
 	[self saveData];
@@ -352,35 +359,26 @@
 												   inManagedObjectContext:moc];
 	
 	trackingTarget.startTime = [NSNumber numberWithInt:0];
-	trackingTarget.ID = "tracking target";
-	VFVisualStimulusTemplate *trackingTemplate = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate" 
-																			   inManagedObjectContext:moc];
-	trackingTemplate.outline = [NSBezierPath bezierPathWithRect:NSRect(0, 0, 32, 32)];
-	trackingTemplate.category = @"tracking target";
-	trackingTemplate.color = [NSColor blackColor];
-	trackingTarget.template = trackingTemplate;
-	lastTrackingTargetFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" 
-															inManagedObjectContext:moc];
-	lastTrackingTargetFrame.location = NSMakePoint(1010, 512);
-	lastTrackingTargetFrame.startTime = 0;
-	[trackingTarget addFramesObject:lastTrackingTargetFrame];
+	trackingTarget.ID = @"tracking target";
+	VFVisualStimulusTemplate *trackingTargetTemplate = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate" 
+																					 inManagedObjectContext:moc];
+	trackingTargetTemplate.outline = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 0, 32, 32)];
+	trackingTargetTemplate.category = @"tracking target";
+	trackingTargetTemplate.imageFilePath = @"img/tracking_target.png";
+	trackingTarget.template = trackingTargetTemplate;
 	
 	trackingCursor = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulus" 
 												   inManagedObjectContext:moc];
 	
 	trackingCursor.startTime = [NSNumber numberWithInt:0];
-	trackingCursor.ID = "tracking cursor";
-	VFVisualStimulusTemplate *trackingTemplate = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate" 
-																			   inManagedObjectContext:moc];
-	trackingTemplate.outline = [NSBezierPath bezierPathWithOvalInRect:NSRect(0, 0, 32, 32)];
-	trackingTemplate.category = @"tracking cursor";
-	trackingTemplate.color = [NSColor blackColor];
-	trackingCursor.template = trackingTemplate;
-	lastTrackingCursorFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" 
-															inManagedObjectContext:moc];
-	lastTrackingCursorFrame.location = NSMakePoint(1010, 512);
-	lastTrackingCursorFrame.startTime = 0;
-	[trackingCursor addFramesObject:lastTrackingCursorFrame];
+	trackingCursor.ID = @"tracking cursor";
+	VFVisualStimulusTemplate *trackingCursorTemplate = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate" 
+																					 inManagedObjectContext:moc];
+	trackingCursorTemplate.outline = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(0, 0, 32, 32)];
+	trackingCursorTemplate.category = @"tracking cursor";
+	trackingCursorTemplate.zorder = [NSNumber numberWithInt:1];
+	trackingCursorTemplate.strokeColor = [NSColor greenColor];
+	trackingCursor.template = trackingCursorTemplate;
 }
 
 #pragma mark -
@@ -538,7 +536,6 @@
 	numValidGazes = 0;
 	numInvalidGazes = 0;	
 	currentBlock = nil;
-	[self saveData];
 }
 
 - (void)parsePauseBlock
@@ -814,12 +811,39 @@
 	trackingEvent.desc = [currentLineFields objectAtIndex:4];
 	trackingEvent.time = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 	
-	VFVisualStimulusFrame *trackingFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" inManagedObjectContext:moc];
-	trackingFrame.location = 
+	if (lastTrackingTargetFrame == nil) {
+		lastTrackingTargetFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" 
+																inManagedObjectContext:moc];
+		lastTrackingTargetFrame.location = NSMakePoint(1010 + [[allDrivingFunctions objectAtIndex:numTrackingEvent + 1] floatValue] * 0.5,
+													   512 + [[allDrivingFunctions objectAtIndex:numTrackingEvent] floatValue] * 0.5);
+		lastTrackingTargetFrame.startTime = [NSNumber numberWithInt:0];
+		[trackingTarget addFramesObject:lastTrackingTargetFrame];
+		
+		lastTrackingCursorFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" 
+																inManagedObjectContext:moc];
+		lastTrackingCursorFrame.location = NSMakePoint(lastTrackingTargetFrame.location.x + [[currentLineFields objectAtIndex:2] floatValue],
+													   lastTrackingTargetFrame.location.y + [[currentLineFields objectAtIndex:3] floatValue]);
+		lastTrackingCursorFrame.startTime = [NSNumber numberWithInt:0];
+		[trackingCursor addFramesObject:lastTrackingCursorFrame];
+	} else {
+		lastTrackingTargetFrame.endTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue] - 1];
+		VFVisualStimulusFrame *trackingTargetFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" inManagedObjectContext:moc];
+		trackingTargetFrame.location = NSMakePoint(lastTrackingTargetFrame.location.x + [[allDrivingFunctions objectAtIndex:numTrackingEvent + 1] floatValue] * 0.5,
+												   lastTrackingTargetFrame.location.y + [[allDrivingFunctions objectAtIndex:numTrackingEvent] floatValue] * 0.5);
+		trackingTargetFrame.startTime = trackingEvent.time;
+		[trackingTarget addFramesObject:trackingTargetFrame];
+		lastTrackingTargetFrame = trackingTargetFrame;
+				
+		lastTrackingCursorFrame.endTime = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue] - 1];
+		VFVisualStimulusFrame *trackingCursorFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" inManagedObjectContext:moc];
+		trackingCursorFrame.location = NSMakePoint(trackingTargetFrame.location.x + [[currentLineFields objectAtIndex:3] floatValue],
+												   trackingTargetFrame.location.y + [[currentLineFields objectAtIndex:2] floatValue]);
+		trackingCursorFrame.startTime = trackingTargetFrame.startTime;
+		[trackingCursor addFramesObject:trackingCursorFrame];
+		lastTrackingCursorFrame = trackingCursorFrame;
+	}
+	numTrackingEvent += 2;
 	
-	trackingTarget.
-	
-	numTrackingEvent++;
 	if (currentBlock != nil) {
 		[ongoingTEs addObject:trackingEvent];
 	}

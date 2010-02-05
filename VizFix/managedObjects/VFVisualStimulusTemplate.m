@@ -15,7 +15,8 @@
 @dynamic zorder;
 @dynamic category;
 @dynamic outline;
-@dynamic color;
+@dynamic fillColor;
+@dynamic strokeColor;
 @dynamic ofVisualStimuli;
 
 - (NSPoint)center

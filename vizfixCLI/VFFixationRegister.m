@@ -33,6 +33,9 @@
 																 endTime:aFixation.endTime]];
 	
 	for (VFVisualStimulus *eachStimulus in onScreenStimuli) {
+		if ([eachStimulus.template.category isEqualToString:@"tracking target"]
+			|| [eachStimulus.template.category isEqualToString:@"tracking cursor"])
+			continue;
 		NSSet *onScreenFrames = [eachStimulus.frames filteredSetUsingPredicate:
 								 [VFUtil predicateForObjectsWithStartTime:aFixation.startTime 
 																  endTime:aFixation.endTime]];

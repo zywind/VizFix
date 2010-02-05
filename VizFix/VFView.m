@@ -170,9 +170,12 @@
 
 - (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate
 {
-	if (visualStimulusTemplate.color != nil) {
-		[visualStimulusTemplate.color setFill];
+	if (visualStimulusTemplate.fillColor != nil) {
+		[visualStimulusTemplate.fillColor setFill];
 		[visualStimulusTemplate.outline fill];
+	} else if (visualStimulusTemplate.strokeColor != nil) {
+		[visualStimulusTemplate.strokeColor setStroke];
+		[visualStimulusTemplate.outline stroke];
 	} else if (visualStimulusTemplate.imageFilePath != nil) {
 		NSURL *imageURL = [NSURL URLWithString:visualStimulusTemplate.imageFilePath 
 								 relativeToURL:dataURL];
