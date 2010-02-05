@@ -19,6 +19,8 @@
 		[decimalFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
 		[decimalFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
 		[decimalFormatter setMaximumFractionDigits:2];
+		
+		filterForTEEvents = [NSPredicate predicateWithFormat:@"category LIKE 'tracking error'"];
     }
     return self;
 }
@@ -44,12 +46,17 @@
 																	  from:eachBlock.startTime 
 																		to:eachBlock.endTime 
 																   withMOC:managedObjectContext];
-		
+		NSArray *trackingErrorsOfCurrentWave = [VFUtil fetchModelObjectsForName:@"CustomEvent" 
+																		   from:eachBlock.startTime
+																			 to:eachBlock.endTime
+																		withMOC:managedObjectContext];
+		trackingErrorsOfCurrentWave = [trackingErrorsOfCurrentWave filteredArrayUsingPredicate:filterForTEEvents];
 		
 		for (VFCondition *eachCondition in eachBlock.conditions) {
 			if ([eachCondition.factor isEqualToString:@"tracking duration"]
 				|| [eachCondition.factor isEqualToString:@"radar duration"]
-				|| [eachCondition.factor isEqualToString:@"number of transitions"]) {
+				|| [eachCondition.factor isEqualToString:@"number of transitions"]
+				|| [eachCondition.factor isEqualToString:@"Avg TE changes per second when on radar"]) {
 				[managedObjectContext deleteObject:eachCondition];
 			}
 		}
@@ -58,6 +65,10 @@
 		int radarDuration = 0;
 		int numTransitions = 0;
 		int lastFixated = 0; // 0 means other, 1 means radar, 2 means tracking.
+		double TEAtLastRadarVisitStart = 0;
+		double sumTEChanges = 0;
+		int lastRadarVisitStartTime = 0;
+		int sumRadarVisitDuration = 0;
 		
 		for (VFFixation *eachFix in fixationsOfCurrentWave) {
 			double fixDuration = [eachFix.endTime intValue] - [eachFix.startTime intValue];
@@ -66,13 +77,29 @@
 				
 				if (lastFixated == 1) {
 					numTransitions++;
+					
+					int visitDuration = [eachFix.startTime intValue] - lastRadarVisitStartTime;
+					if (visitDuration > 500) {
+						NSPredicate *predicate = [NSPredicate predicateWithFormat:@"time <= %@", eachFix.startTime];
+						// Record the tracking error when the visit ends.
+						VFCustomEvent *te = [[trackingErrorsOfCurrentWave filteredArrayUsingPredicate:predicate] lastObject];
+						sumTEChanges += [te.desc doubleValue] -TEAtLastRadarVisitStart;
+						sumRadarVisitDuration += visitDuration;
+					}
 				}
 				lastFixated = 2;
-			} else if (![eachFix.fixatedAOI isEqualToString:@"Other"]) {
+			} else if (![eachFix.fixatedAOI isEqualToString:@"Other"]) { // The eyes are on radar.
 				radarDuration += fixDuration;
 				
 				if (lastFixated == 2) {
 					numTransitions++;
+					
+					NSPredicate *predicate = [NSPredicate predicateWithFormat:@"time >= %@", eachFix.startTime];
+					// Record the tracking error when the visit starts.
+					VFCustomEvent *te = [[trackingErrorsOfCurrentWave filteredArrayUsingPredicate:predicate] objectAtIndex:0];
+					TEAtLastRadarVisitStart = [te.desc doubleValue];
+					
+					lastRadarVisitStartTime = [eachFix.startTime intValue];
 				}
 				lastFixated = 1;
 			} else {
@@ -95,8 +122,13 @@
 		transitionsCondition.factor = @"number of transitions";
 		transitionsCondition.level = [[NSNumber numberWithInt:numTransitions] stringValue];
 		
+		VFCondition *TEAvgChangeWhenOnRadar = [NSEntityDescription insertNewObjectForEntityForName:@"Condition" 
+																			inManagedObjectContext:managedObjectContext];
+		TEAvgChangeWhenOnRadar.factor = @"Avg TE changes per second when on radar";
+		TEAvgChangeWhenOnRadar.level = [decimalFormatter stringFromNumber:[NSNumber numberWithDouble:1000 * (sumTEChanges / sumRadarVisitDuration)]];
+		
 		[eachBlock addConditions:[NSSet setWithObjects:trackingDurationCondition, radarDurationCondition, 
-								  transitionsCondition, nil]];
+								  transitionsCondition, TEAvgChangeWhenOnRadar, nil]];
 		
 		
 		NSArray *trials = [[eachBlock.trials allObjects] 
@@ -113,7 +145,8 @@
 					|| [eachResponse.measure isEqualToString:@"Inclassify Dwell Duration"]
 					|| [eachResponse.measure isEqualToString:@"Preclassify Dwell Duration"]
 					|| [eachResponse.measure isEqualToString:@"Inclassify Scan Path"]
-					|| [eachResponse.measure isEqualToString:@"Tracking Error Change"]) {
+					|| [eachResponse.measure isEqualToString:@"Tracking Error Change"]
+					|| [eachResponse.measure isEqualToString:@"Preclassify Dwell Count"]) {
 					[managedObjectContext deleteObject:eachResponse];
 				} else if ([eachResponse.measure isEqualToString:@"First key RT"]) {
 					firstKeyRT = [eachResponse.value intValue];
@@ -127,10 +160,10 @@
 			int timeOfFirstFixationOnRadar = -1;
 			int timeOfFirstFixationOnTarget = -1;
 			int timeOfLastFixationBackToTracking = -1;
+			int preclassifyDwellCount = 0;
 			BOOL previousOnTracking = NO;
 			NSMutableString *scanpath = [NSMutableString stringWithString:@""];
-			NSString *lastFixatedAOI = nil;
-	
+			
 			for (int i = 0; i < 2; i++) {
 				VFSubTrial *subTrial = [subTrials objectAtIndex:i];
 				
@@ -138,6 +171,9 @@
 									  [VFUtil predicateForObjectsWithStartTime:subTrial.startTime 
 																	   endTime:subTrial.endTime]];
 				
+				NSString *lastFixatedAOI = nil;
+				BOOL lastFixatedIsTarget = NO;
+
 				for (VFFixation *eachFixation in fixations) {
 					BOOL fixatedOnTarget = NO;
 					NSArray *fixatedAOIs = [eachFixation.fixatedAOI componentsSeparatedByString:@"&"];
@@ -146,9 +182,17 @@
 							fixatedOnTarget = YES;
 							// Accumulate fixation duration on target blip.
 							dwellDuration[i] += [eachFixation.endTime intValue] - [eachFixation.startTime intValue];
+							if (!lastFixatedIsTarget && i == 0) {
+								preclassifyDwellCount++;
+							}
 							break;
 						}
 					}
+					
+					if (fixatedOnTarget)
+						lastFixatedIsTarget = YES;
+					else
+						lastFixatedIsTarget = NO;
 					
 					if (i == 1) {
 						// Record scan path.
@@ -221,9 +265,8 @@
 																								to:[NSNumber numberWithInt:[inclassifySubTrial.endTime intValue] - 100]
 																						   withMOC:managedObjectContext];
 					
-					NSPredicate *filterPredicate = [NSPredicate predicateWithFormat:@"category LIKE 'tracking error'"];
 					trackingErrorsOfInclassifySubTrial = [trackingErrorsOfInclassifySubTrial
-														  filteredArrayUsingPredicate:filterPredicate];
+														  filteredArrayUsingPredicate:filterForTEEvents];
 					
 					if ([trackingErrorsOfInclassifySubTrial count] != 0) {
 						double teWhenKeyIn = [((VFCustomEvent *)[trackingErrorsOfInclassifySubTrial lastObject]).desc doubleValue];
@@ -254,7 +297,12 @@
 			r6.measure = @"Inclassify Scan Path";
 			r6.value = scanpath;
 			
-			[eachTrial addResponses:[NSSet setWithObjects:r1, r2, r3, r4, r5, r6, te, nil]];
+			VFResponse *r7 = [NSEntityDescription insertNewObjectForEntityForName:@"Response" 
+														   inManagedObjectContext:managedObjectContext];
+			r7.measure = @"Preclassify Dwell Count";
+			r7.value = [[NSNumber numberWithInt:preclassifyDwellCount] stringValue];
+			
+			[eachTrial addResponses:[NSSet setWithObjects:r1, r2, r3, r4, r5, r6, r7, te, nil]];
 		}
 	}
 	

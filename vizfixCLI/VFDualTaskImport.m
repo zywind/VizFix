@@ -28,6 +28,13 @@
 		[decimalFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
 		[decimalFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
 		[decimalFormatter setMaximumFractionDigits:2];
+		
+		sciFormatter = [[NSNumberFormatter alloc] init];
+		[sciFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+		[sciFormatter setNumberStyle:NSNumberFormatterScientificStyle];
+		[sciFormatter setPositivePrefix:@"+"];
+		
+		allDrivingFunctions = nil;
     }
     return self;
 }
@@ -45,6 +52,7 @@
 	blockEndTime = 0;
 	numValidGazes = 0;
 	numInvalidGazes = 0;
+	numTrackingEvent = 0;
 	pauseOn = NO;
 	
 	// Initialize temporary containers.
@@ -59,6 +67,22 @@
 - (void)import:(NSURL *)rawDataFileURL
 {
 	[self reset];
+	
+	if (allDrivingFunctions == nil) {
+		NSURL *dfURL = [NSURL fileURLWithPath:[[[rawDataFileURL path] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"driving_function3"]];
+		
+		NSString *dfContents = 	[NSString stringWithContentsOfURL:dfURL encoding:NSUTF8StringEncoding error:NULL];
+		allDrivingFunctions = [NSMutableArray arrayWithCapacity:22000];
+		
+		int i = 0;
+		for (NSString *eachLine in [dfContents componentsSeparatedByString:@"\n"]) {
+			i++;
+			// Record only the easy one.
+			if (i % 4 == 3 || i % 4 == 0) {
+				[allDrivingFunctions addObject:[sciFormatter numberFromString:eachLine]];
+			}
+		}
+	}
 	
 	NSLog(@"Starting to import file %@.", [rawDataFileURL path]);
 	
@@ -322,7 +346,41 @@
 		}
 	}
 	
-	visualStimuliTemplates = [NSArray arrayWithArray:tempTemplates];
+	blipTemplates = [NSArray arrayWithArray:tempTemplates];
+	
+	trackingTarget = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulus" 
+												   inManagedObjectContext:moc];
+	
+	trackingTarget.startTime = [NSNumber numberWithInt:0];
+	trackingTarget.ID = "tracking target";
+	VFVisualStimulusTemplate *trackingTemplate = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate" 
+																			   inManagedObjectContext:moc];
+	trackingTemplate.outline = [NSBezierPath bezierPathWithRect:NSRect(0, 0, 32, 32)];
+	trackingTemplate.category = @"tracking target";
+	trackingTemplate.color = [NSColor blackColor];
+	trackingTarget.template = trackingTemplate;
+	lastTrackingTargetFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" 
+															inManagedObjectContext:moc];
+	lastTrackingTargetFrame.location = NSMakePoint(1010, 512);
+	lastTrackingTargetFrame.startTime = 0;
+	[trackingTarget addFramesObject:lastTrackingTargetFrame];
+	
+	trackingCursor = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulus" 
+												   inManagedObjectContext:moc];
+	
+	trackingCursor.startTime = [NSNumber numberWithInt:0];
+	trackingCursor.ID = "tracking cursor";
+	VFVisualStimulusTemplate *trackingTemplate = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate" 
+																			   inManagedObjectContext:moc];
+	trackingTemplate.outline = [NSBezierPath bezierPathWithOvalInRect:NSRect(0, 0, 32, 32)];
+	trackingTemplate.category = @"tracking cursor";
+	trackingTemplate.color = [NSColor blackColor];
+	trackingCursor.template = trackingTemplate;
+	lastTrackingCursorFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" 
+															inManagedObjectContext:moc];
+	lastTrackingCursorFrame.location = NSMakePoint(1010, 512);
+	lastTrackingCursorFrame.startTime = 0;
+	[trackingCursor addFramesObject:lastTrackingCursorFrame];
 }
 
 #pragma mark -
@@ -562,7 +620,7 @@
 	blip.ID = [[currentLineFields objectAtIndex:2] stringByAppendingString:@" PreClassify"];
 	blip.label = [currentLineFields objectAtIndex:10];
 	// Black blip.
-	blip.template = [visualStimuliTemplates objectAtIndex:[[currentLineFields objectAtIndex:5] intValue] - 1];
+	blip.template = [blipTemplates objectAtIndex:[[currentLineFields objectAtIndex:5] intValue] - 1];
 	
 	[ongoingBlips setObject:blip forKey:blip.ID];
 	
@@ -631,7 +689,7 @@
 	int typeIndex = [[currentLineFields objectAtIndex:5] intValue] - 1;
 	
 	VFVisualStimulus *newBlip = [self makeBlip];
-	newBlip.template = [visualStimuliTemplates objectAtIndex:(colorIndex * 3 + typeIndex)];
+	newBlip.template = [blipTemplates objectAtIndex:(colorIndex * 3 + typeIndex)];
 	[newBlip addFramesObject:[self makeBlipFrame]];
 	[ongoingBlips setObject:newBlip forKey:newBlip.ID];
 	
@@ -756,6 +814,12 @@
 	trackingEvent.desc = [currentLineFields objectAtIndex:4];
 	trackingEvent.time = [NSNumber numberWithInt:[[currentLineFields objectAtIndex:0] intValue]];
 	
+	VFVisualStimulusFrame *trackingFrame = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusFrame" inManagedObjectContext:moc];
+	trackingFrame.location = 
+	
+	trackingTarget.
+	
+	numTrackingEvent++;
 	if (currentBlock != nil) {
 		[ongoingTEs addObject:trackingEvent];
 	}

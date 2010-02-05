@@ -16,6 +16,7 @@
 	NSArray *blipsOfCurrentWave;
 	
 	NSNumberFormatter *decimalFormatter;
+	NSPredicate *filterForTEEvents;
 }
 
 @property (retain) NSManagedObjectContext * managedObjectContext;

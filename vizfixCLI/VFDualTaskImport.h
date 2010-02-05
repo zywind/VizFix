@@ -22,6 +22,7 @@
 #import "VFAuditoryStimulus.h"
 #import "VFDTFixationAlg.h"
 #import "VFCustomEvent.h"
+#import "VFFixationRegister.h"
 
 #import "RegexKitLite.h"
 
@@ -51,7 +52,7 @@
 	NSArray *blipColorCodes;
 	NSArray *trackNumConditions;
 	
-	NSArray *visualStimuliTemplates;
+	NSArray *blipTemplates;
 	
 	VFSession *session;
 	VFBlock *currentBlock;
@@ -71,8 +72,16 @@
 	
 	NSNumberFormatter *percentFormatter;
 	NSNumberFormatter *decimalFormatter;
+	NSNumberFormatter *sciFormatter;
 	
 	BOOL pauseOn;
+	NSMutableArray *allDrivingFunctions;
+	
+	VFVisualStimulus *trackingTarget;
+	VFVisualStimulus *trackingCursor;
+	VFVisualStimulusFrame *lastTrackingTargetFrame;
+	VFVisualStimulusFrame *lastTrackingCursorFrame;
+	int numTrackingEvent;
 }
 
 @property (nonatomic, retain) NSManagedObjectContext * moc;

@@ -20,7 +20,6 @@
 #import "VFVisualAngleConverter.h"
 #import "VFCustomEvent.h"
 #import "VFKeyboardEvent.h"
-#import "VFFixationRegister.h"
 
 @interface VFUtil : NSObject {
 
