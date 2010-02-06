@@ -25,6 +25,17 @@
     return self;
 }
 
+- (void)useVisualStimuliOfCategoriesAsAOI:(NSArray *)categories
+{
+	NSMutableArray *allVSs = [NSMutableArray arrayWithCapacity:10];
+	for (NSString *eachCategory in categories) {
+		NSPredicate *predicate = [NSPredicate predicateWithFormat:@"template.category LIKE %@", eachCategory];
+		[allVSs addObjectsFromArray:[visualStimuliArray filteredArrayUsingPredicate:predicate]];
+	}
+	
+	visualStimuliArray = [NSArray arrayWithArray:allVSs];
+}
+
 - (void)registerFixation:(VFFixation *)aFixation
 {
 	aFixation.fixatedAOI = nil;
@@ -33,9 +44,6 @@
 																 endTime:aFixation.endTime]];
 	
 	for (VFVisualStimulus *eachStimulus in onScreenStimuli) {
-		if ([eachStimulus.template.category isEqualToString:@"tracking target"]
-			|| [eachStimulus.template.category isEqualToString:@"tracking cursor"])
-			continue;
 		NSSet *onScreenFrames = [eachStimulus.frames filteredSetUsingPredicate:
 								 [VFUtil predicateForObjectsWithStartTime:aFixation.startTime 
 																  endTime:aFixation.endTime]];

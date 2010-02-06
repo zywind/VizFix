@@ -173,10 +173,9 @@
 	if (visualStimulusTemplate.fillColor != nil) {
 		[visualStimulusTemplate.fillColor setFill];
 		[visualStimulusTemplate.outline fill];
-	} else if (visualStimulusTemplate.strokeColor != nil) {
-		[visualStimulusTemplate.strokeColor setStroke];
-		[visualStimulusTemplate.outline stroke];
-	} else if (visualStimulusTemplate.imageFilePath != nil) {
+	} 
+	
+	if (visualStimulusTemplate.imageFilePath != nil) {
 		NSURL *imageURL = [NSURL URLWithString:visualStimulusTemplate.imageFilePath 
 								 relativeToURL:dataURL];
 		
@@ -191,21 +190,26 @@
 				return;
 			}
 		}
-	
+		
 		NSAffineTransform* xform = [NSAffineTransform transform];
 		[xform translateXBy:0.0 yBy:stimulusImage.size.height];
 		[xform scaleXBy:1.0 yBy:-1.0];
 		[xform concat];
 		
 		[stimulusImage drawAtPoint:NSMakePoint(0.0f, 0.0f) 
-						 fromRect:NSZeroRect 
-						operation:NSCompositeSourceOver
-						 fraction:1.0];
+						  fromRect:NSZeroRect 
+						 operation:NSCompositeSourceOver
+						  fraction:1.0];
 		
 		
 		[xform invert];
 		[xform concat];
 	}
+	
+	if (visualStimulusTemplate.strokeColor != nil) {
+		[visualStimulusTemplate.strokeColor setStroke];
+		[visualStimulusTemplate.outline stroke];
+	} 
 	
 	// If it's drawing background, there's no need to draw auto-AOI.
 	if (![visualStimulusTemplate.category isEqualToString:@"background"] && showAutoAOI) {
@@ -353,7 +357,5 @@
 	[self setFrameSize:NSMakeSize(session.screenResolution.width * viewScale, 
 								  session.screenResolution.height * viewScale)];
 }
-
-
 
 @end

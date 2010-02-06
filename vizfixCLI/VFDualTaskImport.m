@@ -257,6 +257,7 @@
 	VFFixationRegister *fixRegister = [[VFFixationRegister alloc] initWithMOC:moc];
 	fixRegister.autoAOIDOV = 2.5;
 	fixRegister.customAOIs = customAOIs;
+	[fixRegister useVisualStimuliOfCategoriesAsAOI:[NSArray arrayWithObject:@"blip"]];	
 	[fixRegister registerAllFixations];
 
 	[self saveData];
@@ -374,10 +375,10 @@
 	trackingCursor.ID = @"tracking cursor";
 	VFVisualStimulusTemplate *trackingCursorTemplate = [NSEntityDescription insertNewObjectForEntityForName:@"VisualStimulusTemplate" 
 																					 inManagedObjectContext:moc];
-	trackingCursorTemplate.outline = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(0, 0, 32, 32)];
+	trackingCursorTemplate.outline = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 0, 32, 32)];
 	trackingCursorTemplate.category = @"tracking cursor";
 	trackingCursorTemplate.zorder = [NSNumber numberWithInt:1];
-	trackingCursorTemplate.strokeColor = [NSColor greenColor];
+	trackingCursorTemplate.imageFilePath = @"img/tracking_cursor.png";
 	trackingCursor.template = trackingCursorTemplate;
 }
 
