@@ -246,22 +246,6 @@
 	[fixationDetectionAlg detectAllFixationsInMOC:moc withRadiusThresholdInDOV:0.7];
 	[self saveData];
 	NSLog(@"Detecting fixations succeeded.");
-	
-	NSLog(@"Start to register fixations to AOIs.");
-	// Register fixations to AOIs.
-	NSBezierPath *radarAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 180, 710, 512)];
-	NSBezierPath *trackingAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(740, 242, 540, 540)];
-	NSDictionary *customAOIs = [NSDictionary dictionaryWithObjectsAndKeys:radarAOI, @"Radar Display", 
-								trackingAOI, @"Tracking Display", nil];
-	
-	VFFixationRegister *fixRegister = [[VFFixationRegister alloc] initWithMOC:moc];
-	fixRegister.autoAOIDOV = 2.5;
-	fixRegister.customAOIs = customAOIs;
-	[fixRegister useVisualStimuliOfCategoriesAsAOI:[NSArray arrayWithObject:@"blip"]];	
-	[fixRegister registerAllFixations];
-
-	[self saveData];
-	NSLog(@"Registering fixations completed.\nImport completed.\n\n");
 }
 
 - (void)saveData

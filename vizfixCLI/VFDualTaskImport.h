@@ -22,7 +22,6 @@
 #import "VFAuditoryStimulus.h"
 #import "VFDTFixationAlg.h"
 #import "VFCustomEvent.h"
-#import "VFFixationRegister.h"
 
 #import "RegexKitLite.h"
 

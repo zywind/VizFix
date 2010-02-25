@@ -17,10 +17,10 @@
 
 #define LEFT_VIEW_INDEX 0
 #define LEFT_VIEW_PRIORITY 1
-#define LEFT_VIEW_MINIMUM_WIDTH 200.0
+#define LEFT_VIEW_MINIMUM_WIDTH 0
 #define RIGHT_VIEW_INDEX 1
 #define RIGHT_VIEW_PRIORITY 0
-#define RIGHT_VIEW_MINIMUM_WIDTH 200.0
+#define RIGHT_VIEW_MINIMUM_WIDTH 100.0
 
 - (id)init 
 {
@@ -34,6 +34,7 @@
 								  [NSNumber numberWithDouble:1.0/1.0], [NSNumber numberWithDouble:2.0/1.0], nil];
 		playbackSpeedLabels = [NSArray arrayWithObjects:@"1/10 x", @"1/3 x", @"1/2 x", @"1 x", @"2 x", nil];
 		playbackSpeedModifiersIndex = 2; // Default speed 0.5/1.0.
+		step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
     }
     return self;
 }
@@ -311,13 +312,13 @@
 {
 	playing = !playing;
 	if (playing) {
-		NSRunLoop *runloop = [NSRunLoop currentRunLoop];
 		playTimer = [NSTimer timerWithTimeInterval:(1.0/viewRefreshRate)
 											target:self 
 										  selector:@selector(increaseCurrentTime:) 
 										  userInfo:nil 
 										   repeats:YES];
-		[runloop addTimer:playTimer forMode:NSDefaultRunLoopMode];
+		[[NSRunLoop currentRunLoop] addTimer:playTimer
+									 forMode:NSDefaultRunLoopMode];
 	} else {
 		[playTimer invalidate];
 	}
@@ -328,6 +329,7 @@
 	if (playbackSpeedModifiersIndex < [playbackSpeedModifiers count] - 1) {
 		playbackSpeedModifiersIndex++;
 		speedLabel.stringValue = [playbackSpeedLabels objectAtIndex:playbackSpeedModifiersIndex];
+		step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
 	}
 }
 
@@ -336,12 +338,12 @@
 	if (playbackSpeedModifiersIndex > 0) {
 		playbackSpeedModifiersIndex--;
 		speedLabel.stringValue = [playbackSpeedLabels objectAtIndex:playbackSpeedModifiersIndex];
-	}
+		step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
+	}	
 }
 
 - (void)increaseCurrentTime:(NSTimer*)theTimer
 {
-	double step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
 	if (self.currentTime <= self.viewEndTime - step)
 		self.currentTime += step;
 	else {

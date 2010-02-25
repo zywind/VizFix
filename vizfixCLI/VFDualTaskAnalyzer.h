@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import <AppKit/AppKit.h>
 #import "VFUtil.h"
+#import "VFFixationRegister.h"
 
 @interface VFDualTaskAnalyzer : NSObject {
 	NSManagedObjectContext *managedObjectContext;

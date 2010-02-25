@@ -23,7 +23,7 @@
 
 - (id)initWithMOC:(NSManagedObjectContext *)anMOC;
 - (void)registerFixation:(VFFixation *)aFixation;
-- (void)registerAllFixations;
+- (void)registerAllFixationsToClosetAOI;
 - (void)useVisualStimuliOfCategoriesAsAOI:(NSArray *)categories;
 
 @end

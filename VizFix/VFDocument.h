@@ -49,6 +49,8 @@
 	// UI elements data sources.
 	IBOutlet NSTreeController *treeController;
 	IBOutlet NSArrayController *tableViewController;
+	
+	double step;
 }
 
 @property (nonatomic, assign) double currentTime;

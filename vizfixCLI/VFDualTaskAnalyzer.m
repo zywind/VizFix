@@ -28,6 +28,26 @@
 - (void)analyze:(NSURL *)storeFileURL
 {
 	NSLog(@"Start to process file %@.", [storeFileURL path]);
+	NSError *error;
+	
+	NSLog(@"Start to register fixations to AOIs.");
+	// Register fixations to AOIs.
+	NSBezierPath *radarAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 180, 710, 512)];
+	NSBezierPath *trackingAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(740, 242, 540, 540)];
+	NSDictionary *customAOIs = [NSDictionary dictionaryWithObjectsAndKeys:radarAOI, @"Radar Display", 
+								trackingAOI, @"Tracking Display", nil];
+	
+	VFFixationRegister *fixRegister = [[VFFixationRegister alloc] initWithMOC:managedObjectContext];
+	fixRegister.autoAOIDOV = 2.5;
+	fixRegister.customAOIs = customAOIs;
+	[fixRegister useVisualStimuliOfCategoriesAsAOI:[NSArray arrayWithObject:@"blip", @"tracking target"]];
+	[fixRegister registerAllFixationsToClosetAOI];
+	
+	if (![managedObjectContext save:&error]) {
+		NSLog(@"Save fixation registration failed.");
+		return;
+	}
+	NSLog(@"Registering fixations completed.\nImport completed.\n\n");
 
 	VFSession *session = [VFUtil fetchSessionWithMOC:managedObjectContext];
 	NSArray *blocks = [[session.blocks allObjects]
@@ -306,7 +326,6 @@
 		}
 	}
 	
-	NSError *error;
 	if (![managedObjectContext save:&error]) {
 		NSLog(@"Save data failed at %@\n%@", [storeFileURL path], [error localizedFailureReason]);
 	}

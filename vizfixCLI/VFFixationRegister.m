@@ -77,7 +77,7 @@
 	}
 }
 
-- (void)registerAllFixations
+- (void)registerAllFixationsToClosetAOI
 {
 	for (VFFixation *fix in [VFUtil fetchAllObjectsForName:@"Fixation" fromMOC:moc]) {
 		[self registerFixation:fix];
