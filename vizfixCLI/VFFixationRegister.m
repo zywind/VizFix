@@ -20,7 +20,7 @@
 		moc = anMOC;
 		visualStimuliArray = [VFUtil fetchAllObjectsForName:@"VisualStimulus" fromMOC:moc];
 		converter = [[VFVisualAngleConverter alloc] initWithMOC:moc];
-		autoAOIDOV = 2.5;
+		autoAOIDOV = 5.5;
 	}
     return self;
 }
@@ -36,29 +36,43 @@
 	visualStimuliArray = [NSArray arrayWithArray:allVSs];
 }
 
-- (void)registerFixation:(VFFixation *)aFixation
+- (void)registerFixationToClosestAOI:(VFFixation *)aFixation
 {
 	aFixation.fixatedAOI = nil;
 	NSArray *onScreenStimuli = [visualStimuliArray filteredArrayUsingPredicate:
 								[VFUtil predicateForObjectsWithStartTime:aFixation.startTime 
 																 endTime:aFixation.endTime]];
 	
+	double minDistanceOfAll = autoAOIDOV;
+	VFVisualStimulus *targetStimulus;
+	
 	for (VFVisualStimulus *eachStimulus in onScreenStimuli) {
 		NSSet *onScreenFrames = [eachStimulus.frames filteredSetUsingPredicate:
 								 [VFUtil predicateForObjectsWithStartTime:aFixation.startTime 
 																  endTime:aFixation.endTime]];
 		
+		double minDistanceOfFixation = autoAOIDOV;
+		NSPoint minCenter;
+		double minH, minV;
 		for (VFVisualStimulusFrame *eachFrame in onScreenFrames) {
 			NSPoint center = NSMakePoint(eachFrame.location.x + eachStimulus.template.center.x, 
 										 eachFrame.location.y + eachStimulus.template.center.y);
 			
-			NSSize autoAOISize = NSMakeSize([converter horizontalPixelsFromVisualAngles:autoAOIDOV], 
-											[converter verticalPixelsFromVisualAngles:autoAOIDOV]);
-			NSBezierPath *aoiPath = [VFUtil autoAOIAroundCenter:center withSize:autoAOISize];
-			if ([aoiPath containsPoint:aFixation.location]) {
-				[aFixation registerOnAOI:eachStimulus.ID];
-				break;
+			double h = [converter horizontalVisualAnglesFromPixels:(aFixation.location.x - center.x)];
+			double v = [converter verticalVisualAnglesFromPixels:(aFixation.location.y - center.y)];
+			double dis = sqrt(h*h + v*v);
+			if (dis < minDistanceOfFixation) {
+				minDistanceOfFixation = dis;
+				minH = h;
+				minV = v;
+				minCenter = center;
 			}
+		}
+		
+		if (minDistanceOfFixation < minDistanceOfAll) {
+			targetStimulus = eachStimulus;
+			aFixation.fixatedAOI = [NSString stringWithFormat:@"%@, %1.2f, %1.2f, %1.0f, %1.0f", 
+									eachStimulus.ID, minH, minV, minCenter.x, minCenter.y];
 		}
 	}
 	
@@ -77,10 +91,10 @@
 	}
 }
 
-- (void)registerAllFixationsToClosetAOI
+- (void)registerAllFixations
 {
 	for (VFFixation *fix in [VFUtil fetchAllObjectsForName:@"Fixation" fromMOC:moc]) {
-		[self registerFixation:fix];
+		[self registerFixationToClosestAOI:fix];
 	}
 }
 @end

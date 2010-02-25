@@ -32,23 +32,27 @@
 	
 	NSLog(@"Start to register fixations to AOIs.");
 	// Register fixations to AOIs.
-	NSBezierPath *radarAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 180, 710, 512)];
-	NSBezierPath *trackingAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(740, 242, 540, 540)];
-	NSDictionary *customAOIs = [NSDictionary dictionaryWithObjectsAndKeys:radarAOI, @"Radar Display", 
-								trackingAOI, @"Tracking Display", nil];
+
 	
 	VFFixationRegister *fixRegister = [[VFFixationRegister alloc] initWithMOC:managedObjectContext];
-	fixRegister.autoAOIDOV = 2.5;
-	fixRegister.customAOIs = customAOIs;
-	[fixRegister useVisualStimuliOfCategoriesAsAOI:[NSArray arrayWithObject:@"blip", @"tracking target"]];
-	[fixRegister registerAllFixationsToClosetAOI];
+	fixRegister.autoAOIDOV = 5.5;
+	
+//	NSBezierPath *radarAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(0, 180, 710, 512)];
+//	NSBezierPath *trackingAOI = [NSBezierPath bezierPathWithRect:NSMakeRect(740, 242, 540, 540)];
+//	NSDictionary *customAOIs = [NSDictionary dictionaryWithObjectsAndKeys:radarAOI, @"Radar Display", 
+//								trackingAOI, @"Tracking Display", nil];
+//	fixRegister.customAOIs = customAOIs;
+	
+	[fixRegister useVisualStimuliOfCategoriesAsAOI:[NSArray arrayWithObjects:@"blip", nil]];
+	[fixRegister registerAllFixations];
 	
 	if (![managedObjectContext save:&error]) {
 		NSLog(@"Save fixation registration failed.");
 		return;
 	}
-	NSLog(@"Registering fixations completed.\nImport completed.\n\n");
+	NSLog(@"Registering fixations completed.\n\n");
 
+	/*
 	VFSession *session = [VFUtil fetchSessionWithMOC:managedObjectContext];
 	NSArray *blocks = [[session.blocks allObjects]
 					   sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
@@ -330,7 +334,8 @@
 		NSLog(@"Save data failed at %@\n%@", [storeFileURL path], [error localizedFailureReason]);
 	}
 	
-	NSLog(@"Process completed.\n\n\n");
+	NSLog(@"Process completed.\n\n\n"); 
+	*/
 }
 
 - (void)output:(NSURL *)storeFileURL
@@ -357,28 +362,41 @@
 			[blockConditions appendFormat:@"\t%@", eachCondition.level];
 		}
 		
-		NSArray *trials = [[eachBlock.trials allObjects] 
-						   sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
-		for (VFTrial *eachTrial in trials) {
-			NSMutableString *trialConditions = [NSMutableString stringWithString:@""];
-			
-			for (VFCondition *eachCondition in [[eachTrial.conditions allObjects] 
-												sortedArrayUsingDescriptors:factorSortDesc]) {
-				[trialConditions appendFormat:@"\t%@", eachCondition.level];
-			}
-			
-			NSMutableString *trialResponses = [NSMutableString stringWithString:@""];
-			for (VFResponse *eachResponse in [[eachTrial.responses allObjects] 
-											  sortedArrayUsingDescriptors:measureSortDesc]) {
-				[trialResponses appendFormat:@"\t%@", eachResponse.value];
-				if (eachResponse.error != nil) {
-					[trialResponses appendFormat:@"\t%@", eachResponse.error];
-				}
-			}
-			
-			[output appendFormat:@"%@\t%@\t%@%@%@%@\n", sessionInfo, eachBlock.ID, eachTrial.ID,
-			 blockConditions, trialConditions, trialResponses];
+		NSArray *fixations = [VFUtil fetchModelObjectsForName:@"Fixation" 
+														 from:eachBlock.startTime 
+														   to:eachBlock.endTime 
+													  withMOC:managedObjectContext];
+		
+		NSMutableString *scanpath = [NSMutableString stringWithString:@"\t"];
+		for (VFFixation *eachFix in fixations) {
+			[scanpath appendFormat:@"%@;", eachFix.fixatedAOI];
 		}
+		
+		[output appendFormat:@"%@\t%@\t%@%@\n", sessionInfo, eachBlock.ID,
+					 blockConditions, scanpath];
+		
+//		NSArray *trials = [[eachBlock.trials allObjects] 
+//						   sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
+//		for (VFTrial *eachTrial in trials) {
+//			NSMutableString *trialConditions = [NSMutableString stringWithString:@""];
+//			
+//			for (VFCondition *eachCondition in [[eachTrial.conditions allObjects] 
+//												sortedArrayUsingDescriptors:factorSortDesc]) {
+//				[trialConditions appendFormat:@"\t%@", eachCondition.level];
+//			}
+//			
+//			NSMutableString *trialResponses = [NSMutableString stringWithString:@""];
+//			for (VFResponse *eachResponse in [[eachTrial.responses allObjects] 
+//											  sortedArrayUsingDescriptors:measureSortDesc]) {
+//				[trialResponses appendFormat:@"\t%@", eachResponse.value];
+//				if (eachResponse.error != nil) {
+//					[trialResponses appendFormat:@"\t%@", eachResponse.error];
+//				}
+//			}
+//			
+//			[output appendFormat:@"%@\t%@\t%@%@%@%@\n", sessionInfo, eachBlock.ID, eachTrial.ID,
+//			 blockConditions, trialConditions, trialResponses];
+//		}
 	}
 	
 	NSError *error;

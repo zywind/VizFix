@@ -22,8 +22,8 @@
 @property double autoAOIDOV;
 
 - (id)initWithMOC:(NSManagedObjectContext *)anMOC;
-- (void)registerFixation:(VFFixation *)aFixation;
-- (void)registerAllFixationsToClosetAOI;
+- (void)registerFixationToClosestAOI:(VFFixation *)aFixation;
+- (void)registerAllFixations;
 - (void)useVisualStimuliOfCategoriesAsAOI:(NSArray *)categories;
 
 @end
