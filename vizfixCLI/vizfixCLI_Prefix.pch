@@ -1,7 +1,0 @@
-//
-// Prefix header for all source files of the 'vizfixCLI' target in the 'vizfixCLI' project.
-//
-
-#ifdef __OBJC__
-    #import <Foundation/Foundation.h>
-#endif

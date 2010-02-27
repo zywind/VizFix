@@ -7,22 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "VFSession.h"
-#import "VFCondition.h"
-#import "VFResponse.h"
-#import "VFView.h"
-#import "VFSession.h"
-#import "VFBlock.h"
-#import "VFTrial.h"
-#import "VFSubTrial.h"
-#import "VFFixation.h"
-#import "VFVisualStimulus.h"
-#import "VFVisualStimulusTemplate.h"
-#import "VFVisualStimulusFrame.h"
-#import "VFGazeSample.h"
 #import "VFUtil.h"
-
-@class VFVisualAngleConverter;
+#import "VFVisualAngleConverter.h"
+#import "VFMangedObjects.h"
 
 @interface VFView : NSView {
 	IBOutlet NSArrayController *blockController;

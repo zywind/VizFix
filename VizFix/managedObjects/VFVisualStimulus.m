@@ -9,12 +9,10 @@
 #import "VFVisualStimulus.h"
 
 #import "VFVisualStimulusTemplate.h"
-#import "VFTrial.h"
 
 @implementation VFVisualStimulus 
 
 @dynamic template;
-@dynamic isTargetOfTrial;
 @dynamic frames;
 @dynamic startTime;
 @dynamic endTime;

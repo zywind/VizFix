@@ -8,16 +8,6 @@
 
 #import "VFBlock.h"
 
-#import "VFKeyboardEvent.h"
-#import "VFTrial.h"
-#import "VFFixation.h"
-#import "VFAuditoryStimulus.h"
-#import "VFCustomEvent.h"
-#import "VFSession.h"
-#import "VFCondition.h"
-#import "VFGazeSample.h"
-#import "VFVisualStimulus.h"
-
 @implementation VFBlock 
 
 @dynamic ID;

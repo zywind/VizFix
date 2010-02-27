@@ -10,8 +10,6 @@
 
 @class VFBlock;
 @class VFSubTrial;
-@class VFVisualStimulus;
-@class VFAuditoryStimulus;
 @class VFCondition;
 @class VFResponse;
 
@@ -24,8 +22,6 @@
 @property (nonatomic, retain) NSString * ID;
 @property (nonatomic, retain) VFBlock * inBlock;
 @property (nonatomic, retain) NSSet* subTrials;
-@property (nonatomic, retain) NSSet* targetVisualStimuli;
-@property (nonatomic, retain) NSSet* targetAuditoryStimuli;
 @property (nonatomic, retain) NSSet* conditions;
 @property (nonatomic, retain) NSSet* responses;
 @property (nonatomic, readonly) BOOL leaf;
@@ -40,16 +36,6 @@
 - (void)removeSubTrialsObject:(VFSubTrial *)value;
 - (void)addSubTrials:(NSSet *)value;
 - (void)removeSubTrials:(NSSet *)value;
-
-- (void)addTargetVisualStimuliObject:(VFVisualStimulus *)value;
-- (void)removeTargetVisualStimuliObject:(VFVisualStimulus *)value;
-- (void)addTargetVisualStimuli:(NSSet *)value;
-- (void)removeTargetVisualStimuli:(NSSet *)value;
-
-- (void)addTargetAuditoryStimuliObject:(VFAuditoryStimulus *)value;
-- (void)removeTargetAuditoryStimuliObject:(VFAuditoryStimulus *)value;
-- (void)addTargetAuditoryStimuli:(NSSet *)value;
-- (void)removeTargetAuditoryStimuli:(NSSet *)value;
 
 - (void)addConditionsObject:(VFCondition *)value;
 - (void)removeConditionsObject:(VFCondition *)value;

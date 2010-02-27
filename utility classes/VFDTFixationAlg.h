@@ -7,9 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "VFGazeSample.h"
-#import "VFFixation.h"
-#import "VFUtil.h"
 
 @interface VFDTFixationAlg : NSObject {
 	double radiusThreshold;

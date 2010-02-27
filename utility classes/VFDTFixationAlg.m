@@ -8,6 +8,12 @@
 
 #import "VFDTFixationAlg.h"
 
+#import "VFUtil.h"
+#import "VFVisualAngleConverter.h"
+
+#import "VFSession.h"
+#import "VFGazeSample.h"
+#import "VFFixation.h"
 
 @implementation VFDTFixationAlg
 

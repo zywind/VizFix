@@ -8,6 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import "VFUtil.h"
+#import "VFVisualAngleConverter.h"
+#import "VFFixation.h"
 
 @interface VFFixationRegister : NSObject {
 	NSManagedObjectContext *moc;

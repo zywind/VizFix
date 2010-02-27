@@ -9,13 +9,11 @@
 #import "VFAuditoryStimulus.h"
 
 #import "VFAudioSource.h"
-#import "VFTrial.h"
 
 @implementation VFAuditoryStimulus 
 
 @dynamic startTime;
 @dynamic audioSource;
-@dynamic isTargetOfTrial;
 @dynamic locationAsString;
 
 - (NSPoint)primitiveLocation

@@ -8,6 +8,7 @@
 
 #import "VFView.h"
 
+
 @implementation VFView
 
 @synthesize showLabel;

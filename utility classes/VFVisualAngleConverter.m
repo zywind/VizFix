@@ -8,6 +8,8 @@
 
 #import "VFVisualAngleConverter.h"
 
+#import "VFSession.h"
+#import "VFUtil.h"
 
 @implementation VFVisualAngleConverter
 

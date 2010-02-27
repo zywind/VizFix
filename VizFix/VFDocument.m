@@ -8,6 +8,11 @@
 
 #import "VFDocument.h"
 
+#import "VFUtil.h"
+#import "PrioritySplitViewDelegate.h"
+#import "SBCenteringClipView.h"
+#import "VFDTFixationAlg.h"
+
 @implementation VFDocument
 
 @synthesize currentTime;
@@ -59,7 +64,7 @@
 	[sessionController setContent:session];
 	
 	// Control the resizing of splitView
-	splitViewDelegate =
+	PrioritySplitViewDelegate *splitViewDelegate =
 	[[PrioritySplitViewDelegate alloc] init];
 	
 	[splitViewDelegate

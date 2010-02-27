@@ -9,7 +9,6 @@
 #import <CoreData/CoreData.h>
 
 @class VFAudioSource;
-@class VFTrial;
 
 @interface VFAuditoryStimulus :  NSManagedObject  
 {
@@ -22,7 +21,6 @@
 @property (nonatomic, retain) NSNumber * startTime;
 @property (nonatomic, readonly) NSNumber * endTime;
 @property (nonatomic, retain) VFAudioSource * audioSource;
-@property (nonatomic, retain) VFTrial * isTargetOfTrial;
 
 @end
 

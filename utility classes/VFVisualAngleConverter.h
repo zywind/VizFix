@@ -7,10 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "VFUtil.h"
 
-@class VFUtil;
-@class VFSession;
 
 @interface VFVisualAngleConverter : NSObject {
 	NSSize screenResolution;

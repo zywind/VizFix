@@ -10,8 +10,6 @@
 
 #import "VFBlock.h"
 #import "VFSubTrial.h"
-#import "VFVisualStimulus.h"
-#import "VFAuditoryStimulus.h"
 #import "VFCondition.h"
 #import "VFResponse.h"
 
@@ -22,8 +20,6 @@
 @dynamic ID;
 @dynamic inBlock;
 @dynamic subTrials;
-@dynamic targetVisualStimuli;
-@dynamic targetAuditoryStimuli;
 @dynamic conditions;
 @dynamic responses;
 

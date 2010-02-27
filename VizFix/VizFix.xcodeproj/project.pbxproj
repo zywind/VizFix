@@ -48,9 +48,10 @@
 		2F7446A80DB6BCF400F9684A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		2F7446AA0DB6BCF400F9684A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/VFDocument.xib; sourceTree = "<group>"; };
 		32DBCF750370BD2300C91783 /* VizFix_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VizFix_Prefix.pch; sourceTree = "<group>"; };
+		3B22AB56113870BB00312B8B /* VFMangedObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFMangedObjects.h; path = managedObjects/VFMangedObjects.h; sourceTree = "<group>"; };
 		3B3D734C11066FBA00C03AEA /* VFDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFDocument.h; sourceTree = "<group>"; };
-		3B7732571114D37300827FCB /* VFUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFUtil.h; sourceTree = "<group>"; };
-		3B7732581114D37300827FCB /* VFUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFUtil.m; sourceTree = "<group>"; };
+		3B7732571114D37300827FCB /* VFUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFUtil.h; path = "../utility classes/VFUtil.h"; sourceTree = "<group>"; };
+		3B7732581114D37300827FCB /* VFUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VFUtil.m; path = "../utility classes/VFUtil.m"; sourceTree = "<group>"; };
 		3BC19E871100FD9B00AD4968 /* VFView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFView.h; sourceTree = "<group>"; };
 		3BC19E881100FD9B00AD4968 /* VFView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFView.m; sourceTree = "<group>"; };
 		3BC50456110ADB880004A125 /* VFGazeSample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFGazeSample.h; path = managedObjects/VFGazeSample.h; sourceTree = "<group>"; };
@@ -89,10 +90,10 @@
 		3BE64ABD110595A1008D8939 /* VFAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFAppDelegate.m; sourceTree = "<group>"; };
 		3BEBF0B611027E3B00E27227 /* PrioritySplitViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrioritySplitViewDelegate.h; sourceTree = "<group>"; };
 		3BEBF0B711027E3B00E27227 /* PrioritySplitViewDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrioritySplitViewDelegate.m; sourceTree = "<group>"; };
-		3BF011951104FA2B00A309E2 /* VFDTFixationAlg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFDTFixationAlg.h; sourceTree = "<group>"; };
-		3BF011961104FA2B00A309E2 /* VFDTFixationAlg.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFDTFixationAlg.m; sourceTree = "<group>"; };
-		3BF776151112175A00061B38 /* VFVisualAngleConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFVisualAngleConverter.h; sourceTree = "<group>"; };
-		3BF776161112175A00061B38 /* VFVisualAngleConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFVisualAngleConverter.m; sourceTree = "<group>"; };
+		3BF011951104FA2B00A309E2 /* VFDTFixationAlg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFDTFixationAlg.h; path = "../utility classes/VFDTFixationAlg.h"; sourceTree = "<group>"; };
+		3BF011961104FA2B00A309E2 /* VFDTFixationAlg.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VFDTFixationAlg.m; path = "../utility classes/VFDTFixationAlg.m"; sourceTree = "<group>"; };
+		3BF776151112175A00061B38 /* VFVisualAngleConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFVisualAngleConverter.h; path = "../utility classes/VFVisualAngleConverter.h"; sourceTree = "<group>"; };
+		3BF776161112175A00061B38 /* VFVisualAngleConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VFVisualAngleConverter.m; path = "../utility classes/VFVisualAngleConverter.m"; sourceTree = "<group>"; };
 		775BDEF0067A8BF0009058FE /* VFModel.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = VFModel.xcdatamodel; sourceTree = "<group>"; };
 		7788DA0506752A1600599AAD /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -153,19 +154,14 @@
 		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				3BF777A811125BC300061B38 /* UI Helpers */,
 				3B3D734C11066FBA00C03AEA /* VFDocument.h */,
 				2A37F4ACFDCFA73011CA2CEA /* VFDocument.m */,
 				3BC19E871100FD9B00AD4968 /* VFView.h */,
 				3BC19E881100FD9B00AD4968 /* VFView.m */,
-				3BF011951104FA2B00A309E2 /* VFDTFixationAlg.h */,
-				3BF011961104FA2B00A309E2 /* VFDTFixationAlg.m */,
 				3BE64ABC110595A1008D8939 /* VFAppDelegate.h */,
 				3BE64ABD110595A1008D8939 /* VFAppDelegate.m */,
-				3BF776151112175A00061B38 /* VFVisualAngleConverter.h */,
-				3BF776161112175A00061B38 /* VFVisualAngleConverter.m */,
-				3B7732571114D37300827FCB /* VFUtil.h */,
-				3B7732581114D37300827FCB /* VFUtil.m */,
+				3BF777A811125BC300061B38 /* UI Helpers */,
+				3B22AB581138754700312B8B /* utility classes */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -199,7 +195,20 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3B46B82911016DBD002DF0C3 /* Manged Objects */ = {
+		3B22AB581138754700312B8B /* utility classes */ = {
+			isa = PBXGroup;
+			children = (
+				3BF776151112175A00061B38 /* VFVisualAngleConverter.h */,
+				3BF776161112175A00061B38 /* VFVisualAngleConverter.m */,
+				3B7732571114D37300827FCB /* VFUtil.h */,
+				3B7732581114D37300827FCB /* VFUtil.m */,
+				3BF011951104FA2B00A309E2 /* VFDTFixationAlg.h */,
+				3BF011961104FA2B00A309E2 /* VFDTFixationAlg.m */,
+			);
+			name = "utility classes";
+			sourceTree = "<group>";
+		};
+		3B46B82911016DBD002DF0C3 /* Managed Objects */ = {
 			isa = PBXGroup;
 			children = (
 				3BC50456110ADB880004A125 /* VFGazeSample.h */,
@@ -232,8 +241,9 @@
 				3BC50471110ADB880004A125 /* VFSession.m */,
 				3BC50472110ADB880004A125 /* VFFixation.h */,
 				3BC50473110ADB880004A125 /* VFFixation.m */,
+				3B22AB56113870BB00312B8B /* VFMangedObjects.h */,
 			);
-			name = "Manged Objects";
+			name = "Managed Objects";
 			sourceTree = "<group>";
 		};
 		3BF777A811125BC300061B38 /* UI Helpers */ = {
@@ -250,7 +260,7 @@
 		E1B74B1A0667B4A90069E3BA /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				3B46B82911016DBD002DF0C3 /* Manged Objects */,
+				3B46B82911016DBD002DF0C3 /* Managed Objects */,
 				775BDEF0067A8BF0009058FE /* VFModel.xcdatamodel */,
 			);
 			name = Models;

@@ -8,6 +8,9 @@
 
 #import "VFFixationRegister.h"
 
+#import "VFVisualStimulus.h"
+#import "VFVisualStimulusFrame.h"
+#import "VFVisualStimulusTemplate.h"
 
 @implementation VFFixationRegister
 
@@ -53,7 +56,6 @@
 		
 		double minDistanceOfFixation = autoAOIDOV;
 		NSPoint minCenter;
-		double minH, minV;
 		for (VFVisualStimulusFrame *eachFrame in onScreenFrames) {
 			NSPoint center = NSMakePoint(eachFrame.location.x + eachStimulus.template.center.x, 
 										 eachFrame.location.y + eachStimulus.template.center.y);
@@ -63,8 +65,6 @@
 			double dis = sqrt(h*h + v*v);
 			if (dis < minDistanceOfFixation) {
 				minDistanceOfFixation = dis;
-				minH = h;
-				minV = v;
 				minCenter = center;
 			}
 		}
@@ -72,7 +72,7 @@
 		if (minDistanceOfFixation < minDistanceOfAll) {
 			targetStimulus = eachStimulus;
 			aFixation.fixatedAOI = [NSString stringWithFormat:@"%@, %1.2f, %1.2f, %1.0f, %1.0f", 
-									eachStimulus.ID, minH, minV, minCenter.x, minCenter.y];
+									eachStimulus.ID, aFixation.location.x - minCenter.x, aFixation.location.y - minCenter.y, minCenter.x, minCenter.y];
 		}
 	}
 	

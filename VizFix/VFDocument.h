@@ -7,18 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "VFView.h"
-#import "VFSession.h"
-#import "VFBlock.h"
-#import "VFTrial.h"
-#import "VFSubTrial.h"
-#import "PrioritySplitViewDelegate.h"
-#import "VFDTFixationAlg.h"
-#import "VFCondition.h"
-#import "VFResponse.h"
-#import "SBCenteringClipView.h"
 
-@class PrioritySplitViewDelegate;
+#import "VFSession.h"
+#import "VFView.h"
 
 @interface VFDocument : NSPersistentDocument {
 	IBOutlet NSObjectController *sessionController;
@@ -41,7 +32,6 @@
 	
 	// UI elements
 	IBOutlet NSSplitView *splitView;
-	PrioritySplitViewDelegate *splitViewDelegate;	
 	IBOutlet NSScrollView *scrollView;
 	IBOutlet NSButton *playButton;
 	IBOutlet VFView	*layoutView;

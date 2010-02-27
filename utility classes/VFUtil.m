@@ -8,6 +8,7 @@
 
 #import "VFUtil.h"
 
+#import "VFSession.h"
 
 @implementation VFUtil
 

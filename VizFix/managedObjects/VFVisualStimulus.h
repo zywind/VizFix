@@ -9,14 +9,12 @@
 #import <CoreData/CoreData.h>
 
 @class VFVisualStimulusTemplate;
-@class VFTrial;
 
 @interface VFVisualStimulus :  NSManagedObject  
 {
 }
 
 @property (nonatomic, retain) VFVisualStimulusTemplate * template;
-@property (nonatomic, retain) VFTrial * isTargetOfTrial;
 @property (nonatomic, retain) NSSet* frames;
 @property (nonatomic, retain) NSNumber * endTime;
 @property (nonatomic, retain) NSNumber * startTime;
