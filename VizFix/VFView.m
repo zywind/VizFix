@@ -214,8 +214,8 @@
 	
 	// If it's drawing background, there's no need to draw auto-AOI.
 	if (![visualStimulusTemplate.category isEqualToString:@"background"] && showAutoAOI) {
-		NSSize autoAOISize = NSMakeSize([DOVConverter horizontalPixelsFromVisualAngles:2.5], 
-										[DOVConverter verticalPixelsFromVisualAngles:2.5]);
+		NSSize autoAOISize = NSMakeSize([DOVConverter horizontalPixelsFromVisualAngles:2.0], 
+										[DOVConverter verticalPixelsFromVisualAngles:2.0]);
 		NSBezierPath *foveaZonePath = [VFUtil autoAOIAroundCenter:visualStimulusTemplate.center withSize:autoAOISize];
 		
 		[[NSColor grayColor] set];
