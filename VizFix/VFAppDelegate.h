@@ -7,10 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
-
+@class VFPreferenceController;
 
 @interface VFAppDelegate : NSObject {
-
+	VFPreferenceController *prefController;
 }
 
+- (IBAction)showPreferencePanel:(id)sender;
 @end

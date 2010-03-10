@@ -31,6 +31,7 @@
 	BOOL showGazeSample;
 	BOOL inSummaryMode;
 	double currentTime;
+	float autoAOISizeDOV;
 	
 	NSUInteger selectedGroupType; // 2 for block, 3 for trial, 4 for subtrial
 	

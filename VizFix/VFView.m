@@ -7,7 +7,7 @@
 //
 
 #import "VFView.h"
-
+#import "VFPreferenceController.h"
 
 @implementation VFView
 
@@ -34,6 +34,8 @@
 		[self addObserver:self forKeyPath:@"viewScale" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"inSummaryMode" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"currentTime" options:NSKeyValueObservingOptionNew context:NULL];
+				
+		autoAOISizeDOV = [[NSUserDefaults standardUserDefaults] floatForKey:VFAutoAOISizeKey];
 	}
     return self;
 }
@@ -114,7 +116,9 @@
 		NSSet *frames = vs.frames;
 
 		if (!inSummaryMode) {
-			[self drawFrame:[[frames filteredSetUsingPredicate:playbackPredicateForTimePeriod] anyObject]];
+			VFVisualStimulusFrame *aFrame = [[frames filteredSetUsingPredicate:playbackPredicateForTimePeriod] anyObject];
+			if (aFrame != nil)
+				[self drawFrame:aFrame];
 		} else {
 			NSArray *vsFrames = [[frames allObjects] sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
 			VFVisualStimulusFrame *lastDrawnFrame;
@@ -214,8 +218,8 @@
 	
 	// If it's drawing background, there's no need to draw auto-AOI.
 	if (![visualStimulusTemplate.category isEqualToString:@"background"] && showAutoAOI) {
-		NSSize autoAOISize = NSMakeSize([DOVConverter horizontalPixelsFromVisualAngles:2.0], 
-										[DOVConverter verticalPixelsFromVisualAngles:2.0]);
+		NSSize autoAOISize = NSMakeSize([DOVConverter horizontalPixelsFromVisualAngles:autoAOISizeDOV], 
+										[DOVConverter verticalPixelsFromVisualAngles:autoAOISizeDOV]);
 		NSBezierPath *foveaZonePath = [VFUtil autoAOIAroundCenter:visualStimulusTemplate.center withSize:autoAOISize];
 		
 		[[NSColor grayColor] set];
