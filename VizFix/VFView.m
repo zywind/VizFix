@@ -36,8 +36,6 @@
 		[self addObserver:self forKeyPath:@"viewScale" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"inSummaryMode" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"currentTime" options:NSKeyValueObservingOptionNew context:NULL];
-				
-		autoAOISizeDOV = [[NSUserDefaults standardUserDefaults] floatForKey:VFAutoAOISizeKey];
 	}
     return self;
 }
@@ -125,6 +123,8 @@
 {
 	// Save the previous graphics state
 	[NSGraphicsContext saveGraphicsState];
+	
+	autoAOISizeDOV = [[NSUserDefaults standardUserDefaults] floatForKey:VFAutoAOISizeKey];
 	
 	NSAffineTransform* xform = [NSAffineTransform transform];
 	[xform scaleXBy:viewScale yBy:viewScale];
