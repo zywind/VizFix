@@ -11,7 +11,11 @@
 #import "VFVisualAngleConverter.h"
 #import "VFMangedObjects.h"
 
+@class VFDocument;
+
 @interface VFView : NSView {
+	VFDocument *document;
+	
 	IBOutlet NSArrayController *blockController;
 	IBOutlet NSArrayController *trialController;
 	IBOutlet NSArrayController *subTrialController;
@@ -51,6 +55,7 @@
 @property double viewScale;
 @property double currentTime;
 @property (retain) NSURL *dataURL;
+@property VFDocument *document;
 
 - (void)setSession:(VFSession *)session;
 - (IBAction)changeViewScale:(id)sender;
@@ -63,4 +68,7 @@
 - (void)drawFixations;
 - (void)drawFixation:(VFFixation *)currentFixation withColor:(NSColor *)color;
 - (void)updateViewContentsFrom:(double)viewStartTime to:(double)viewEndTime;
+
+- (void)stepForward;
+- (void)stepBackward;
 @end

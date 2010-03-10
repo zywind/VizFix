@@ -8,6 +8,7 @@
 
 #import "VFView.h"
 #import "VFPreferenceController.h"
+#import "VFDocument.h"
 
 @implementation VFView
 
@@ -18,6 +19,7 @@
 @synthesize showGazeSample;
 @synthesize inSummaryMode;
 @synthesize currentTime;
+@synthesize document;
 
 - (id)initWithFrame:(NSRect)frameRect
 {
@@ -98,6 +100,26 @@
 
 	[self setNeedsDisplay:YES];
 }
+
+- (void)stepForward
+{
+	NSArray *followingFixations = [fixationsArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"startTime > %f", currentTime]];
+	if ([followingFixations count] != 0) {
+		self.currentTime = [((VFFixation *)[followingFixations objectAtIndex:0]).startTime intValue];
+		// The binding is not bidirectional!! I wish there is a better solution.
+		document.currentTime = self.currentTime;
+	}
+}
+
+- (void)stepBackward
+{
+	NSArray *previousFixations = [fixationsArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"startTime < %f", currentTime]];
+	if ([previousFixations count] != 0) {
+		self.currentTime = [((VFFixation *)[previousFixations lastObject]).startTime intValue];
+		document.currentTime = self.currentTime;
+	}
+}
+
 
 - (void)drawRect:(NSRect)rect
 {

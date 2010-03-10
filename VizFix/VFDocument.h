@@ -52,6 +52,8 @@
 - (IBAction)togglePlayState:(id)sender;
 - (IBAction)speedUp:(id)sender;
 - (IBAction)slowDown:(id)sender;
+- (IBAction)stepForward:(id)sender;
+- (IBAction)stepBackward:(id)sender;
 - (void)increaseCurrentTime:(NSTimer*)theTimer;
 // Browse data.
 - (void)updateTableView;

@@ -58,6 +58,7 @@
 		
 	[layoutView bind:@"inSummaryMode" toObject:self withKeyPath:@"inSummaryMode" options:nil];
 	[layoutView bind:@"currentTime" toObject:self withKeyPath:@"currentTime" options:nil];
+	layoutView.document = self;
 	
 	// Retrieve Session.
 	session = [VFUtil fetchSessionWithMOC:[self managedObjectContext]];
@@ -345,6 +346,16 @@
 		speedLabel.stringValue = [playbackSpeedLabels objectAtIndex:playbackSpeedModifiersIndex];
 		step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
 	}	
+}
+
+- (IBAction)stepForward:(id)sender
+{
+	[layoutView	stepForward];
+}
+
+- (IBAction)stepBackward:(id)sender
+{
+	[layoutView stepBackward];
 }
 
 - (void)increaseCurrentTime:(NSTimer*)theTimer
