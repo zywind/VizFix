@@ -361,7 +361,11 @@
 	NSBezierPath *fixLocPath = [NSBezierPath bezierPathWithOvalInRect:innerRect];
 	[fixLocPath fill];
 	
-	double radius = log([aFixation.endTime intValue] - [aFixation.startTime intValue]) * 2;
+	double radius;
+	if (inSummaryMode)
+		radius = pow([aFixation.endTime intValue] - [aFixation.startTime intValue], 0.4);
+	else
+		radius = pow(currentTime - [aFixation.startTime intValue], 0.4);
 	NSRect durationRect = NSMakeRect(x - radius , y - radius, 2 * radius, 2 * radius);
 	NSBezierPath *durationPath = [NSBezierPath bezierPathWithOvalInRect:durationRect];	
 	[durationPath setLineWidth:2];
