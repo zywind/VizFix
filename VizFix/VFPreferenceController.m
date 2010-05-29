@@ -9,6 +9,7 @@
 #import "VFPreferenceController.h"
 
 NSString * const VFAutoAOISizeKey = @"AutoAOISize";
+NSString * const VFFixationColorKey = @"FixationColor";
 
 @implementation VFPreferenceController
 

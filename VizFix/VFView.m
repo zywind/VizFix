@@ -294,12 +294,11 @@
 
 - (void)drawFixations
 {
-	NSColor *color;
+	NSColor *color = nil;
+	
+	color = (NSColor *)[NSUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] 
+															  objectForKey:VFFixationColorKey]];	
 	if (!inSummaryMode) {			
-		color = [NSColor colorWithCalibratedHue:0.8 
-									 saturation:1.0 
-									 brightness:1.0 
-										  alpha:1.0];
 		VFFixation *currentFixation;
 		int i = 0;
 		BOOL foundFixation = NO;
@@ -329,12 +328,8 @@
 	} else {
 		for (int i = 0; i < [fixationsArray count]; i++) {
 			VFFixation *currentFixation = [fixationsArray objectAtIndex:i];
-			
-			color = [NSColor colorWithCalibratedHue:0.8 
-										 saturation:(1.0 - ((i / (float)[fixationsArray count]) / 2.0)) 
-										 brightness:(0.5 + ((i / (float)[fixationsArray count]) / 2.0)) 
-											  alpha:1.0];
-						
+			// TODO: The alpha component seems not working.
+			color = [color colorWithAlphaComponent:(1.0 - ((i / (float)[fixationsArray count]) / 2.0))];						
 			[self drawFixation:currentFixation withColor:color];
 			
 			

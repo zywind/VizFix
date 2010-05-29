@@ -17,6 +17,12 @@
 	
 	[defaultValues setObject:[NSNumber numberWithFloat:2.0f] forKey:VFAutoAOISizeKey];
 	
+	NSData *theData=[NSArchiver archivedDataWithRootObject:[NSColor colorWithCalibratedHue:0.8 
+																				saturation:1.0 
+																				brightness:1.0 
+																					 alpha:1.0]];
+	[defaultValues setObject:theData forKey:VFFixationColorKey];
+	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 }
 

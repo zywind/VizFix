@@ -9,9 +9,11 @@
 #import <Cocoa/Cocoa.h>
 
 extern NSString * const VFAutoAOISizeKey;
+extern NSString * const VFFixationColorKey;
 
 @interface VFPreferenceController : NSWindowController {
 	IBOutlet NSTextField *AOISizeTextField;
+	IBOutlet NSColorWell *FixationColorWell;
 }
 
 @end
