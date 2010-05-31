@@ -9,7 +9,6 @@
 #import <CoreData/CoreData.h>
 #import <AppKit/AppKit.h>
 
-@class VFVisualStimulusTemplate;
 @class VFBlock;
 
 @interface VFSession :  NSManagedObject  
@@ -25,7 +24,7 @@
 @property (nonatomic, retain) NSString * screenResolutionAsString;
 @property (nonatomic, retain) NSString * screenDimensionAsString;
 
-@property (nonatomic, retain) VFVisualStimulusTemplate * background;
+@property (nonatomic, retain) NSColor * backgroundColor;
 @property (nonatomic, retain) NSString * sessionID;
 @property (nonatomic, retain) NSString * experiment;
 @property (nonatomic, retain) NSNumber * distanceToScreen;

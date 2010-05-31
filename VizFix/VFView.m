@@ -130,7 +130,7 @@
 	[xform scaleXBy:viewScale yBy:viewScale];
 	[xform concat];
 	// Draw background.
-	[self drawVisualStimulusTemplate:session.background];
+	[session.backgroundColor drawSwatchInRect:rect];
 	
 	// Draw screen objects.
 	for (VFVisualStimulus *vs in visualStimuliArray)

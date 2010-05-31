@@ -10,6 +10,8 @@
 
 @class VFVisualStimulusTemplate;
 
+/*! Visual stimulus.
+ */
 @interface VFVisualStimulus :  NSManagedObject  
 {
 }
@@ -17,6 +19,9 @@
 @property (nonatomic, retain) VFVisualStimulusTemplate * template;
 @property (nonatomic, retain) NSSet* frames;
 @property (nonatomic, retain) NSNumber * endTime;
+
+/*! Start time.
+ */
 @property (nonatomic, retain) NSNumber * startTime;
 @property (nonatomic, retain) NSString * label;
 @property (nonatomic, retain) NSString * ID;

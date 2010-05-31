@@ -8,7 +8,6 @@
 
 #import "VFSession.h"
 
-#import "VFVisualStimulusTemplate.h"
 #import "VFBlock.h"
 
 @implementation VFSession
@@ -22,7 +21,7 @@
 @dynamic gazeSampleRate;
 @dynamic date;
 @dynamic blocks;
-@dynamic background;
+@dynamic backgroundColor;
 @dynamic duration;
 
 - (NSSize)primitiveScreenResolution
