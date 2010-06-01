@@ -8,9 +8,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "VFSession.h"
 #import "VFView.h"
 
+@class VFSession;
 @interface VFDocument : NSPersistentDocument {
 	IBOutlet NSObjectController *sessionController;
 	IBOutlet NSArrayController *blockController;

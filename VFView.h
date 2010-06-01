@@ -7,9 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "VFUtil.h"
-#import "VFVisualAngleConverter.h"
-#import "VFMangedObjects.h"
+#import <VizFixLib/VFMangedObjects.h>
+#import <VizFixLib/VFVisualAngleConverter.h>
 
 @class VFDocument;
 

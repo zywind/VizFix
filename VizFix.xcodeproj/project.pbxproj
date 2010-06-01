@@ -17,33 +17,33 @@
 		3BE64ABE110595A1008D8939 /* VFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BE64ABD110595A1008D8939 /* VFAppDelegate.m */; };
 		3BEBF0B811027E3B00E27227 /* PrioritySplitViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BEBF0B711027E3B00E27227 /* PrioritySplitViewDelegate.m */; };
 		3BF7CA3711B09B1700E8CD9F /* VFSubTrial.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50463110ADB880004A125 /* VFSubTrial.m */; };
-		3BF7CA3811B09B1800E8CD9F /* VFGazeSample.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50456110ADB880004A125 /* VFGazeSample.h */; };
+		3BF7CA3811B09B1800E8CD9F /* VFGazeSample.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50456110ADB880004A125 /* VFGazeSample.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA3911B09B1900E8CD9F /* VFAuditoryStimulus.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5045F110ADB880004A125 /* VFAuditoryStimulus.m */; };
-		3BF7CA3A11B09B1900E8CD9F /* VFAuditoryStimulus.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045E110ADB880004A125 /* VFAuditoryStimulus.h */; };
+		3BF7CA3A11B09B1900E8CD9F /* VFAuditoryStimulus.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045E110ADB880004A125 /* VFAuditoryStimulus.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA3B11B09B2200E8CD9F /* VFMangedObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 3B22AB56113870BB00312B8B /* VFMangedObjects.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA3C11B09B2200E8CD9F /* VFCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5046F110ADB880004A125 /* VFCustomEvent.m */; };
 		3BF7CA3D11B09B2300E8CD9F /* VFKeyboardEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50465110ADB880004A125 /* VFKeyboardEvent.m */; };
 		3BF7CA3E11B09B2300E8CD9F /* VFVisualStimulusTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50467110ADB880004A125 /* VFVisualStimulusTemplate.m */; };
 		3BF7CA3F11B09B2400E8CD9F /* VFCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5045D110ADB880004A125 /* VFCondition.m */; };
-		3BF7CA4011B09B2500E8CD9F /* VFBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50458110ADB880004A125 /* VFBlock.h */; };
+		3BF7CA4011B09B2500E8CD9F /* VFBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50458110ADB880004A125 /* VFBlock.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA4111B09B2600E8CD9F /* VFTrial.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50461110ADB880004A125 /* VFTrial.m */; };
-		3BF7CA4211B09B2600E8CD9F /* VFSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50470110ADB880004A125 /* VFSession.h */; };
+		3BF7CA4211B09B2600E8CD9F /* VFSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50470110ADB880004A125 /* VFSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA4311B09B2700E8CD9F /* VFFixation.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50473110ADB880004A125 /* VFFixation.m */; };
-		3BF7CA4411B09B2800E8CD9F /* VFResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045A110ADB880004A125 /* VFResponse.h */; };
+		3BF7CA4411B09B2800E8CD9F /* VFResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045A110ADB880004A125 /* VFResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA4511B09B2800E8CD9F /* VFAudioSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5046B110ADB880004A125 /* VFAudioSource.m */; };
 		3BF7CA4611B09B2900E8CD9F /* VFGazeSample.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50457110ADB880004A125 /* VFGazeSample.m */; };
-		3BF7CA4711B09B2A00E8CD9F /* VFFixation.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50472110ADB880004A125 /* VFFixation.h */; };
-		3BF7CA4811B09B2A00E8CD9F /* VFCondition.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045C110ADB880004A125 /* VFCondition.h */; };
+		3BF7CA4711B09B2A00E8CD9F /* VFFixation.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50472110ADB880004A125 /* VFFixation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BF7CA4811B09B2A00E8CD9F /* VFCondition.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045C110ADB880004A125 /* VFCondition.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA4911B09B2B00E8CD9F /* VFBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50459110ADB880004A125 /* VFBlock.m */; };
-		3BF7CA4A11B09B2B00E8CD9F /* VFAudioSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5046A110ADB880004A125 /* VFAudioSource.h */; };
-		3BF7CA4B11B09B2B00E8CD9F /* VFVisualStimulusTemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50466110ADB880004A125 /* VFVisualStimulusTemplate.h */; };
+		3BF7CA4A11B09B2B00E8CD9F /* VFAudioSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5046A110ADB880004A125 /* VFAudioSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BF7CA4B11B09B2B00E8CD9F /* VFVisualStimulusTemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50466110ADB880004A125 /* VFVisualStimulusTemplate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA4C11B09B2D00E8CD9F /* VFSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50471110ADB880004A125 /* VFSession.m */; };
-		3BF7CA4D11B09B2E00E8CD9F /* VFKeyboardEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50464110ADB880004A125 /* VFKeyboardEvent.h */; };
-		3BF7CA4E11B09B2E00E8CD9F /* VFSubTrial.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50462110ADB880004A125 /* VFSubTrial.h */; };
-		3BF7CA4F11B09B2F00E8CD9F /* VFTrial.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50460110ADB880004A125 /* VFTrial.h */; };
-		3BF7CA5011B09B2F00E8CD9F /* VFVisualStimulusFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5046C110ADB880004A125 /* VFVisualStimulusFrame.h */; };
-		3BF7CA5111B09B2F00E8CD9F /* VFVisualStimulus.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50468110ADB880004A125 /* VFVisualStimulus.h */; };
-		3BF7CA5211B09B3000E8CD9F /* VFCustomEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5046E110ADB880004A125 /* VFCustomEvent.h */; };
+		3BF7CA4D11B09B2E00E8CD9F /* VFKeyboardEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50464110ADB880004A125 /* VFKeyboardEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BF7CA4E11B09B2E00E8CD9F /* VFSubTrial.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50462110ADB880004A125 /* VFSubTrial.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BF7CA4F11B09B2F00E8CD9F /* VFTrial.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50460110ADB880004A125 /* VFTrial.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BF7CA5011B09B2F00E8CD9F /* VFVisualStimulusFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5046C110ADB880004A125 /* VFVisualStimulusFrame.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BF7CA5111B09B2F00E8CD9F /* VFVisualStimulus.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50468110ADB880004A125 /* VFVisualStimulus.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BF7CA5211B09B3000E8CD9F /* VFCustomEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5046E110ADB880004A125 /* VFCustomEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA5311B09B3000E8CD9F /* VFResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5045B110ADB880004A125 /* VFResponse.m */; };
 		3BF7CA5411B09B3200E8CD9F /* VFVisualStimulus.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50469110ADB880004A125 /* VFVisualStimulus.m */; };
 		3BF7CA5511B09B3200E8CD9F /* VFVisualStimulusFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5046D110ADB880004A125 /* VFVisualStimulusFrame.m */; };
@@ -92,6 +92,7 @@
 		2F7446A80DB6BCF400F9684A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		2F7446AA0DB6BCF400F9684A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/VFDocument.xib; sourceTree = "<group>"; };
 		32DBCF750370BD2300C91783 /* VizFix_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VizFix_Prefix.pch; sourceTree = "<group>"; };
+		3B088DAA11B5AD94006C2DAF /* Doxyfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
 		3B22AB56113870BB00312B8B /* VFMangedObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFMangedObjects.h; sourceTree = "<group>"; };
 		3B3D734C11066FBA00C03AEA /* VFDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFDocument.h; sourceTree = "<group>"; };
 		3B7732571114D37300827FCB /* VFUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFUtil.h; path = "../utility classes/VFUtil.h"; sourceTree = "<group>"; };
@@ -221,6 +222,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				3B088DAA11B5AD94006C2DAF /* Doxyfile */,
 				2F7446A70DB6BCF400F9684A /* MainMenu.xib */,
 				2F7446A90DB6BCF400F9684A /* VFDocument.xib */,
 				8D15AC360486D014006FF6A4 /* Info.plist */,
@@ -250,6 +252,8 @@
 			children = (
 				3BC50456110ADB880004A125 /* VFGazeSample.h */,
 				3BC50457110ADB880004A125 /* VFGazeSample.m */,
+				3BC50470110ADB880004A125 /* VFSession.h */,
+				3BC50471110ADB880004A125 /* VFSession.m */,
 				3BC50458110ADB880004A125 /* VFBlock.h */,
 				3BC50459110ADB880004A125 /* VFBlock.m */,
 				3BC5045A110ADB880004A125 /* VFResponse.h */,
@@ -274,8 +278,6 @@
 				3BC5046D110ADB880004A125 /* VFVisualStimulusFrame.m */,
 				3BC5046E110ADB880004A125 /* VFCustomEvent.h */,
 				3BC5046F110ADB880004A125 /* VFCustomEvent.m */,
-				3BC50470110ADB880004A125 /* VFSession.h */,
-				3BC50471110ADB880004A125 /* VFSession.m */,
 				3BC50472110ADB880004A125 /* VFFixation.h */,
 				3BC50473110ADB880004A125 /* VFFixation.m */,
 				3B22AB56113870BB00312B8B /* VFMangedObjects.h */,

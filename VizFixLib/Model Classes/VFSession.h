@@ -10,38 +10,79 @@
 #import <AppKit/AppKit.h>
 
 @class VFBlock;
-
+/**
+	Stores information regarding the session.
+ */
 @interface VFSession :  NSManagedObject  
 {
 	NSSize screenResolution;
 	NSSize screenDimension;
 }
 
+/**
+ ￼	Experiment name.
+ */
+@property (nonatomic, retain) NSString * experiment;
+/**
+ ￼	Subject ID.
+ */
+@property (nonatomic, retain) NSString * subjectID;
+/**
+ ￼	Session ID.
+ */
+@property (nonatomic, retain) NSString * sessionID;
+/**
+ ￼	Session date and time.
+ */
+@property (nonatomic, retain) NSDate * date;
+/**
+ ￼	Experiment display background color.
+ */
+@property (nonatomic, retain) NSColor * backgroundColor;
+/**
+	￼Screen resolution in pixels, width X height.
+ */
 @property (nonatomic, assign) NSSize screenResolution;
 @property (nonatomic, assign) NSSize primitiveScreenResolution;
+/**
+ ￼	Screen dimension in mm, width X height.
+ */
 @property (nonatomic, assign) NSSize screenDimension;
 @property (nonatomic, assign) NSSize primitiveScreenDimension;
 @property (nonatomic, retain) NSString * screenResolutionAsString;
 @property (nonatomic, retain) NSString * screenDimensionAsString;
-
-@property (nonatomic, retain) NSColor * backgroundColor;
-@property (nonatomic, retain) NSString * sessionID;
-@property (nonatomic, retain) NSString * experiment;
+/**
+ ￼	Subject's eye-to-screen distance, in mm.
+ */
 @property (nonatomic, retain) NSNumber * distanceToScreen;
-@property (nonatomic, retain) NSString * subjectID;
+/**
+ ￼	Eye tracker's sampling rate.
+ */
 @property (nonatomic, retain) NSNumber * gazeSampleRate;
-@property (nonatomic, retain) NSDate * date;
+/**
+ ￼	Optional. Session's duration.
+ */
+@property (nonatomic, retain) NSNumber * duration;
+/**
+ ￼	Read only, combines subjectID and sessionID.
+ */
+@property (nonatomic, readonly) NSString* ID;
+
 @property (nonatomic, retain) NSSet* blocks;
 @property (nonatomic, readonly) BOOL leaf;
 @property (nonatomic, readonly) NSSet* children;
-@property (nonatomic, readonly) NSString* ID;
-@property (nonatomic, retain) NSNumber * duration;
 
 @end
 
 
 @interface VFSession (CoreDataGeneratedAccessors)
+/**
+	Add a block object that occurred within the session.￼  @see VFBlock.
+ */
 - (void)addBlocksObject:(VFBlock *)value;
+/**
+	Remove a block object.￼  @see VFBlock.
+ */
 - (void)removeBlocksObject:(VFBlock *)value;
 - (void)addBlocks:(NSSet *)value;
 - (void)removeBlocks:(NSSet *)value;

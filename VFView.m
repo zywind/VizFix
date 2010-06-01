@@ -9,6 +9,7 @@
 #import "VFView.h"
 #import "VFPreferenceController.h"
 #import "VFDocument.h"
+#import <VizFixLib/VFUtil.h>
 
 @implementation VFView
 

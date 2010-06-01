@@ -8,10 +8,10 @@
 
 #import "VFDocument.h"
 
-#import "VFUtil.h"
 #import "PrioritySplitViewDelegate.h"
 #import "SBCenteringClipView.h"
-#import "VFDTFixationAlg.h"
+#import <VizFixLib/VFUtil.h>
+#import <VizFixLib/VFDTFixationAlg.h>
 
 @implementation VFDocument
 
@@ -47,6 +47,16 @@
 - (NSString *)windowNibName 
 {
     return @"VFDocument";
+}
+
+- (id)managedObjectModel
+{
+	static id sharedModel = nil;
+    if (sharedModel == nil) {
+		NSURL *modelURL = [NSURL fileURLWithPath:@"/Library/Frameworks/VizFixLib.framework/Resources/VFModel.mom"];
+        sharedModel = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] retain];
+    }
+    return sharedModel;
 }
 
 - (void)windowControllerDidLoadNib:(NSWindowController *)windowController 
