@@ -8,12 +8,10 @@
  */
 
 #import "VFGazeSample.h"
-#import "VFBlock.h"
-#import "VFResponse.h"
+#import "VFStatistic.h"
 #import "VFCondition.h"
 #import "VFAuditoryStimulus.h"
-#import "VFTrial.h"
-#import "VFSubTrial.h"
+#import "VFProcedure.h"
 #import "VFKeyboardEvent.h"
 #import "VFVisualStimulusTemplate.h"
 #import "VFVisualStimulus.h"

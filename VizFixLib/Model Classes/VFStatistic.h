@@ -8,16 +8,15 @@
 
 #import <CoreData/CoreData.h>
 
-@class VFTrial;
+@class VFProcedure;
 
-@interface VFResponse :  NSManagedObject  
+@interface VFStatistic :  NSManagedObject  
 {
 }
 
 @property (nonatomic, retain) NSString * measure;
 @property (nonatomic, retain) NSString * value;
-@property (nonatomic, retain) NSString * error;
-@property (nonatomic, retain) VFTrial * ofTrial;
+@property (nonatomic, retain) VFProcedure * ofTrial;
 
 @end
 

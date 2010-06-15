@@ -72,7 +72,6 @@
 	
 	// Retrieve Session.
 	session = [VFUtil fetchSessionWithMOC:[self managedObjectContext]];
-	[sessionController setContent:session];
 	
 	// Control the resizing of splitView
 	PrioritySplitViewDelegate *splitViewDelegate =
@@ -103,11 +102,6 @@
 	// Initialize layoutView.
 	[layoutView setSession:session];
 	[layoutView setDataURL:[self fileURL]];
-	
-	// draw the layoutView.
-	NSUInteger indexArr [] = {0, 0};
-	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndexes:indexArr length:2]];
-	[treeController setSelectionIndexPath:[NSIndexPath indexPathWithIndex:0]];
 	
 	[playButton setButtonType:NSToggleButton];
 	
@@ -187,99 +181,62 @@
 
 - (void)updateTableView
 {
-	if ([[treeController selectionIndexPaths] count] == 0)
-		return;
-	
-	VFBlock *selectedBlock = nil;
-	VFTrial *selectedTrial = nil;
-	VFSubTrial *selectedSubTrial = nil;
-	NSDictionary *tempDict;
-
 	[tableViewController removeObjects:[tableViewController arrangedObjects]];
 	
-	NSIndexPath *indexPath = [[treeController selectionIndexPaths] objectAtIndex:0];
-	if ([indexPath length] == 1) {
-		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Experiment", @"entry", session.experiment, @"value", nil];
-		[tableViewController addObject:tempDict];
-		NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-		[dateFormat setDateStyle:NSDateFormatterMediumStyle];
-		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Date", @"entry", 
-					[dateFormat stringFromDate:session.date], @"value", nil];
-		[tableViewController addObject:tempDict];
-		[dateFormat setDateStyle:NSDateFormatterNoStyle];
-		[dateFormat setTimeStyle:NSDateFormatterMediumStyle];
-		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Time", @"entry", 
-					[dateFormat stringFromDate:session.date], @"value", nil];
-		[tableViewController addObject:tempDict];
-		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Subject", @"entry", session.subjectID, @"value", nil];
-		[tableViewController addObject:tempDict];
-		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Session", @"entry", session.sessionID, @"value", nil];
-		[tableViewController addObject:tempDict];
-		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Duration (seconds)", @"entry", [NSNumber numberWithInt:[session.duration intValue] / 1000], @"value", nil];
-		[tableViewController addObject:tempDict];
-		return;
-	}
-	NSArray *factorSortDesc = [NSArray arrayWithObject:
-							   [[NSSortDescriptor alloc] initWithKey:@"factor" ascending:YES]];
-	if ([indexPath length] >= 2) {
-		[blockController setSelectionIndex:[indexPath indexAtPosition:1]];
-		selectedBlock = [[blockController selectedObjects] objectAtIndex:0];
-		
-		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Conditions:", @"entry", @"", @"value", nil];
-		[tableViewController addObject:tempDict];
-		for (VFCondition *eachCondition in [[selectedBlock.conditions allObjects] 
-											sortedArrayUsingDescriptors:factorSortDesc]) {
-			tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachCondition.factor, 
-					@"entry", eachCondition.level, @"value", nil];
-			[tableViewController addObject:tempDict];
-		}
-	}
-	if ([indexPath length] >= 3) {
-		[trialController setSelectionIndex:[indexPath indexAtPosition:2]];
-		selectedTrial = [[trialController selectedObjects] objectAtIndex:0];
-				
-		for (VFCondition *eachCondition in [[selectedTrial.conditions allObjects] 
-											sortedArrayUsingDescriptors:factorSortDesc]) {
-			tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachCondition.factor, 
-					@"entry", eachCondition.level, @"value", nil];
-			[tableViewController addObject:tempDict];
-		}
-		
-		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"", @"entry", @"", @"value", nil];
-		[tableViewController addObject:tempDict];
-		
+	NSDictionary *tempDict;
+
+	if ([[treeController selectedObjects] count] != 0) {
+	
+		NSArray *factorSortDesc = [NSArray arrayWithObject:
+								   [[NSSortDescriptor alloc] initWithKey:@"factor" ascending:YES]];
 		NSArray *measureSortDesc = [NSArray arrayWithObject:
 									[[NSSortDescriptor alloc] initWithKey:@"measure" ascending:YES]];
-		tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Responses:", @"entry", @"", @"value", nil];
-		[tableViewController addObject:tempDict];
-		for (VFResponse *eachResponse in [[selectedTrial.responses allObjects] 
-										  sortedArrayUsingDescriptors:measureSortDesc]) {
-			tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachResponse.measure, 
-						@"entry", eachResponse.value, @"value", nil];
-			[tableViewController addObject:tempDict];
-			if (eachResponse.error != nil) {
-				tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"error", 
-							@"entry", eachResponse.error, @"value", nil];
+
+		VFProcedure *proc = [[treeController selectedObjects] objectAtIndex:0];
+		
+		self.viewStartTime = [proc.startTime intValue];
+		self.viewEndTime = [proc.endTime intValue];
+		self.currentTime = self.viewStartTime;	
+		
+		do {
+			
+			for (VFCondition *eachCondition in [[proc.conditions allObjects] 
+												sortedArrayUsingDescriptors:factorSortDesc]) {
+				
+				tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachCondition.factor, 
+							@"entry", eachCondition.level, @"value", nil];
 				[tableViewController addObject:tempDict];
 			}
-		}
-	}
-	if ([indexPath length] == 4) {
-		[subTrialController setSelectionIndex:[indexPath indexAtPosition:3]];
-		selectedSubTrial = [[subTrialController selectedObjects] objectAtIndex:0];
+
+			for (VFStatistic *eachStat in [[proc.statistics allObjects] 
+										   sortedArrayUsingDescriptors:measureSortDesc]) {
+				tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachStat.measure, 
+							@"entry", eachStat.value, @"value", nil];
+				[tableViewController addObject:tempDict];			
+			}
+			
+			proc = proc.parentProc;
+		} while (proc);
 	}
 	
-	if (selectedSubTrial != nil) {
-		self.viewStartTime = [selectedSubTrial.startTime intValue];
-		self.viewEndTime = [selectedSubTrial.endTime intValue];
-	} else if (selectedTrial != nil) {
-		self.viewStartTime = [selectedTrial.startTime intValue];
-		self.viewEndTime = [selectedTrial.endTime intValue];
-	} else if (selectedBlock != nil) {
-		self.viewStartTime = [selectedBlock.startTime intValue];
-		self.viewEndTime = [selectedBlock.endTime intValue];
-	}
-	self.currentTime = self.viewStartTime;
+	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Experiment", @"entry", session.experiment, @"value", nil];
+	[tableViewController addObject:tempDict];
+	NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+	[dateFormat setDateStyle:NSDateFormatterMediumStyle];
+	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Date", @"entry", 
+				[dateFormat stringFromDate:session.date], @"value", nil];
+	[tableViewController addObject:tempDict];
+	[dateFormat setDateStyle:NSDateFormatterNoStyle];
+	[dateFormat setTimeStyle:NSDateFormatterMediumStyle];
+	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Time", @"entry", 
+				[dateFormat stringFromDate:session.date], @"value", nil];
+	[tableViewController addObject:tempDict];
+	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Subject", @"entry", session.subjectID, @"value", nil];
+	[tableViewController addObject:tempDict];
+	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Session", @"entry", session.sessionID, @"value", nil];
+	[tableViewController addObject:tempDict];
+	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Duration (seconds)", @"entry", [NSNumber numberWithInt:[session.duration intValue] / 1000], @"value", nil];
+	[tableViewController addObject:tempDict];
 }
 
 #pragma mark -

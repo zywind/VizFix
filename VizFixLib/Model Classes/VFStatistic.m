@@ -6,15 +6,14 @@
 //  Copyright 2010 University of Oregon. All rights reserved.
 //
 
-#import "VFResponse.h"
+#import "VFStatistic.h"
 
-#import "VFTrial.h"
+#import "VFProcedure.h"
 
-@implementation VFResponse 
+@implementation VFStatistic 
 
 @dynamic measure;
 @dynamic value;
-@dynamic error;
 @dynamic ofTrial;
 
 @end

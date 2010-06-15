@@ -12,10 +12,6 @@
 
 @class VFSession;
 @interface VFDocument : NSPersistentDocument {
-	IBOutlet NSObjectController *sessionController;
-	IBOutlet NSArrayController *blockController;
-	IBOutlet NSArrayController *trialController;
-	IBOutlet NSArrayController *subTrialController;
 	VFSession *session;
 	
 	// Playback control

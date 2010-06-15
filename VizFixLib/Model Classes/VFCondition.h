@@ -8,7 +8,7 @@
 
 #import <CoreData/CoreData.h>
 
-@class VFTrial;
+@class VFProcedure;
 @class VFBlock;
 
 @interface VFCondition :  NSManagedObject  
@@ -17,22 +17,15 @@
 
 @property (nonatomic, retain) NSString * factor;
 @property (nonatomic, retain) NSString * level;
-@property (nonatomic, retain) NSSet* ofTrial;
-@property (nonatomic, retain) NSSet* ofBlock;
+@property (nonatomic, retain) NSSet* ofProcs;
 
 @end
 
 
 @interface VFCondition (CoreDataGeneratedAccessors)
-- (void)addOfTrialObject:(VFTrial *)value;
-- (void)removeOfTrialObject:(VFTrial *)value;
-- (void)addOfTrial:(NSSet *)value;
-- (void)removeOfTrial:(NSSet *)value;
-
-- (void)addOfBlockObject:(VFBlock *)value;
-- (void)removeOfBlockObject:(VFBlock *)value;
-- (void)addOfBlock:(NSSet *)value;
-- (void)removeOfBlock:(NSSet *)value;
-
+- (void)addOfProcsObject:(VFProcedure *)value;
+- (void)removeOfProcsObject:(VFProcedure *)value;
+- (void)addOfProcs:(NSSet *)value;
+- (void)removeOfProcs:(NSSet *)value;
 @end
 

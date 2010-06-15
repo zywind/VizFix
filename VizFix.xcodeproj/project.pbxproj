@@ -16,7 +16,6 @@
 		3BC64F4511113D59006F36CE /* SBCenteringClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC64F4411113D59006F36CE /* SBCenteringClipView.m */; };
 		3BE64ABE110595A1008D8939 /* VFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BE64ABD110595A1008D8939 /* VFAppDelegate.m */; };
 		3BEBF0B811027E3B00E27227 /* PrioritySplitViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BEBF0B711027E3B00E27227 /* PrioritySplitViewDelegate.m */; };
-		3BF7CA3711B09B1700E8CD9F /* VFSubTrial.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50463110ADB880004A125 /* VFSubTrial.m */; };
 		3BF7CA3811B09B1800E8CD9F /* VFGazeSample.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50456110ADB880004A125 /* VFGazeSample.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA3911B09B1900E8CD9F /* VFAuditoryStimulus.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5045F110ADB880004A125 /* VFAuditoryStimulus.m */; };
 		3BF7CA3A11B09B1900E8CD9F /* VFAuditoryStimulus.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045E110ADB880004A125 /* VFAuditoryStimulus.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -25,26 +24,23 @@
 		3BF7CA3D11B09B2300E8CD9F /* VFKeyboardEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50465110ADB880004A125 /* VFKeyboardEvent.m */; };
 		3BF7CA3E11B09B2300E8CD9F /* VFVisualStimulusTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50467110ADB880004A125 /* VFVisualStimulusTemplate.m */; };
 		3BF7CA3F11B09B2400E8CD9F /* VFCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5045D110ADB880004A125 /* VFCondition.m */; };
-		3BF7CA4011B09B2500E8CD9F /* VFBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50458110ADB880004A125 /* VFBlock.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3BF7CA4111B09B2600E8CD9F /* VFTrial.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50461110ADB880004A125 /* VFTrial.m */; };
+		3BF7CA4111B09B2600E8CD9F /* VFProcedure.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50461110ADB880004A125 /* VFProcedure.m */; };
 		3BF7CA4211B09B2600E8CD9F /* VFSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50470110ADB880004A125 /* VFSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA4311B09B2700E8CD9F /* VFFixation.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50473110ADB880004A125 /* VFFixation.m */; };
-		3BF7CA4411B09B2800E8CD9F /* VFResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045A110ADB880004A125 /* VFResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BF7CA4411B09B2800E8CD9F /* VFStatistic.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045A110ADB880004A125 /* VFStatistic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA4511B09B2800E8CD9F /* VFAudioSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5046B110ADB880004A125 /* VFAudioSource.m */; };
 		3BF7CA4611B09B2900E8CD9F /* VFGazeSample.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50457110ADB880004A125 /* VFGazeSample.m */; };
 		3BF7CA4711B09B2A00E8CD9F /* VFFixation.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50472110ADB880004A125 /* VFFixation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA4811B09B2A00E8CD9F /* VFCondition.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045C110ADB880004A125 /* VFCondition.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3BF7CA4911B09B2B00E8CD9F /* VFBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50459110ADB880004A125 /* VFBlock.m */; };
 		3BF7CA4A11B09B2B00E8CD9F /* VFAudioSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5046A110ADB880004A125 /* VFAudioSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA4B11B09B2B00E8CD9F /* VFVisualStimulusTemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50466110ADB880004A125 /* VFVisualStimulusTemplate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA4C11B09B2D00E8CD9F /* VFSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50471110ADB880004A125 /* VFSession.m */; };
 		3BF7CA4D11B09B2E00E8CD9F /* VFKeyboardEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50464110ADB880004A125 /* VFKeyboardEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3BF7CA4E11B09B2E00E8CD9F /* VFSubTrial.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50462110ADB880004A125 /* VFSubTrial.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3BF7CA4F11B09B2F00E8CD9F /* VFTrial.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50460110ADB880004A125 /* VFTrial.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BF7CA4F11B09B2F00E8CD9F /* VFProcedure.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50460110ADB880004A125 /* VFProcedure.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA5011B09B2F00E8CD9F /* VFVisualStimulusFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5046C110ADB880004A125 /* VFVisualStimulusFrame.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA5111B09B2F00E8CD9F /* VFVisualStimulus.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50468110ADB880004A125 /* VFVisualStimulus.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA5211B09B3000E8CD9F /* VFCustomEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5046E110ADB880004A125 /* VFCustomEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3BF7CA5311B09B3000E8CD9F /* VFResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5045B110ADB880004A125 /* VFResponse.m */; };
+		3BF7CA5311B09B3000E8CD9F /* VFStatistic.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5045B110ADB880004A125 /* VFStatistic.m */; };
 		3BF7CA5411B09B3200E8CD9F /* VFVisualStimulus.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50469110ADB880004A125 /* VFVisualStimulus.m */; };
 		3BF7CA5511B09B3200E8CD9F /* VFVisualStimulusFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5046D110ADB880004A125 /* VFVisualStimulusFrame.m */; };
 		3BF7CA5611B09B6100E8CD9F /* VFModel.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 775BDEF0067A8BF0009058FE /* VFModel.xcdatamodel */; };
@@ -104,18 +100,14 @@
 		3BC19E881100FD9B00AD4968 /* VFView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFView.m; sourceTree = "<group>"; };
 		3BC50456110ADB880004A125 /* VFGazeSample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFGazeSample.h; sourceTree = "<group>"; };
 		3BC50457110ADB880004A125 /* VFGazeSample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFGazeSample.m; sourceTree = "<group>"; };
-		3BC50458110ADB880004A125 /* VFBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFBlock.h; sourceTree = "<group>"; };
-		3BC50459110ADB880004A125 /* VFBlock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFBlock.m; sourceTree = "<group>"; };
-		3BC5045A110ADB880004A125 /* VFResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFResponse.h; sourceTree = "<group>"; };
-		3BC5045B110ADB880004A125 /* VFResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFResponse.m; sourceTree = "<group>"; };
+		3BC5045A110ADB880004A125 /* VFStatistic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFStatistic.h; sourceTree = "<group>"; };
+		3BC5045B110ADB880004A125 /* VFStatistic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFStatistic.m; sourceTree = "<group>"; };
 		3BC5045C110ADB880004A125 /* VFCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFCondition.h; sourceTree = "<group>"; };
 		3BC5045D110ADB880004A125 /* VFCondition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFCondition.m; sourceTree = "<group>"; };
 		3BC5045E110ADB880004A125 /* VFAuditoryStimulus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFAuditoryStimulus.h; sourceTree = "<group>"; };
 		3BC5045F110ADB880004A125 /* VFAuditoryStimulus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFAuditoryStimulus.m; sourceTree = "<group>"; };
-		3BC50460110ADB880004A125 /* VFTrial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFTrial.h; sourceTree = "<group>"; };
-		3BC50461110ADB880004A125 /* VFTrial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFTrial.m; sourceTree = "<group>"; };
-		3BC50462110ADB880004A125 /* VFSubTrial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFSubTrial.h; sourceTree = "<group>"; };
-		3BC50463110ADB880004A125 /* VFSubTrial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFSubTrial.m; sourceTree = "<group>"; };
+		3BC50460110ADB880004A125 /* VFProcedure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFProcedure.h; sourceTree = "<group>"; };
+		3BC50461110ADB880004A125 /* VFProcedure.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFProcedure.m; sourceTree = "<group>"; };
 		3BC50464110ADB880004A125 /* VFKeyboardEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFKeyboardEvent.h; sourceTree = "<group>"; };
 		3BC50465110ADB880004A125 /* VFKeyboardEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFKeyboardEvent.m; sourceTree = "<group>"; };
 		3BC50466110ADB880004A125 /* VFVisualStimulusTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFVisualStimulusTemplate.h; sourceTree = "<group>"; };
@@ -254,18 +246,14 @@
 				3BC50457110ADB880004A125 /* VFGazeSample.m */,
 				3BC50470110ADB880004A125 /* VFSession.h */,
 				3BC50471110ADB880004A125 /* VFSession.m */,
-				3BC50458110ADB880004A125 /* VFBlock.h */,
-				3BC50459110ADB880004A125 /* VFBlock.m */,
-				3BC5045A110ADB880004A125 /* VFResponse.h */,
-				3BC5045B110ADB880004A125 /* VFResponse.m */,
+				3BC5045A110ADB880004A125 /* VFStatistic.h */,
+				3BC5045B110ADB880004A125 /* VFStatistic.m */,
 				3BC5045C110ADB880004A125 /* VFCondition.h */,
 				3BC5045D110ADB880004A125 /* VFCondition.m */,
 				3BC5045E110ADB880004A125 /* VFAuditoryStimulus.h */,
 				3BC5045F110ADB880004A125 /* VFAuditoryStimulus.m */,
-				3BC50460110ADB880004A125 /* VFTrial.h */,
-				3BC50461110ADB880004A125 /* VFTrial.m */,
-				3BC50462110ADB880004A125 /* VFSubTrial.h */,
-				3BC50463110ADB880004A125 /* VFSubTrial.m */,
+				3BC50460110ADB880004A125 /* VFProcedure.h */,
+				3BC50461110ADB880004A125 /* VFProcedure.m */,
 				3BC50464110ADB880004A125 /* VFKeyboardEvent.h */,
 				3BC50465110ADB880004A125 /* VFKeyboardEvent.m */,
 				3BC50466110ADB880004A125 /* VFVisualStimulusTemplate.h */,
@@ -324,16 +312,14 @@
 				3BF7CA3811B09B1800E8CD9F /* VFGazeSample.h in Headers */,
 				3BF7CA3A11B09B1900E8CD9F /* VFAuditoryStimulus.h in Headers */,
 				3BF7CA3B11B09B2200E8CD9F /* VFMangedObjects.h in Headers */,
-				3BF7CA4011B09B2500E8CD9F /* VFBlock.h in Headers */,
 				3BF7CA4211B09B2600E8CD9F /* VFSession.h in Headers */,
-				3BF7CA4411B09B2800E8CD9F /* VFResponse.h in Headers */,
+				3BF7CA4411B09B2800E8CD9F /* VFStatistic.h in Headers */,
 				3BF7CA4711B09B2A00E8CD9F /* VFFixation.h in Headers */,
 				3BF7CA4811B09B2A00E8CD9F /* VFCondition.h in Headers */,
 				3BF7CA4A11B09B2B00E8CD9F /* VFAudioSource.h in Headers */,
 				3BF7CA4B11B09B2B00E8CD9F /* VFVisualStimulusTemplate.h in Headers */,
 				3BF7CA4D11B09B2E00E8CD9F /* VFKeyboardEvent.h in Headers */,
-				3BF7CA4E11B09B2E00E8CD9F /* VFSubTrial.h in Headers */,
-				3BF7CA4F11B09B2F00E8CD9F /* VFTrial.h in Headers */,
+				3BF7CA4F11B09B2F00E8CD9F /* VFProcedure.h in Headers */,
 				3BF7CA5011B09B2F00E8CD9F /* VFVisualStimulusFrame.h in Headers */,
 				3BF7CA5111B09B2F00E8CD9F /* VFVisualStimulus.h in Headers */,
 				3BF7CA5211B09B3000E8CD9F /* VFCustomEvent.h in Headers */,
@@ -448,19 +434,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3BF7CA3711B09B1700E8CD9F /* VFSubTrial.m in Sources */,
 				3BF7CA3911B09B1900E8CD9F /* VFAuditoryStimulus.m in Sources */,
 				3BF7CA3C11B09B2200E8CD9F /* VFCustomEvent.m in Sources */,
 				3BF7CA3D11B09B2300E8CD9F /* VFKeyboardEvent.m in Sources */,
 				3BF7CA3E11B09B2300E8CD9F /* VFVisualStimulusTemplate.m in Sources */,
 				3BF7CA3F11B09B2400E8CD9F /* VFCondition.m in Sources */,
-				3BF7CA4111B09B2600E8CD9F /* VFTrial.m in Sources */,
+				3BF7CA4111B09B2600E8CD9F /* VFProcedure.m in Sources */,
 				3BF7CA4311B09B2700E8CD9F /* VFFixation.m in Sources */,
 				3BF7CA4511B09B2800E8CD9F /* VFAudioSource.m in Sources */,
 				3BF7CA4611B09B2900E8CD9F /* VFGazeSample.m in Sources */,
-				3BF7CA4911B09B2B00E8CD9F /* VFBlock.m in Sources */,
 				3BF7CA4C11B09B2D00E8CD9F /* VFSession.m in Sources */,
-				3BF7CA5311B09B3000E8CD9F /* VFResponse.m in Sources */,
+				3BF7CA5311B09B3000E8CD9F /* VFStatistic.m in Sources */,
 				3BF7CA5411B09B3200E8CD9F /* VFVisualStimulus.m in Sources */,
 				3BF7CA5511B09B3200E8CD9F /* VFVisualStimulusFrame.m in Sources */,
 				3BF7CA5611B09B6100E8CD9F /* VFModel.xcdatamodel in Sources */,

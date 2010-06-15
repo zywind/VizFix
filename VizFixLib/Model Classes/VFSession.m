@@ -8,8 +8,6 @@
 
 #import "VFSession.h"
 
-#import "VFBlock.h"
-
 @implementation VFSession
 
 @dynamic screenResolutionAsString;
@@ -20,7 +18,7 @@
 @dynamic subjectID;
 @dynamic gazeSampleRate;
 @dynamic date;
-@dynamic blocks;
+@dynamic topLevelProcs;
 @dynamic backgroundColor;
 @dynamic duration;
 
@@ -115,7 +113,7 @@
 
 - (NSSet *)children
 {
-	return self.blocks;
+	return self.topLevelProcs;
 }
 
 - (NSString *)ID

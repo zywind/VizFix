@@ -15,9 +15,6 @@
 @interface VFView : NSView {
 	VFDocument *document;
 	
-	IBOutlet NSArrayController *blockController;
-	IBOutlet NSArrayController *trialController;
-	IBOutlet NSArrayController *subTrialController;
 	IBOutlet NSTextField *keyLabel;
 	NSArray *gazesArray;
 	NSArray *fixationsArray;
@@ -43,8 +40,6 @@
 	NSPredicate *playbackPredicateForTimePeriod;
 	NSPredicate *playbackPredicateForTimeStamp;
 
-	
-	IBOutlet NSTreeController *treeController;
 }
 
 @property BOOL showLabel;

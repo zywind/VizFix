@@ -8,14 +8,11 @@
 
 #import "VFCondition.h"
 
-#import "VFTrial.h"
-#import "VFBlock.h"
 
 @implementation VFCondition 
 
 @dynamic factor;
 @dynamic level;
-@dynamic ofTrial;
-@dynamic ofBlock;
+@dynamic ofProcs;
 
 @end

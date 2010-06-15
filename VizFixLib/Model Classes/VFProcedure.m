@@ -1,31 +1,26 @@
 // 
-//  VFSubTrial.m
+//  VFTrial.m
 //  VizFix
 //
 //  Created by Yunfeng Zhang on 1/22/10.
 //  Copyright 2010 University of Oregon. All rights reserved.
 //
 
-#import "VFSubTrial.h"
+#import "VFProcedure.h"
 
-#import "VFTrial.h"
+@implementation VFProcedure 
 
-@implementation VFSubTrial 
-
+@dynamic startTime;
 @dynamic endTime;
 @dynamic ID;
-@dynamic startTime;
-@dynamic inTrial;
+@dynamic parentProc;
+@dynamic subProcs;
+@dynamic conditions;
+@dynamic statistics;
 
 - (BOOL)leaf
 {
-	return YES;
+	return NO;
 }
-
-- (NSSet *)children
-{
-	return nil;
-}
-
 
 @end

@@ -8,8 +8,8 @@
 
 #import <CoreData/CoreData.h>
 #import <AppKit/AppKit.h>
+#import "VFProcedure.h"
 
-@class VFBlock;
 /**
 	Stores information regarding the session.
  */
@@ -68,24 +68,17 @@
  */
 @property (nonatomic, readonly) NSString* ID;
 
-@property (nonatomic, retain) NSSet* blocks;
+@property (nonatomic, retain) NSSet* topLevelProcs;
 @property (nonatomic, readonly) BOOL leaf;
-@property (nonatomic, readonly) NSSet* children;
 
 @end
 
 
 @interface VFSession (CoreDataGeneratedAccessors)
-/**
-	Add a block object that occurred within the session.￼  @see VFBlock.
- */
-- (void)addBlocksObject:(VFBlock *)value;
-/**
-	Remove a block object.￼  @see VFBlock.
- */
-- (void)removeBlocksObject:(VFBlock *)value;
-- (void)addBlocks:(NSSet *)value;
-- (void)removeBlocks:(NSSet *)value;
+
+- (void)addTopLevelProcsObject:(VFProcedure *)value;
+- (void)removeTopLevelProcsObject:(VFProcedure *)value;
+- (void)addTopLevelProcs:(NSSet *)value;
+- (void)removeTopLevelProcs:(NSSet *)value;
 
 @end
-
