@@ -183,10 +183,13 @@
 {
 	[tableViewController removeObjects:[tableViewController arrangedObjects]];
 	
-	NSDictionary *tempDict;
+	NSDictionary *emptyLine = [NSDictionary dictionaryWithObjectsAndKeys:@"", @"entry", @"", @"value", nil];
 
 	if ([[treeController selectedObjects] count] != 0) {
-	
+		
+		NSMutableArray *condDicts = [NSMutableArray array];
+		NSMutableArray *statsDicts = [NSMutableArray array];
+
 		NSArray *factorSortDesc = [NSArray arrayWithObject:
 								   [[NSSortDescriptor alloc] initWithKey:@"factor" ascending:YES]];
 		NSArray *measureSortDesc = [NSArray arrayWithObject:
@@ -203,40 +206,58 @@
 			for (VFCondition *eachCondition in [[proc.conditions allObjects] 
 												sortedArrayUsingDescriptors:factorSortDesc]) {
 				
-				tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachCondition.factor, 
-							@"entry", eachCondition.level, @"value", nil];
-				[tableViewController addObject:tempDict];
+				[condDicts addObject:[NSDictionary dictionaryWithObjectsAndKeys:eachCondition.factor, 
+									  @"entry", eachCondition.level, @"value", nil]];
 			}
 
 			for (VFStatistic *eachStat in [[proc.statistics allObjects] 
 										   sortedArrayUsingDescriptors:measureSortDesc]) {
-				tempDict = [NSDictionary dictionaryWithObjectsAndKeys:eachStat.measure, 
-							@"entry", eachStat.value, @"value", nil];
-				[tableViewController addObject:tempDict];			
+				[statsDicts addObject:[NSDictionary dictionaryWithObjectsAndKeys:eachStat.measure, 
+									  @"entry", eachStat.value, @"value", nil]];
 			}
 			
 			proc = proc.parentProc;
 		} while (proc);
+		
+		if ([condDicts count] != 0) {
+			[tableViewController addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"Conditions:", @"entry", @"", @"value", nil]];
+			[tableViewController addObjects:condDicts];
+			[tableViewController addObject:[emptyLine copy]];
+		}
+		
+		if ([statsDicts count] != 0) {
+			[tableViewController addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"Statistics:", @"entry", @"", @"value", nil]];
+			[tableViewController addObjects:statsDicts];		
+			[tableViewController addObject:[emptyLine copy]];
+		}
 	}
 	
-	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Experiment", @"entry", session.experiment, @"value", nil];
-	[tableViewController addObject:tempDict];
+	[tableViewController addObject:
+	 [NSDictionary dictionaryWithObjectsAndKeys:@"Session Info:", @"entry", @"", @"value", nil]];
+	[tableViewController addObject:
+	 [NSDictionary dictionaryWithObjectsAndKeys:@"Experiment", @"entry", session.experiment, @"value", nil]];
+
 	NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
 	[dateFormat setDateStyle:NSDateFormatterMediumStyle];
-	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Date", @"entry", 
-				[dateFormat stringFromDate:session.date], @"value", nil];
-	[tableViewController addObject:tempDict];
+	[tableViewController addObject: 
+		[NSDictionary dictionaryWithObjectsAndKeys:@"Date", @"entry", 
+		 [dateFormat stringFromDate:session.date], @"value", nil]];
+	
 	[dateFormat setDateStyle:NSDateFormatterNoStyle];
 	[dateFormat setTimeStyle:NSDateFormatterMediumStyle];
-	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Time", @"entry", 
-				[dateFormat stringFromDate:session.date], @"value", nil];
-	[tableViewController addObject:tempDict];
-	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Subject", @"entry", session.subjectID, @"value", nil];
-	[tableViewController addObject:tempDict];
-	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Session", @"entry", session.sessionID, @"value", nil];
-	[tableViewController addObject:tempDict];
-	tempDict = [NSDictionary dictionaryWithObjectsAndKeys:@"Duration (seconds)", @"entry", [NSNumber numberWithInt:[session.duration intValue] / 1000], @"value", nil];
-	[tableViewController addObject:tempDict];
+	[tableViewController addObject: 
+	 [NSDictionary dictionaryWithObjectsAndKeys:@"Time", @"entry", 
+	  [dateFormat stringFromDate:session.date], @"value", nil]];
+	
+	[tableViewController addObject:
+	 [NSDictionary dictionaryWithObjectsAndKeys:@"Subject", @"entry", session.subjectID, @"value", nil]];
+	
+	[tableViewController addObject:
+	 [NSDictionary dictionaryWithObjectsAndKeys:@"Session", @"entry", session.sessionID, @"value", nil]];
+	
+	[tableViewController addObject:
+	 [NSDictionary dictionaryWithObjectsAndKeys:@"Duration (seconds)", @"entry", 
+	  [NSNumber numberWithInt:[session.duration intValue] / 1000], @"value", nil]];
 }
 
 #pragma mark -

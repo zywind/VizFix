@@ -24,8 +24,6 @@
 @property (nonatomic, retain) NSSet* conditions;
 @property (nonatomic, retain) NSSet* statistics;
 
-@property (nonatomic, readonly) BOOL leaf;
-
 @end
 
 

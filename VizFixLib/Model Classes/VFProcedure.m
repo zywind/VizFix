@@ -18,9 +18,4 @@
 @dynamic conditions;
 @dynamic statistics;
 
-- (BOOL)leaf
-{
-	return NO;
-}
-
 @end

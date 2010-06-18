@@ -12,6 +12,7 @@
 
 @interface VFVisualStimulusTemplate :  NSManagedObject  
 {
+	NSPoint fixationPoint;
 }
 
 @property (nonatomic, retain) NSString * imageFilePath;
@@ -21,8 +22,10 @@
 @property (nonatomic, retain) NSColor * fillColor;
 @property (nonatomic, retain) NSColor * strokeColor;
 @property (nonatomic, retain) NSSet* ofVisualStimuli;
+@property (nonatomic, assign) NSPoint fixationPoint;
+@property (nonatomic, assign) NSPoint primitiveFixationPoint;
+@property (nonatomic, retain) NSString * fixationPointAsString;
 
-- (NSPoint)center;
 @end
 
 @interface VFVisualStimulusTemplate (CoreDataGeneratedAccessors)

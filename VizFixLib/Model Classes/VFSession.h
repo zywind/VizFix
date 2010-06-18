@@ -68,17 +68,4 @@
  */
 @property (nonatomic, readonly) NSString* ID;
 
-@property (nonatomic, retain) NSSet* topLevelProcs;
-@property (nonatomic, readonly) BOOL leaf;
-
-@end
-
-
-@interface VFSession (CoreDataGeneratedAccessors)
-
-- (void)addTopLevelProcsObject:(VFProcedure *)value;
-- (void)removeTopLevelProcsObject:(VFProcedure *)value;
-- (void)addTopLevelProcs:(NSSet *)value;
-- (void)removeTopLevelProcs:(NSSet *)value;
-
 @end

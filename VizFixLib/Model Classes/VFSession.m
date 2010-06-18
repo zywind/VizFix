@@ -18,7 +18,6 @@
 @dynamic subjectID;
 @dynamic gazeSampleRate;
 @dynamic date;
-@dynamic topLevelProcs;
 @dynamic backgroundColor;
 @dynamic duration;
 
@@ -104,16 +103,6 @@
 	
     NSString *screenDimensionAsString = NSStringFromSize(aSize);
 	[self setValue:screenDimensionAsString forKey:@"screenDimensionAsString"]; 
-}
-
-- (BOOL)leaf
-{
-	return NO;
-}
-
-- (NSSet *)children
-{
-	return self.topLevelProcs;
 }
 
 - (NSString *)ID
