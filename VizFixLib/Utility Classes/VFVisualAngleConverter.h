@@ -12,30 +12,12 @@
 @interface VFVisualAngleConverter : NSObject {
 	NSSize screenResolution;
 	NSSize screenDimension;
-	NSUInteger distanceToScreen; 
+	int distanceToScreen; 
 }
 
-/*!
- In pixels.
- */
-@property (assign) NSSize screenResolution;
-/*!
- In mm.
- */
-@property (assign) NSSize screenDimension;
-/*!
- In mm.
- */
-@property (assign) NSUInteger distanceToScreen;
-
-- (id)initWithDistanceToScreen:(NSUInteger)distance 
-			  screenResolution:(NSSize)resolution 
-			   screenDimension:(NSSize)dimension;
 - (id)initWithMOC:(NSManagedObjectContext *)moc;
 
-- (double)horizontalPixelsFromVisualAngles:(double)DOV;
-- (double)horizontalVisualAnglesFromPixels:(double)pixels;
-- (double)verticalPixelsFromVisualAngles:(double)DOV;
-- (double)verticalVisualAnglesFromPixels:(double)pixels;
+- (double)pixelsFromVisualAngles:(double)DOV;
+- (double)visualAnglesFromPixels:(double)pixels;
 
 @end

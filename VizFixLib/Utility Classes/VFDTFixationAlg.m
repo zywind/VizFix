@@ -14,50 +14,34 @@
 #import "VFSession.h"
 #import "VFGazeSample.h"
 #import "VFFixation.h"
+#import "VFFetchHelper.h"
 
 @implementation VFDTFixationAlg
 
-- (void)detectAllFixationsInMOC:(NSManagedObjectContext *)moc withRadiusThresholdInDOV:(double)aRadius
-{
-	VFSession *session = [VFUtil fetchSessionWithMOC:moc];
-	VFVisualAngleConverter *DOVConverter = 
-	[[VFVisualAngleConverter alloc] initWithDistanceToScreen:[session.distanceToScreen intValue]
-											screenResolution:session.screenResolution 
-											 screenDimension:session.screenDimension];	
-	gazeSampleRate = [session.gazeSampleRate doubleValue];
-	
-	radiusThreshold = sqrt([DOVConverter horizontalPixelsFromVisualAngles:aRadius] 
-						   * [DOVConverter verticalPixelsFromVisualAngles:aRadius]);
-	
-	// Retrieve gazes
-	NSEntityDescription *entityDescription = [NSEntityDescription
-											  entityForName:@"GazeSample" inManagedObjectContext:moc];
-	NSFetchRequest *request = [[NSFetchRequest alloc] init];
-	[request setEntity:entityDescription];
-	
-	[request setSortDescriptors:[VFUtil timeSortDescriptor]];
-	
-	NSError *error;
-	NSArray *gazeArray = [moc executeFetchRequest:request error:&error];
-	if (gazeArray == nil)
-	{
-		NSLog(@"Fetch gaze samples failed.\n%@", [error localizedDescription]);
-		return;
-	}
-	
-	[self detectFixation:gazeArray];
-	gazeArray = nil;
-}
-
-- (void)detectFixation:(NSArray *)gazeArray
++ (void)detectFixation:(NSArray *)gazeArray withDispersionThreshold:(double)DTInDov andMinFixationDuration:(double)minFixationDuration;
 {	
+	NSManagedObjectContext * moc = [[gazeArray objectAtIndex:0] managedObjectContext];
+
+	VFVisualAngleConverter *DOVConverter = [[VFVisualAngleConverter alloc] initWithMOC:moc];
+	
+	VFFetchHelper *fetchHelper = [[VFFetchHelper alloc] initWithMoc:moc];
+	VFSession *session = [fetchHelper session];
+	
+	double gazeSampleRate = [session.gazeSampleRate doubleValue];
+	
+	// 330.0 ms is estimated from Karsh's 12 consecutive invalid samples, in which their sample rate is 60 HZ.
+	double dispersionThreshold = [DOVConverter pixelsFromVisualAngles:DTInDov];
+	
+	int maxNumConsecutiveInvalidSamples = round(330.0 / (1000.0 / gazeSampleRate));
+	
+	int minNumInFixation = round(minFixationDuration / (1000.0 / gazeSampleRate));
+	
 	BOOL FLAG = NO;
 	NSUInteger numConsecutiveInvalidSamples = 0;
 	
 	NSMutableArray *ongoingFixationGazes = [NSMutableArray arrayWithCapacity:20];
 	NSMutableArray *previousFixationGazes = [NSMutableArray arrayWithCapacity:20];
 	
-	NSManagedObjectContext * moc = [[gazeArray objectAtIndex:0] managedObjectContext];
 	
 	for (int i = 0; i < [gazeArray count]; i++)
 	{
@@ -66,7 +50,7 @@
 		// Establish the onset of a fixation
 		if (![gaze.valid boolValue]) {
 			numConsecutiveInvalidSamples++;
-			if (numConsecutiveInvalidSamples >= [self thresholdOfNumConsecutiveInvalidSamples])
+			if (numConsecutiveInvalidSamples >= maxNumConsecutiveInvalidSamples)
 			{
 				FLAG = NO;
 				numConsecutiveInvalidSamples = 0;
@@ -79,16 +63,16 @@
 		[ongoingFixationGazes addObject:gaze];
 		numConsecutiveInvalidSamples = 0;
 		
-		if ([ongoingFixationGazes count] < [self minNumInFixation]) {
+		if ([ongoingFixationGazes count] < minNumInFixation) {
 			continue;
 		}
 		
-		float dispersion = [self dispersionOfGazes:ongoingFixationGazes];
-		NSPoint curCentroid = [self centroidOfGazes:ongoingFixationGazes];
+		float dispersion = [VFDTFixationAlg dispersionOfGazes:ongoingFixationGazes];
+		NSPoint curCentroid = [VFDTFixationAlg centroidOfGazes:ongoingFixationGazes];
 		[ongoingFixationGazes sortUsingDescriptors:[VFUtil timeSortDescriptor]];
 		VFGazeSample *earliestGaze = [ongoingFixationGazes objectAtIndex:0];
 		
-		if (dispersion >= radiusThreshold) {
+		if (dispersion >= dispersionThreshold) {
 			// I took the other method described in Karsh. Because I found removing the most deviant gaze sometiems has problem.
 			[ongoingFixationGazes removeObject:earliestGaze];
 			continue;
@@ -96,9 +80,9 @@
 		
 		if (FLAG) {
 			FLAG = NO;
-			NSPoint prevCentroid = [self centroidOfGazes:previousFixationGazes];
+			NSPoint prevCentroid = [VFDTFixationAlg centroidOfGazes:previousFixationGazes];
 			
-			if ([VFUtil distanceBetweenThisPoint:prevCentroid andThatPoint:curCentroid] < radiusThreshold) {
+			if ([VFUtil distanceBetweenThisPoint:prevCentroid andThatPoint:curCentroid] < dispersionThreshold) {
 				[ongoingFixationGazes addObjectsFromArray:previousFixationGazes];
 				// Go to 2.
 			} else {
@@ -124,7 +108,7 @@
 			gaze = [gazeArray objectAtIndex:i];
 			if (![gaze.valid boolValue]) {
 				numConsecutiveInvalidSamples++;
-				if (numConsecutiveInvalidSamples < [self thresholdOfNumConsecutiveInvalidSamples])
+				if (numConsecutiveInvalidSamples < maxNumConsecutiveInvalidSamples)
 				{
 					// Make the ongoing fixatin.
 					VFFixation *ongoingFixation = [NSEntityDescription 
@@ -149,7 +133,7 @@
 			
 			numConsecutiveInvalidSamples = 0;
 			if ([VFUtil distanceBetweenThisPoint:gaze.location 
-									andThatPoint:curCentroid] >= radiusThreshold) {
+									andThatPoint:curCentroid] >= dispersionThreshold) {
 				numSuccessiveOutsideGaze++;
 				if (numSuccessiveOutsideGaze == 1) {
 					firstOutsideGaze = gaze;
@@ -160,7 +144,7 @@
 					centroidOfOutsideGazes.y = (firstOutsideGaze.location.y + gaze.location.y) / 2;
 					
 					if ([VFUtil distanceBetweenThisPoint:centroidOfOutsideGazes
-											andThatPoint:curCentroid] >= radiusThreshold) {
+											andThatPoint:curCentroid] >= dispersionThreshold) {
 						[previousFixationGazes addObjectsFromArray:ongoingFixationGazes];
 						[ongoingFixationGazes removeAllObjects];
 						
@@ -185,7 +169,7 @@
 	if ([previousFixationGazes count] != 0) {
 		VFFixation *prevFixation = [NSEntityDescription 
 									insertNewObjectForEntityForName:@"Fixation" inManagedObjectContext:moc];
-		NSPoint prevCentroid = [self centroidOfGazes:previousFixationGazes];
+		NSPoint prevCentroid = [VFDTFixationAlg centroidOfGazes:previousFixationGazes];
 		
 		[previousFixationGazes sortUsingDescriptors:[VFUtil timeSortDescriptor]];
 		prevFixation.startTime = ((VFGazeSample *)[previousFixationGazes objectAtIndex:0]).time;
@@ -195,10 +179,10 @@
 		
 	}
 	
-	if ([ongoingFixationGazes count] >= [self minNumInFixation]) {
+	if ([ongoingFixationGazes count] >= minNumInFixation) {
 		VFFixation *ongoingFixation = [NSEntityDescription 
 									   insertNewObjectForEntityForName:@"Fixation" inManagedObjectContext:moc];
-		NSPoint curCentroid = [self centroidOfGazes:ongoingFixationGazes];
+		NSPoint curCentroid = [VFDTFixationAlg centroidOfGazes:ongoingFixationGazes];
 		
 		[ongoingFixationGazes sortUsingDescriptors:[VFUtil timeSortDescriptor]];
 		ongoingFixation.startTime = ((VFGazeSample *)[ongoingFixationGazes objectAtIndex:0]).time;
@@ -208,19 +192,7 @@
 	}
 }
 
-// 330.0 ms is estimated from Karsh's 12 consecutive invalid samples, in which their sample rate is 60 HZ.
-- (NSUInteger)thresholdOfNumConsecutiveInvalidSamples
-{
-	return round(330.0 / (1000.0 / (float)gazeSampleRate));
-}
-
-// Assuming the minimum fixation duration is 100.0 ms.
-- (NSUInteger)minNumInFixation
-{
-	return round(100.0 / (1000.0 / (float)gazeSampleRate));
-}
-
-- (NSPoint)centroidOfGazes:(NSArray *)gazes
++ (NSPoint)centroidOfGazes:(NSArray *)gazes
 {
 	NSPoint centroid = NSMakePoint(0.0f, 0.0f);
 	for (VFGazeSample *eachGaze in gazes)
@@ -234,7 +206,7 @@
 	return centroid;
 }
 
-- (float)dispersionOfGazes:(NSArray *)gazes
++ (float)dispersionOfGazes:(NSArray *)gazes
 {
 	NSPoint centroid = [self centroidOfGazes:gazes];
 	

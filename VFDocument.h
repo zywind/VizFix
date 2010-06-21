@@ -9,9 +9,10 @@
 #import <Cocoa/Cocoa.h>
 
 #import "VFView.h"
+#import <VizFixLib/VFFetchHelper.h>
 
-@class VFSession;
 @interface VFDocument : NSPersistentDocument {
+	VFFetchHelper *fetchHelper;
 	VFSession *session;
 	
 	// Playback control
@@ -26,6 +27,9 @@
 	BOOL playing;
 	BOOL inSummaryMode;
 	
+	int minFixationDuration;
+	double dispersionThreshold;
+	
 	// UI elements
 	IBOutlet NSSplitView *splitView;
 	IBOutlet NSScrollView *scrollView;
@@ -35,6 +39,7 @@
 	// UI elements data sources.
 	IBOutlet NSTreeController *treeController;
 	IBOutlet NSArrayController *tableViewController;
+	IBOutlet NSPanel *detectFixationPanel;
 	
 	double step;
 }
@@ -43,6 +48,9 @@
 @property (nonatomic, assign) double viewEndTime;
 @property (nonatomic, assign) double viewStartTime;
 @property (nonatomic, assign) BOOL inSummaryMode;
+
+@property (nonatomic, assign) int minFixationDuration;
+@property (nonatomic, assign) double dispersionThreshold;
 
 // Playback control.
 - (IBAction)togglePlayState:(id)sender;
@@ -62,4 +70,8 @@
 - (void)doDetectAndInsertFixations;
 
 - (NSArray *)startTimeSortDescriptor;
+
+- (IBAction)cancelDetection: (id)sender;
+- (IBAction)doDetect: (id)sender;
+
 @end

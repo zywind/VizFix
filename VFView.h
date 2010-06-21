@@ -9,11 +9,13 @@
 #import <Cocoa/Cocoa.h>
 #import <VizFixLib/VFMangedObjects.h>
 #import <VizFixLib/VFVisualAngleConverter.h>
+#import <VizFixLib/VFFetchHelper.h>
 
 @class VFDocument;
 
 @interface VFView : NSView {
 	VFDocument *document;
+	VFFetchHelper *fetchHelper;
 	
 	IBOutlet NSTextField *keyLabel;
 	NSArray *gazesArray;

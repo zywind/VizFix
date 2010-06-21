@@ -7,15 +7,18 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "VFUtil.h"
-#import "VFVisualAngleConverter.h"
-#import "VFFixation.h"
+
+@class VFVisualAngleConverter;
+@class VFFetchHelper;
+@class VFFixation;
 
 @interface VFFixationRegister : NSObject {
 	NSManagedObjectContext *moc;
 	VFVisualAngleConverter *converter;
 	NSArray *visualStimuliArray;
 	NSDictionary *customAOIs;
+	
+	VFFetchHelper *fetchHelper;
 	
 	double autoAOIDOV;
 }

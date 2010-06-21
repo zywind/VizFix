@@ -44,10 +44,10 @@
 - (void)setSession:(VFSession *)aSession
 {
 	session = aSession;
-	DOVConverter = [[VFVisualAngleConverter alloc] initWithDistanceToScreen:[session.distanceToScreen intValue]
-														   screenResolution:session.screenResolution 
-															screenDimension:session.screenDimension];
+	DOVConverter = [[VFVisualAngleConverter alloc] initWithMOC:[aSession managedObjectContext]];
 	[self setFrameSize:session.screenResolution];
+	
+	fetchHelper = [[VFFetchHelper alloc] initWithMoc:[aSession managedObjectContext]];
 }
 
 - (BOOL)isFlipped
@@ -72,30 +72,25 @@
 {
 	if (session == nil)
 		return;
-	NSManagedObjectContext *moc = [session managedObjectContext];
 	
 	NSNumber *startTime = [NSNumber numberWithDouble:viewStartTime];
 	NSNumber *endTime = [NSNumber numberWithDouble:viewEndTime];
 	if (showGazeSample) {
-		gazesArray = [VFUtil fetchModelObjectsForName:@"GazeSample" 
+		gazesArray = [fetchHelper fetchModelObjectsForName:@"GazeSample" 
 												 from:startTime 
-												   to:endTime
-											  withMOC:moc];
+												   to:endTime];
 	} else {
 		gazesArray = nil;
 	}
-	visualStimuliArray = [VFUtil fetchModelObjectsForName:@"VisualStimulus" 
+	visualStimuliArray = [fetchHelper fetchModelObjectsForName:@"VisualStimulus" 
 													 from:startTime 
-													   to:endTime
-												  withMOC:moc];
-	fixationsArray = [VFUtil fetchModelObjectsForName:@"Fixation" 
+													   to:endTime];
+	fixationsArray = [fetchHelper fetchModelObjectsForName:@"Fixation" 
 											   from:startTime 
-												 to:endTime
-											withMOC:moc];
-	keyEventsArray = [VFUtil fetchModelObjectsForName:@"KeyboardEvent" 
+												 to:endTime];
+	keyEventsArray = [fetchHelper fetchModelObjectsForName:@"KeyboardEvent" 
 												 from:startTime
-												   to:endTime 
-											  withMOC:moc];
+												   to:endTime];
 
 	[self setNeedsDisplay:YES];
 }
@@ -242,9 +237,9 @@
 	// If it's drawing background, there's no need to draw auto-AOI.
 	if (showAutoAOI && ![visualStimulusTemplate.category isEqualToString:@"background"] 
 		&& (visualStimulusTemplate.fixationPoint.x != 1.0e+5f)) {
-		NSSize autoAOISize = NSMakeSize([DOVConverter horizontalPixelsFromVisualAngles:autoAOISizeDOV], 
-										[DOVConverter verticalPixelsFromVisualAngles:autoAOISizeDOV]);
-		NSBezierPath *foveaZonePath = [VFUtil autoAOIAroundCenter:visualStimulusTemplate.fixationPoint withSize:autoAOISize];
+		NSSize autoAOISize = NSMakeSize([DOVConverter pixelsFromVisualAngles:autoAOISizeDOV], 
+										[DOVConverter pixelsFromVisualAngles:autoAOISizeDOV]);
+		NSBezierPath *foveaZonePath = [VFUtil autoAOIAroundPoint:visualStimulusTemplate.fixationPoint withSize:autoAOISize];
 		
 		[[NSColor grayColor] set];
 		[foveaZonePath stroke];

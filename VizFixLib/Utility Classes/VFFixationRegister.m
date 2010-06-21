@@ -8,6 +8,10 @@
 
 #import "VFFixationRegister.h"
 
+#import "VFVisualAngleConverter.h"
+#import "VFFixation.h"
+#import "VFFetchHelper.h"
+
 #import "VFVisualStimulus.h"
 #import "VFVisualStimulusFrame.h"
 #import "VFVisualStimulusTemplate.h"
@@ -21,7 +25,8 @@
 {	
 	if (self = [super init]) {
 		moc = anMOC;
-		visualStimuliArray = [VFUtil fetchAllObjectsForName:@"VisualStimulus" fromMOC:moc];
+		fetchHelper = [[VFFetchHelper alloc] initWithMOC:moc];
+		visualStimuliArray = [fetchHelper fetchAllObjectsForName:@"VisualStimulus"];
 		converter = [[VFVisualAngleConverter alloc] initWithMOC:moc];
 		autoAOIDOV = 5.5;
 	}
@@ -47,8 +52,7 @@
 								[NSPredicate predicateWithFormat:@"(startTime <= %@ AND endTime >= %@)", 
 								 aFixation.startTime, aFixation.startTime]];
 	
-	double deviationThreshold = sqrt([converter horizontalPixelsFromVisualAngles:autoAOIDOV] 
-									 * [converter verticalPixelsFromVisualAngles:autoAOIDOV]);
+	double deviationThreshold = [converter pixelsFromVisualAngles:autoAOIDOV];
 	
 	double minDistanceOfAll = deviationThreshold;
 	VFVisualStimulus *targetStimulus;
@@ -61,8 +65,8 @@
 		double minDistanceOfFixation = deviationThreshold;
 		NSPoint minCenter;
 		for (VFVisualStimulusFrame *eachFrame in onScreenFrames) {
-			NSPoint center = NSMakePoint(eachFrame.location.x + eachStimulus.template.center.x, 
-										 eachFrame.location.y + eachStimulus.template.center.y);
+			NSPoint center = NSMakePoint(eachFrame.location.x + eachStimulus.template.fixationPoint.x, 
+										 eachFrame.location.y + eachStimulus.template.fixationPoint.y);
 			
 			double h = aFixation.location.x - center.x;
 			double v = aFixation.location.y - center.y;
@@ -98,7 +102,7 @@
 
 - (void)registerAllFixations
 {
-	for (VFFixation *fix in [VFUtil fetchAllObjectsForName:@"Fixation" fromMOC:moc]) {
+	for (VFFixation *fix in [fetchHelper fetchAllObjectsForName:@"Fixation"]) {
 		[self registerFixationToClosestAOI:fix];
 	}
 }

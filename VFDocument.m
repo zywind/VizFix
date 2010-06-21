@@ -12,6 +12,7 @@
 #import "SBCenteringClipView.h"
 #import <VizFixLib/VFUtil.h>
 #import <VizFixLib/VFDTFixationAlg.h>
+#import "VFPreferenceController.h"
 
 @implementation VFDocument
 
@@ -19,6 +20,8 @@
 @synthesize viewEndTime;
 @synthesize viewStartTime;
 @synthesize inSummaryMode;
+@synthesize minFixationDuration;
+@synthesize dispersionThreshold;
 
 #define LEFT_VIEW_INDEX 0
 #define LEFT_VIEW_PRIORITY 1
@@ -40,7 +43,12 @@
 		playbackSpeedLabels = [NSArray arrayWithObjects:@"1/10 x", @"1/3 x", @"1/2 x", @"1 x", @"2 x", nil];
 		playbackSpeedModifiersIndex = 2; // Default speed 0.5/1.0.
 		step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
-    }
+		
+		fetchHelper = [[VFFetchHelper alloc] initWithMoc:[self managedObjectContext]];
+		
+		minFixationDuration = 100;
+		dispersionThreshold = 0.7;
+	}
     return self;
 }
 
@@ -71,7 +79,7 @@
 	layoutView.document = self;
 	
 	// Retrieve Session.
-	session = [VFUtil fetchSessionWithMOC:[self managedObjectContext]];
+	session = [fetchHelper session];
 	
 	// Control the resizing of splitView
 	PrioritySplitViewDelegate *splitViewDelegate =
@@ -360,48 +368,57 @@
 #pragma mark ---------DETECT FIXATIONS---------
 - (IBAction)detectFixations:(id)sender
 {
-	// Show alert panel.
-	NSAlert *alert = [[NSAlert alloc] init];
-	[alert addButtonWithTitle:@"Continue"];
-	[alert addButtonWithTitle:@"Cancel"];
-	[alert setMessageText:@"This will delete your old fixations. Continue?"];
-	[alert setInformativeText:@"Detect fixations will delete your old fixations. Continue?"];
-	[alert setAlertStyle:NSWarningAlertStyle];
-	
-	[alert beginSheetModalForWindow:[[[self windowControllers] objectAtIndex:0] window] 
-					  modalDelegate:self 
-					 didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:) 
-						contextInfo:nil];
+	[NSApp beginSheet:detectFixationPanel
+	   modalForWindow:[[[self windowControllers] objectAtIndex:0] window] 
+		modalDelegate:self 
+	   didEndSelector:@selector(didEndSheet:returnCode:contextInfo:) 
+		  contextInfo:nil];
 }
 
-- (void)alertDidEnd:(NSAlert *)alert returnCode:(int)returnCode
-		contextInfo:(void *)contextInfo
+- (IBAction)cancelDetection: (id)sender
 {
-	if (returnCode == NSAlertFirstButtonReturn) {
+    [NSApp endSheet:detectFixationPanel returnCode:NSCancelButton];
+}
+
+- (IBAction)doDetect: (id)sender
+{
+	[NSApp endSheet:detectFixationPanel returnCode:NSOKButton];
+}
+
+- (void)didEndSheet:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
+{
+	if (returnCode == NSOKButton) {
 		[self doDetectAndInsertFixations];
 		[layoutView updateViewContentsFrom:self.viewStartTime to:self.viewEndTime];
     }
+    [sheet orderOut:self];
 }
 
 - (void)doDetectAndInsertFixations
 {
-	NSManagedObjectContext *moc = [self managedObjectContext];
-	NSArray *fixationArray = [VFUtil fetchAllObjectsForName:@"Fixation" fromMOC:moc];
+	NSManagedObjectContext *moc = [session managedObjectContext];
+	NSArray *fixationArray = [fetchHelper fetchModelObjectsForName:@"Fixation" 
+															  from:[NSNumber numberWithDouble:viewStartTime]
+																to:[NSNumber numberWithDouble:viewEndTime]];
 	
 	for (VFFixation *eachFixation in fixationArray) {
 		[moc deleteObject:eachFixation];
 	}
-	
 	fixationArray = nil;
-		
-	VFDTFixationAlg *fixationDetectionAlg = [[VFDTFixationAlg alloc] init];
-
-	[fixationDetectionAlg detectAllFixationsInMOC:moc withRadiusThresholdInDOV:0.7];
+	
+	NSArray *gazes = [fetchHelper fetchModelObjectsForName:@"GazeSample" 
+													  from:[NSNumber numberWithDouble:viewStartTime]
+														to:[NSNumber numberWithDouble:viewEndTime]];
+	
+	[VFDTFixationAlg detectFixation:gazes 
+			withDispersionThreshold:self.dispersionThreshold 
+			 andMinFixationDuration:self.minFixationDuration];
 }
 
 - (NSArray *)startTimeSortDescriptor
 {
 	return [VFUtil startTimeSortDescriptor];
 }
+					  
 
 @end
