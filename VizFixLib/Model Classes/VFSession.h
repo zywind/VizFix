@@ -60,12 +60,8 @@
  */
 @property (nonatomic, retain) NSNumber * gazeSampleRate;
 /**
- ￼	Optional. Session's duration.
+ ￼	Session's duration.
  */
 @property (nonatomic, retain) NSNumber * duration;
-/**
- ￼	Read only, combines subjectID and sessionID.
- */
-@property (nonatomic, readonly) NSString* ID;
 
 @end

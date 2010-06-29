@@ -105,20 +105,4 @@
 	[self setValue:screenDimensionAsString forKey:@"screenDimensionAsString"]; 
 }
 
-- (NSString *)ID
-{
-	return [NSString stringWithFormat:@"%@ %@", self.subjectID, self.sessionID];
-}
-
-- (void)setNilValueForKey:(NSString *)key 
-{
-	if ([key isEqualToString:@"screenDimension"]) {
-		screenDimension = NSMakeSize(0.0f, 0.0f);
-    } else if ([key isEqualToString:@"screenResolution"]) {
-		screenResolution = NSMakeSize(0.0f, 0.0f);
-	} else {
-        [super setNilValueForKey:key];
-    }
-}
-
 @end

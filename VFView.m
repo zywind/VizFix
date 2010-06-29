@@ -9,7 +9,6 @@
 #import "VFView.h"
 #import "VFPreferenceController.h"
 #import "VFDocument.h"
-#import <VizFixLib/VFUtil.h>
 
 @implementation VFView
 
@@ -20,6 +19,8 @@
 @synthesize showGazeSample;
 @synthesize inSummaryMode;
 @synthesize currentTime;
+@synthesize viewStartTime;
+@synthesize viewEndTime;
 @synthesize document;
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -47,7 +48,7 @@
 	DOVConverter = [[VFVisualAngleConverter alloc] initWithMOC:[aSession managedObjectContext]];
 	[self setFrameSize:session.screenResolution];
 	
-	fetchHelper = [[VFFetchHelper alloc] initWithMoc:[aSession managedObjectContext]];
+	fetchHelper = [[VFFetchHelper alloc] initWithMOC:[aSession managedObjectContext]];
 }
 
 - (BOOL)isFlipped
@@ -68,7 +69,7 @@
 	[self setNeedsDisplay:YES];
 }
 
-- (void)updateViewContentsFrom:(double)viewStartTime to:(double)viewEndTime
+- (void)updateViewContents
 {
 	if (session == nil)
 		return;
@@ -138,13 +139,16 @@
 			if (aFrame != nil)
 				[self drawFrame:aFrame];
 		} else {
-			NSArray *vsFrames = [[frames allObjects] sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];
+			NSPredicate *predicate = [VFUtil predicateForObjectsWithStartTime:[NSNumber numberWithDouble:viewStartTime]
+																	  endTime:[NSNumber numberWithDouble:viewEndTime]];
+			NSArray *vsFrames = [[[frames filteredSetUsingPredicate:predicate] allObjects]
+								 sortedArrayUsingDescriptors:[VFUtil startTimeSortDescriptor]];			
+			
 			VFVisualStimulusFrame *lastDrawnFrame;
-			for (int i = 0; i < [vsFrames count]; i++) {
+			for (int i = 0; i < [vsFrames count]; i++) {				
 				VFVisualStimulusFrame *thisFrame = [vsFrames objectAtIndex:i];
 				if (i == 0 || i == [vsFrames count] - 1 || 
-					([VFUtil distanceBetweenThisPoint:thisFrame.location 
-										 andThatPoint:lastDrawnFrame.location] >= 16)){
+					([VFUtil distanceBetweenThisPoint:thisFrame.location andThatPoint:lastDrawnFrame.location] > 16)){
 					[self drawFrame:thisFrame];
 					lastDrawnFrame = thisFrame;
 				}
@@ -179,7 +183,16 @@
 	[transform concat];
 	
 	VFVisualStimulus *theStimulus = frame.ofVisualStimulus;
-	[self drawVisualStimulusTemplate:theStimulus.template];
+	
+	double alpha;
+	if (inSummaryMode) {
+		alpha = pow(([frame.endTime doubleValue] - viewStartTime) 
+				/ (viewEndTime - viewStartTime), 0.7);
+	} else {
+		alpha = 1.0;
+	}
+	
+	[self drawVisualStimulusTemplate:theStimulus.template withAlpha:alpha];
 	// Depends on the label font size.
 	if (showLabel) {
 		[theStimulus.label drawAtPoint:NSMakePoint(0.0f, 0.0f)
@@ -191,7 +204,7 @@
 	[transform concat];
 }
 
-- (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate
+- (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate withAlpha:(double)alpha
 {
 	if (visualStimulusTemplate.fillColor != nil) {
 		[visualStimulusTemplate.fillColor setFill];
@@ -199,8 +212,8 @@
 	} 
 	
 	if (visualStimulusTemplate.imageFilePath != nil) {
-		NSURL *imageURL = [NSURL URLWithString:visualStimulusTemplate.imageFilePath 
-								 relativeToURL:dataURL];
+		NSString *filePath = [[[dataURL path] stringByDeletingLastPathComponent] stringByAppendingPathComponent:visualStimulusTemplate.imageFilePath];
+		NSURL *imageURL = [NSURL fileURLWithPath:filePath];
 		
 		NSImage *stimulusImage = [imageCacheDict valueForKey:visualStimulusTemplate.imageFilePath];
 		if (stimulusImage == nil) {
@@ -222,7 +235,7 @@
 		[stimulusImage drawAtPoint:NSMakePoint(0.0f, 0.0f) 
 						  fromRect:NSZeroRect 
 						 operation:NSCompositeSourceOver
-						  fraction:1.0];
+						  fraction:alpha];
 		
 		
 		[xform invert];
@@ -326,9 +339,9 @@
 		for (int i = 0; i < [fixationsArray count]; i++) {
 			VFFixation *currentFixation = [fixationsArray objectAtIndex:i];
 			// TODO: The alpha component seems not working.
-			color = [color colorWithAlphaComponent:(1.0 - ((i / (float)[fixationsArray count]) / 2.0))];						
-			[self drawFixation:currentFixation withColor:color];
+			NSColor *colorToDraw = [color shadowWithLevel:0.7*pow((viewEndTime - [currentFixation.startTime doubleValue]) / (viewEndTime - viewStartTime), 0.7)];
 			
+			[self drawFixation:currentFixation withColor:colorToDraw];
 			
 			// Draw a line from last fixation to this one.
 			if (i > 0) {
@@ -363,6 +376,8 @@
 	[durationPath setLineWidth:2];
 	
 	[durationPath stroke];
+	
+	
 	[[color colorWithAlphaComponent:0.4] setFill];
 	[durationPath fill];
 }

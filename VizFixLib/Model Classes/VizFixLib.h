@@ -20,3 +20,8 @@
 #import "VFCustomEvent.h"
 #import "VFSession.h"
 #import "VFFixation.h"
+#import "VFUtil.h"
+#import "VFFixationRegister.h"
+#import "VFVisualAngleConverter.h"
+#import "VFDTFixationAlg.h"
+#import "VFFetchHelper.h"

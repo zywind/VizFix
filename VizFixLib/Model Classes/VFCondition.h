@@ -9,13 +9,21 @@
 #import <CoreData/CoreData.h>
 
 @class VFProcedure;
-@class VFBlock;
 
+/**
+ Stores statistics of a procedure.
+ */
 @interface VFCondition :  NSManagedObject  
 {
 }
 
+/**
+	Factor name.￼
+ */
 @property (nonatomic, retain) NSString * factor;
+/**
+	The factor level of this condition.￼
+ */
 @property (nonatomic, retain) NSString * level;
 @property (nonatomic, retain) NSSet* ofProcs;
 
@@ -23,6 +31,11 @@
 
 
 @interface VFCondition (CoreDataGeneratedAccessors)
+
+/**
+	I usually use VFProcedure::addConditionsObject instead.
+	@param value ￼The procedure being added.
+ */
 - (void)addOfProcsObject:(VFProcedure *)value;
 - (void)removeOfProcsObject:(VFProcedure *)value;
 - (void)addOfProcs:(NSSet *)value;

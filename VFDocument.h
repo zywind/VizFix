@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "VFView.h"
-#import <VizFixLib/VFFetchHelper.h>
+#import <VizFixLib/VizFixLib.h>
 
 @interface VFDocument : NSPersistentDocument {
 	VFFetchHelper *fetchHelper;
@@ -36,6 +36,8 @@
 	IBOutlet NSButton *playButton;
 	IBOutlet VFView	*layoutView;
 	IBOutlet NSTextField *speedLabel;
+	IBOutlet NSComboBox *detectingGroupBox;
+	
 	// UI elements data sources.
 	IBOutlet NSTreeController *treeController;
 	IBOutlet NSArrayController *tableViewController;
@@ -67,6 +69,7 @@
 - (IBAction)toggleShowAutoAOI:(id)sender;
 - (IBAction)toggleShowGazeSample:(id)sender;
 - (IBAction)detectFixations:(id)sender;
+- (IBAction)captureVisualization:(id)sender;
 - (void)doDetectAndInsertFixations;
 
 - (NSArray *)startTimeSortDescriptor;

@@ -22,7 +22,7 @@
 		3BF7CA3811B09B1800E8CD9F /* VFGazeSample.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50456110ADB880004A125 /* VFGazeSample.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA3911B09B1900E8CD9F /* VFAuditoryStimulus.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5045F110ADB880004A125 /* VFAuditoryStimulus.m */; };
 		3BF7CA3A11B09B1900E8CD9F /* VFAuditoryStimulus.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045E110ADB880004A125 /* VFAuditoryStimulus.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3BF7CA3B11B09B2200E8CD9F /* VFMangedObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 3B22AB56113870BB00312B8B /* VFMangedObjects.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3BF7CA3B11B09B2200E8CD9F /* VizFixLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 3B22AB56113870BB00312B8B /* VizFixLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA3C11B09B2200E8CD9F /* VFCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5046F110ADB880004A125 /* VFCustomEvent.m */; };
 		3BF7CA3D11B09B2300E8CD9F /* VFKeyboardEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50465110ADB880004A125 /* VFKeyboardEvent.m */; };
 		3BF7CA3E11B09B2300E8CD9F /* VFVisualStimulusTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC50467110ADB880004A125 /* VFVisualStimulusTemplate.m */; };
@@ -93,7 +93,7 @@
 		2F7446AA0DB6BCF400F9684A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/VFDocument.xib; sourceTree = "<group>"; };
 		32DBCF750370BD2300C91783 /* VizFix_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VizFix_Prefix.pch; sourceTree = "<group>"; };
 		3B088DAA11B5AD94006C2DAF /* Doxyfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
-		3B22AB56113870BB00312B8B /* VFMangedObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFMangedObjects.h; sourceTree = "<group>"; };
+		3B22AB56113870BB00312B8B /* VizFixLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VizFixLib.h; path = "VizFixLib/Model Classes/VizFixLib.h"; sourceTree = "<group>"; };
 		3B3D734C11066FBA00C03AEA /* VFDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFDocument.h; sourceTree = "<group>"; };
 		3B7732571114D37300827FCB /* VFUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VFUtil.h; path = "../utility classes/VFUtil.h"; sourceTree = "<group>"; };
 		3B7732581114D37300827FCB /* VFUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VFUtil.m; path = "../utility classes/VFUtil.m"; sourceTree = "<group>"; };
@@ -183,9 +183,9 @@
 		2A37F4AAFDCFA73011CA2CEA /* VizFix */ = {
 			isa = PBXGroup;
 			children = (
-				3B22AB581138754700312B8B /* Utility Classes */,
-				E1B74B1A0667B4A90069E3BA /* Models */,
-				2A37F4ABFDCFA73011CA2CEA /* Classes */,
+				3BF777A811125BC300061B38 /* UI Helpers */,
+				2A37F4ABFDCFA73011CA2CEA /* VizFix */,
+				3B46127111D02A0800E0E93A /* VizFixLib */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				3BF7CBE911B0A0B300E8CD9F /* Frameworks */,
@@ -194,7 +194,7 @@
 			name = VizFix;
 			sourceTree = "<group>";
 		};
-		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
+		2A37F4ABFDCFA73011CA2CEA /* VizFix */ = {
 			isa = PBXGroup;
 			children = (
 				3BA23D8C114715C90079FC20 /* VFPreferenceController.h */,
@@ -205,9 +205,8 @@
 				3BC19E881100FD9B00AD4968 /* VFView.m */,
 				3BE64ABC110595A1008D8939 /* VFAppDelegate.h */,
 				3BE64ABD110595A1008D8939 /* VFAppDelegate.m */,
-				3BF777A811125BC300061B38 /* UI Helpers */,
 			);
-			name = Classes;
+			name = VizFix;
 			sourceTree = "<group>";
 		};
 		2A37F4AFFDCFA73011CA2CEA /* Other Sources */ = {
@@ -251,6 +250,17 @@
 			path = "VizFixLib/Utility Classes";
 			sourceTree = "<group>";
 		};
+		3B46127111D02A0800E0E93A /* VizFixLib */ = {
+			isa = PBXGroup;
+			children = (
+				3B22AB56113870BB00312B8B /* VizFixLib.h */,
+				3B46B82911016DBD002DF0C3 /* Model Classes */,
+				3B22AB581138754700312B8B /* Utility Classes */,
+				775BDEF0067A8BF0009058FE /* VFModel.xcdatamodel */,
+			);
+			name = VizFixLib;
+			sourceTree = "<group>";
+		};
 		3B46B82911016DBD002DF0C3 /* Model Classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -280,7 +290,6 @@
 				3BC5046F110ADB880004A125 /* VFCustomEvent.m */,
 				3BC50472110ADB880004A125 /* VFFixation.h */,
 				3BC50473110ADB880004A125 /* VFFixation.m */,
-				3B22AB56113870BB00312B8B /* VFMangedObjects.h */,
 			);
 			name = "Model Classes";
 			path = "VizFixLib/Model Classes";
@@ -305,15 +314,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		E1B74B1A0667B4A90069E3BA /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				775BDEF0067A8BF0009058FE /* VFModel.xcdatamodel */,
-				3B46B82911016DBD002DF0C3 /* Model Classes */,
-			);
-			name = Models;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -325,7 +325,7 @@
 				3B85702711CBF4BA00294B59 /* VFFixationRegister.h in Headers */,
 				3BF7CA3811B09B1800E8CD9F /* VFGazeSample.h in Headers */,
 				3BF7CA3A11B09B1900E8CD9F /* VFAuditoryStimulus.h in Headers */,
-				3BF7CA3B11B09B2200E8CD9F /* VFMangedObjects.h in Headers */,
+				3BF7CA3B11B09B2200E8CD9F /* VizFixLib.h in Headers */,
 				3BF7CA4211B09B2600E8CD9F /* VFSession.h in Headers */,
 				3BF7CA4411B09B2800E8CD9F /* VFStatistic.h in Headers */,
 				3BF7CA4711B09B2A00E8CD9F /* VFFixation.h in Headers */,
@@ -430,14 +430,14 @@
 /* Begin PBXShellScriptBuildPhase section */
 		3B5FDE5511B1A04400619A1A /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			files = (
 			);
 			inputPaths = (
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "#\n# Build the doxygen documentation for the project and load the docset into Xcode \n#\n# Created by Fred McCann on 03/16/2010.\n# http://www.duckrowing.com\n#\n# Based on the build script provided by Apple:\n# http://developer.apple.com/tools/creatingdocsetswithdoxygen.html\n#\n# Set the variable $COMPANY_RDOMAIN_PREFIX equal to the reverse domain name of your comany\n# Example: com.duckrowing\n#\n\nDOXYGEN_PATH=/Applications/Doxygen.app/Contents/Resources/doxygen\nDOCSET_PATH=$SOURCE_ROOT/build\n\nif ! [ -f $SOURCE_ROOT/Doxyfile ] \nthen \n  echo doxygen config file does not exist\n  $DOXYGEN_PATH -g $SOURCE_ROOT/Doxyfile\nfi\n\n#  Append the proper input/output directories and docset info to the config file.\n#  This works even though values are assigned higher up in the file. Easier than sed.\n\ncp $SOURCE_ROOT/Doxyfile $TEMP_DIR/Doxyfile\n\necho \"INPUT = $SOURCE_ROOT/VizFixLib\" >> $TEMP_DIR/Doxyfile\necho \"OUTPUT_DIRECTORY       = $DOCSET_PATH\" >> $TEMP_DIR/Doxyfile\necho \"DOCSET_FEEDNAME = $PRODUCT_NAME Documentation\" >> $TEMP_DIR/Doxyfile\necho \"DOCSET_BUNDLE_ID       = $COMPANY_RDOMAIN_PREFIX.$PRODUCT_NAME\" >> $TEMP_DIR/Doxyfile\n\n#  Run doxygen on the updated config file.\n#  Note: doxygen creates a Makefile that does most of the heavy lifting.\n\n$DOXYGEN_PATH $TEMP_DIR/Doxyfile\n\n#  make will invoke docsetutil. Take a look at the Makefile to see how this is done.\n\nmake -C \"$DOCSET_PATH/html\" install\n\n#  Construct a temporary applescript file to tell Xcode to load a docset.\n\nrm -f $TEMP_DIR/loadDocSet.scpt\n\necho \"tell application \\\"Xcode\\\"\" >> $TEMP_DIR/loadDocSet.scpt\necho \"load documentation set with path \\\"/Users/$USER/Library/Developer/Shared/Documentation/DocSets/$COMPANY_RDOMAIN_PREFIX.$PRODUCT_NAME.docset\\\"\" >> $TEMP_DIR/loadDocSet.scpt\necho \"end tell\" >> $TEMP_DIR/loadDocSet.scpt\n\n#  Run the load-docset applescript command.\nosascript $TEMP_DIR/loadDocSet.scpt\n\nexit 0";
 		};

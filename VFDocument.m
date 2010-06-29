@@ -10,8 +10,6 @@
 
 #import "PrioritySplitViewDelegate.h"
 #import "SBCenteringClipView.h"
-#import <VizFixLib/VFUtil.h>
-#import <VizFixLib/VFDTFixationAlg.h>
 #import "VFPreferenceController.h"
 
 @implementation VFDocument
@@ -44,7 +42,7 @@
 		playbackSpeedModifiersIndex = 2; // Default speed 0.5/1.0.
 		step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
 		
-		fetchHelper = [[VFFetchHelper alloc] initWithMoc:[self managedObjectContext]];
+		fetchHelper = [[VFFetchHelper alloc] initWithMOC:[self managedObjectContext]];
 		
 		minFixationDuration = 100;
 		dispersionThreshold = 0.7;
@@ -76,6 +74,9 @@
 		
 	[layoutView bind:@"inSummaryMode" toObject:self withKeyPath:@"inSummaryMode" options:nil];
 	[layoutView bind:@"currentTime" toObject:self withKeyPath:@"currentTime" options:nil];
+	[layoutView bind:@"viewStartTime" toObject:self withKeyPath:@"viewStartTime" options:nil];
+	[layoutView bind:@"viewEndTime" toObject:self withKeyPath:@"viewEndTime" options:nil];
+
 	layoutView.document = self;
 	
 	// Retrieve Session.
@@ -114,6 +115,9 @@
 	[playButton setButtonType:NSToggleButton];
 	
 	speedLabel.stringValue = [playbackSpeedLabels objectAtIndex:playbackSpeedModifiersIndex];
+	
+	// Initialize detectingGroupBox
+	[detectingGroupBox selectItemAtIndex:0];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -122,10 +126,9 @@
 		if (self.inSummaryMode && playing) {
 			[playButton performClick:self];
 		}
-		
 	} else if (object == treeController && [keyPath isEqualToString:@"selectionIndexPaths"]) {
 		[self updateTableView];
-		[layoutView updateViewContentsFrom:self.viewStartTime to:self.viewEndTime];
+		[layoutView updateViewContents];
 	}
 }
 
@@ -341,7 +344,7 @@
 		playbackSpeedModifiersIndex--;
 		speedLabel.stringValue = [playbackSpeedLabels objectAtIndex:playbackSpeedModifiersIndex];
 		step = 1000.0 / viewRefreshRate * [[playbackSpeedModifiers objectAtIndex:playbackSpeedModifiersIndex] doubleValue];
-	}	
+	}
 }
 
 - (IBAction)stepForward:(id)sender
@@ -389,7 +392,7 @@
 {
 	if (returnCode == NSOKButton) {
 		[self doDetectAndInsertFixations];
-		[layoutView updateViewContentsFrom:self.viewStartTime to:self.viewEndTime];
+		[layoutView updateViewContents];
     }
     [sheet orderOut:self];
 }
@@ -397,18 +400,31 @@
 - (void)doDetectAndInsertFixations
 {
 	NSManagedObjectContext *moc = [session managedObjectContext];
+	NSNumber *detectinStartTime;
+	NSNumber *detectingEndTime;
+	
+	if ([detectingGroupBox indexOfSelectedItem] == 0) {
+		detectinStartTime = [NSNumber numberWithDouble:viewStartTime];
+		detectingEndTime = [NSNumber numberWithDouble:viewEndTime];
+	} else {
+		detectinStartTime = [NSNumber numberWithInt:0];
+		detectingEndTime = session.duration;
+	}
+	
 	NSArray *fixationArray = [fetchHelper fetchModelObjectsForName:@"Fixation" 
-															  from:[NSNumber numberWithDouble:viewStartTime]
-																to:[NSNumber numberWithDouble:viewEndTime]];
+															  from:detectinStartTime
+																to:detectingEndTime];
 	
 	for (VFFixation *eachFixation in fixationArray) {
 		[moc deleteObject:eachFixation];
 	}
 	fixationArray = nil;
 	
-	NSArray *gazes = [fetchHelper fetchModelObjectsForName:@"GazeSample" 
-													  from:[NSNumber numberWithDouble:viewStartTime]
-														to:[NSNumber numberWithDouble:viewEndTime]];
+	NSArray *gazes;
+	gazes = [fetchHelper fetchModelObjectsForName:@"GazeSample" 
+											 from:detectinStartTime
+											   to:detectingEndTime];
+	
 	
 	[VFDTFixationAlg detectFixation:gazes 
 			withDispersionThreshold:self.dispersionThreshold 
@@ -419,6 +435,47 @@
 {
 	return [VFUtil startTimeSortDescriptor];
 }
-					  
+
+- (IBAction)captureVisualization:(id)sender
+{	
+//	[scrollView lockFocus];
+//	NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:[[scrollView contentView] frame]];
+//	[scrollView unlockFocus];
+//	
+//	NSData * data = [rep representationUsingType:NSPNGFileType properties:nil];
+	
+	NSImage *im = [[NSImage alloc] initWithSize:[layoutView bounds].size];
+
+	[im lockFocus];
+	[layoutView drawRect:[layoutView bounds]];
+	[im unlockFocus];
+	
+	// Flip the image
+	NSSize imgSize;
+	
+	imgSize.width = [[im bestRepresentationForDevice: nil] pixelsWide];
+    imgSize.height = [[im bestRepresentationForDevice: nil] pixelsHigh];
+	
+    NSImage *flippedImage = [[NSImage alloc] initWithSize:imgSize];
+	
+    [flippedImage lockFocus];
+	
+    NSAffineTransform *rotateTF = [NSAffineTransform transform];
+	
+    [rotateTF translateXBy:0.0 yBy:imgSize.height];
+    [rotateTF scaleXBy:1.0 yBy:-1.0];
+    [rotateTF concat];
+	
+    NSRect r1 = NSMakeRect(0, 0, imgSize.width, imgSize.height);
+    [[im bestRepresentationForDevice: nil] drawInRect: r1];
+	
+    [flippedImage unlockFocus];
+	
+	NSData * data = [flippedImage TIFFRepresentation];
+	NSString * path = [[NSString stringWithFormat:@"~/Desktop/visualization %@.tiff", 
+						[[NSDate date] description]] stringByExpandingTildeInPath];
+	
+	[data writeToFile:path atomically:NO];
+}
 
 @end

@@ -10,11 +10,20 @@
 
 @class VFProcedure;
 
+/**
+ Stores statistics of a procedure.
+ */
 @interface VFStatistic :  NSManagedObject  
 {
 }
 
+/**
+ The measure name.￼
+ */
 @property (nonatomic, retain) NSString * measure;
+/**
+ The value in string.￼
+ */
 @property (nonatomic, retain) NSString * value;
 @property (nonatomic, retain) VFProcedure * ofTrial;
 

@@ -7,7 +7,6 @@
 //
 
 #import "VFStatistic.h"
-
 #import "VFProcedure.h"
 
 @implementation VFStatistic 

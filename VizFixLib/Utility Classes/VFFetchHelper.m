@@ -8,12 +8,11 @@
 
 #import "VFFetchHelper.h"
 #import "VFUtil.h"
-#import "VFMangedObjects.h"
-
+#import "VFSession.h"
 
 @implementation VFFetchHelper
 
-- (id)initWithMoc:(NSManagedObjectContext *)anMOC
+- (id)initWithMOC:(NSManagedObjectContext *)anMOC
 {	
 	if (self = [super init]) {
 		moc = anMOC;
@@ -37,7 +36,7 @@
 		return [fetchResults objectAtIndex:0];
 	} else {
 		NSLog(@"Fetch session failed!\n%@", [fetchError localizedDescription]);
-		return nil;
+		exit(1);
 	}
 }
 
@@ -63,7 +62,7 @@
 	} else {
 		// TODO: refine error
 		NSLog(@"Fetch top level procedures failed.\n%@", [fetchError localizedDescription]);
-		return nil;
+		exit(1);
 	}
 }
 
@@ -102,7 +101,7 @@
 	} else {
 		// TODO: refine error
 		NSLog(@"Fetch %@ failed.\n%@", entityName, [fetchError localizedDescription]);
-		return nil;
+		exit(1);
 	}
 }
 

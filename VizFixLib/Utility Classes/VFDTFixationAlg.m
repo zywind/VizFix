@@ -24,7 +24,7 @@
 
 	VFVisualAngleConverter *DOVConverter = [[VFVisualAngleConverter alloc] initWithMOC:moc];
 	
-	VFFetchHelper *fetchHelper = [[VFFetchHelper alloc] initWithMoc:moc];
+	VFFetchHelper *fetchHelper = [[VFFetchHelper alloc] initWithMOC:moc];
 	VFSession *session = [fetchHelper session];
 	
 	double gazeSampleRate = [session.gazeSampleRate doubleValue];

@@ -60,15 +60,4 @@
 	[self setValue:locationAsString forKey:@"locationAsString"]; 
 }
 
-// Used internally. Sets the gaze sample's location to (0, 0). 
-- (void)setNilValueForKey:(NSString *)key 
-{
-	if ([key isEqualToString:@"location"]) {
-		location = NSMakePoint(0.0f, 0.0f);
-    }
-    else {
-        [super setNilValueForKey:key];
-    }
-}
-
 @end

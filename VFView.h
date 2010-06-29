@@ -7,9 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import <VizFixLib/VFMangedObjects.h>
-#import <VizFixLib/VFVisualAngleConverter.h>
-#import <VizFixLib/VFFetchHelper.h>
+#import <VizFixLib/VizFixLib.h>
 
 @class VFDocument;
 
@@ -33,6 +31,8 @@
 	BOOL showGazeSample;
 	BOOL inSummaryMode;
 	double currentTime;
+	double viewStartTime;
+	double viewEndTime;
 	float autoAOISizeDOV;
 	
 	NSUInteger selectedGroupType; // 2 for block, 3 for trial, 4 for subtrial
@@ -50,6 +50,8 @@
 @property BOOL inSummaryMode;
 @property double viewScale;
 @property double currentTime;
+@property double viewEndTime;
+@property double viewStartTime;
 @property (retain) NSURL *dataURL;
 @property VFDocument *document;
 
@@ -58,12 +60,12 @@
 
 // Draw helper methods.
 - (void)drawFrame:(VFVisualStimulusFrame *)frame;
-- (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate;
+- (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate withAlpha:(double)alpha;
 - (void)drawGazes;
 - (void)showKeyEvents;
 - (void)drawFixations;
 - (void)drawFixation:(VFFixation *)currentFixation withColor:(NSColor *)color;
-- (void)updateViewContentsFrom:(double)viewStartTime to:(double)viewEndTime;
+- (void)updateViewContents;
 
 - (void)stepForward;
 - (void)stepBackward;

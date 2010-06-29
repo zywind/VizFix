@@ -11,7 +11,10 @@
 #import "VFCondition.h"
 #import "VFStatistic.h"
 
-@interface VFProcedure :  NSManagedObject  
+/**
+	￼Stores information about a Procedure.
+ */
+@interface VFProcedure :  NSManagedObject
 {
 }
 
@@ -33,6 +36,10 @@
 - (void)addSubProcs:(NSSet *)value;
 - (void)removeSubProcs:(NSSet *)value;
 
+/**
+ ￼Add a condition object.
+ @param value ￼The condition being added.
+ */
 - (void)addConditionsObject:(VFCondition *)value;
 - (void)removeConditionsObject:(VFCondition *)value;
 - (void)addConditions:(NSSet *)value;

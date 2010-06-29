@@ -80,8 +80,9 @@
 		if (minDistanceOfFixation < minDistanceOfAll) {
 			minDistanceOfAll = minDistanceOfFixation;
 			targetStimulus = eachStimulus;
-			aFixation.fixatedAOI = [NSString stringWithFormat:@"%@, %1.2f, %1.2f, %1.0f, %1.0f", 
-									eachStimulus.ID, aFixation.location.x - minCenter.x, aFixation.location.y - minCenter.y, minCenter.x, minCenter.y];
+//			aFixation.fixatedAOI = [NSString stringWithFormat:@"%@, %1.2f, %1.2f, %1.0f, %1.0f", 
+//									eachStimulus.ID, aFixation.location.x - minCenter.x, aFixation.location.y - minCenter.y, minCenter.x, minCenter.y];
+			aFixation.fixatedAOI = eachStimulus.ID;
 		}
 	}
 	

@@ -13,7 +13,7 @@
 	NSManagedObjectContext *moc;
 }
 
-- (id)initWithMoc:(NSManagedObjectContext *)anMOC;
+- (id)initWithMOC:(NSManagedObjectContext *)anMOC;
 - (VFSession *)session;
 - (NSArray *)topLevelProcedures;
 - (NSArray *)fetchModelObjectsForName:(NSString *)entityName 
