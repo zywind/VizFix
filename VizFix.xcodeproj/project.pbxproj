@@ -76,7 +76,7 @@
 		3BF7CA7C11B09C7C00E8CD9F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /LIbrary/Frameworks;
+			dstPath = "~/LIbrary/Frameworks";
 			dstSubfolderSpec = 0;
 			files = (
 				3B9FD2E711CC1CC900F56FAE /* VizFixLib.framework in CopyFiles */,

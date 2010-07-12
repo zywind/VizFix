@@ -57,12 +57,7 @@
 
 - (id)managedObjectModel
 {
-	static id sharedModel = nil;
-    if (sharedModel == nil) {
-		NSURL *modelURL = [NSURL fileURLWithPath:@"/Library/Frameworks/VizFixLib.framework/Resources/VFModel.mom"];
-        sharedModel = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] retain];
-    }
-    return sharedModel;
+	return [VFUtil managedObjectModel];
 }
 
 - (void)windowControllerDidLoadNib:(NSWindowController *)windowController 

@@ -50,6 +50,16 @@
     return location;
 }
 
+- (void)setNilValueForKey:(NSString *)key 
+{
+	if ([key isEqualToString:@"location"]) {
+		location = NSMakePoint(0.0f, 0.0f);
+    }
+    else {
+        [super setNilValueForKey:key];
+    }
+}
+
 - (void)setLocation:(NSPoint)aPoint
 {
     [self willChangeValueForKey:@"location"];
