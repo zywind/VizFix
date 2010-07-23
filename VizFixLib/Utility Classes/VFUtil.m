@@ -79,10 +79,10 @@ static NSArray *visualStimuliSort = nil;
 			 startTime, startTime, startTime, endTime];
 }
 
-+ (NSBezierPath *)autoAOIAroundPoint:(NSPoint)point withSize:(NSSize)aoiSize
++ (NSBezierPath *)distanceGuideAroundPoint:(NSPoint)point withSize:(NSSize)aoiSize
 {
-	NSRect aoiRect = NSMakeRect(point.x - aoiSize.width/2, point.y - aoiSize.height/2, 
-								aoiSize.width, aoiSize.height);
+	NSRect aoiRect = NSMakeRect(point.x - aoiSize.width, point.y - aoiSize.height, 
+								aoiSize.width * 2, aoiSize.height * 2);
 	
 	return [NSBezierPath bezierPathWithOvalInRect:aoiRect];
 }
@@ -91,7 +91,7 @@ static NSArray *visualStimuliSort = nil;
 {
 	static id sharedModel = nil;
     if (sharedModel == nil) {
-		NSString *modelPath = @"~/Library/Frameworks/VizFixLib.framework/Resources/VFModel.mom";
+		NSString *modelPath = @"/Library/Frameworks/VizFixLib.framework/Resources/VFModel.mom";
 		NSURL *modelURL = [NSURL fileURLWithPath:[modelPath stringByExpandingTildeInPath]];
         sharedModel = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] retain];
     }

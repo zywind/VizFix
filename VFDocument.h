@@ -92,7 +92,7 @@
 
 // Menu actions.
 - (IBAction)toggleShowLabel:(id)sender;
-- (IBAction)toggleShowAutoAOI:(id)sender;
+- (IBAction)toggleShowDistanceGuide:(id)sender;
 - (IBAction)toggleShowGazeSample:(id)sender;
 - (IBAction)detectFixations:(id)sender;
 - (IBAction)captureVisualization:(id)sender;

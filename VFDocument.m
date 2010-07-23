@@ -300,9 +300,9 @@
 	if (theAction == @selector(toggleShowLabel:)) {
 		NSMenuItem *menuItem = (NSMenuItem *)anItem;
 		[menuItem setState:layoutView.showLabel];
-	} else if (theAction == @selector(toggleShowAutoAOI:)) {
+	} else if (theAction == @selector(toggleShowDistanceGuide:)) {
 		NSMenuItem *menuItem = (NSMenuItem *)anItem;
-		[menuItem setState:layoutView.showAutoAOI];
+		[menuItem setState:layoutView.showDistanceGuide];
 	} else if (theAction == @selector(toggleShowGazeSample:)) {
 		NSMenuItem *menuItem = (NSMenuItem *)anItem;
 		[menuItem setState:layoutView.showGazeSample];
@@ -318,11 +318,11 @@
 	layoutView.showLabel = [sender state];
 }
 
-- (IBAction)toggleShowAutoAOI:(id)sender
+- (IBAction)toggleShowDistanceGuide:(id)sender
 {
 	sender = (NSMenuItem *)sender;
 	[sender setState:![sender state]];
-	layoutView.showAutoAOI = [sender state];
+	layoutView.showDistanceGuide = [sender state];
 }
 
 - (IBAction)toggleShowGazeSample:(id)sender

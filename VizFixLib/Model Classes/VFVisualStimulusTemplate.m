@@ -100,4 +100,14 @@
 	[self setValue:fixationPointAsString forKey:@"fixationPointAsString"]; 
 }
 
+- (void)setNilValueForKey:(NSString *)key 
+{
+	if ([key isEqualToString:@"fixationPoint"]) {
+		fixationPoint = NSMakePoint(1.0e+5f, 1.0e+5f);
+    }
+    else {
+        [super setNilValueForKey:key];
+    }
+}
+
 @end

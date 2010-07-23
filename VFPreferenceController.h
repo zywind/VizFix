@@ -33,7 +33,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-extern NSString * const VFAutoAOISizeKey;
+extern NSString * const VFDistanceGuideSizeKey;
 extern NSString * const VFFixationColorKey;
 
 @interface VFPreferenceController : NSWindowController {

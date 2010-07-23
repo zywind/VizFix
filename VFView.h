@@ -53,13 +53,13 @@
 	
 	double viewScale;
 	BOOL showLabel;
-	BOOL showAutoAOI;
+	BOOL showDistanceGuide;
 	BOOL showGazeSample;
 	BOOL inSummaryMode;
 	double currentTime;
 	double viewStartTime;
 	double viewEndTime;
-	float autoAOISizeDOV;
+	float distanceGuideSizeDOV;
 	
 	NSUInteger selectedGroupType; // 2 for block, 3 for trial, 4 for subtrial
 	
@@ -71,7 +71,7 @@
 }
 
 @property BOOL showLabel;
-@property BOOL showAutoAOI;
+@property BOOL showDistanceGuide;
 @property BOOL showGazeSample;
 @property BOOL inSummaryMode;
 @property double viewScale;

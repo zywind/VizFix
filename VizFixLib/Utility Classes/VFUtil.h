@@ -42,7 +42,7 @@
 + (NSArray*)visualStimuliSortDescriptors;
 + (float)distanceBetweenThisPoint:(NSPoint)center andThatPoint:(NSPoint)point;
 + (NSPredicate *)predicateForObjectsWithStartTime:(NSNumber *)startTime endTime:(NSNumber *)endTime;
-+ (NSBezierPath *)autoAOIAroundPoint:(NSPoint)center withSize:(NSSize)aoiSize;
++ (NSBezierPath *)distanceGuideAroundPoint:(NSPoint)center withSize:(NSSize)aoiSize;
 + (id)managedObjectModel;
 
 @end

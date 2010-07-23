@@ -33,7 +33,7 @@
 
 #import "VFPreferenceController.h"
 
-NSString * const VFAutoAOISizeKey = @"AutoAOISize";
+NSString * const VFDistanceGuideSizeKey = @"DistanceGuideSize";
 NSString * const VFFixationColorKey = @"FixationColor";
 
 @implementation VFPreferenceController

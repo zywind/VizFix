@@ -45,11 +45,11 @@
 	
 	VFFetchHelper *fetchHelper;
 	
-	double autoAOIDOV;
+	double distanceGuideDOV;
 }
 
 @property (retain) NSDictionary * customAOIs;
-@property double autoAOIDOV;
+@property double distanceGuideDOV;
 
 - (id)initWithMOC:(NSManagedObjectContext *)anMOC;
 - (void)registerFixationToClosestAOI:(VFFixation *)aFixation;

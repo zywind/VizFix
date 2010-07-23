@@ -40,7 +40,7 @@
 {
 	NSMutableDictionary *defaultValues = [NSMutableDictionary dictionary];
 	
-	[defaultValues setObject:[NSNumber numberWithFloat:2.0f] forKey:VFAutoAOISizeKey];
+	[defaultValues setObject:[NSNumber numberWithFloat:2.0f] forKey:VFDistanceGuideSizeKey];
 	
 	NSData *theData=[NSArchiver archivedDataWithRootObject:[NSColor colorWithCalibratedHue:0.8 
 																				saturation:1.0 

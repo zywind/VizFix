@@ -44,7 +44,7 @@
 @implementation VFFixationRegister
 
 @synthesize customAOIs;
-@synthesize autoAOIDOV;
+@synthesize distanceGuideDOV;
 
 - (id)initWithMOC:(NSManagedObjectContext *)anMOC
 {	
@@ -53,7 +53,7 @@
 		fetchHelper = [[VFFetchHelper alloc] initWithMOC:moc];
 		visualStimuliArray = [fetchHelper fetchAllObjectsForName:@"VisualStimulus"];
 		converter = [[VFVisualAngleConverter alloc] initWithMOC:moc];
-		autoAOIDOV = 5.5;
+		distanceGuideDOV = 5.5;
 	}
     return self;
 }
@@ -77,7 +77,7 @@
 								[NSPredicate predicateWithFormat:@"(startTime <= %@ AND endTime >= %@)", 
 								 aFixation.startTime, aFixation.startTime]];
 	
-	double deviationThreshold = [converter pixelsFromVisualAngles:autoAOIDOV];
+	double deviationThreshold = [converter pixelsFromVisualAngles:distanceGuideDOV];
 	
 	double minDistanceOfAll = deviationThreshold;
 	VFVisualStimulus *targetStimulus;

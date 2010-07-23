@@ -38,7 +38,7 @@
 @implementation VFView
 
 @synthesize showLabel;
-@synthesize showAutoAOI;
+@synthesize showDistanceGuide;
 @synthesize dataURL;
 @synthesize viewScale;
 @synthesize showGazeSample;
@@ -56,9 +56,9 @@
 		viewScale = 100.0 / 100.0;
 		showLabel = YES;
 		showGazeSample = YES;
-		showAutoAOI = NO;
+		showDistanceGuide = NO;
 		[self addObserver:self forKeyPath:@"showLabel" options:NSKeyValueObservingOptionNew context:NULL];
-		[self addObserver:self forKeyPath:@"showAutoAOI" options:NSKeyValueObservingOptionNew context:NULL];
+		[self addObserver:self forKeyPath:@"showDistanceGuide" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"showGazeSample" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"viewScale" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"inSummaryMode" options:NSKeyValueObservingOptionNew context:NULL];
@@ -146,7 +146,7 @@
 	// Save the previous graphics state
 	[NSGraphicsContext saveGraphicsState];
 	
-	autoAOISizeDOV = [[NSUserDefaults standardUserDefaults] floatForKey:VFAutoAOISizeKey];
+	distanceGuideSizeDOV = [[NSUserDefaults standardUserDefaults] floatForKey:VFDistanceGuideSizeKey];
 	
 	NSAffineTransform* xform = [NSAffineTransform transform];
 	[xform scaleXBy:viewScale yBy:viewScale];
@@ -220,9 +220,9 @@
 	[self drawVisualStimulusTemplate:theStimulus.template withAlpha:alpha];
 	// Depends on the label font size.
 	if (showLabel) {
-		[theStimulus.label drawAtPoint:NSMakePoint(0.0f, 0.0f)
-		 withAttributes:[NSDictionary dictionaryWithObject:[NSColor whiteColor] 
-													forKey:NSForegroundColorAttributeName]];
+		[theStimulus.label drawAtPoint:NSMakePoint(0, 0)
+		 withAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor whiteColor], NSBackgroundColorAttributeName, 
+									[NSColor blackColor], NSForegroundColorAttributeName, nil]];
 	}
 	
 	[transform invert];
@@ -272,12 +272,12 @@
 		[visualStimulusTemplate.outline stroke];
 	} 
 	
-	// If it's drawing background, there's no need to draw auto-AOI.
-	if (showAutoAOI && ![visualStimulusTemplate.category isEqualToString:@"background"] 
+	// If it's drawing background, there's no need to draw distance guide.
+	if (showDistanceGuide && ![visualStimulusTemplate.category isEqualToString:@"background"] 
 		&& (visualStimulusTemplate.fixationPoint.x != 1.0e+5f)) {
-		NSSize autoAOISize = NSMakeSize([DOVConverter pixelsFromVisualAngles:autoAOISizeDOV], 
-										[DOVConverter pixelsFromVisualAngles:autoAOISizeDOV]);
-		NSBezierPath *foveaZonePath = [VFUtil autoAOIAroundPoint:visualStimulusTemplate.fixationPoint withSize:autoAOISize];
+		NSSize distanceGuideSize = NSMakeSize([DOVConverter pixelsFromVisualAngles:distanceGuideSizeDOV], 
+										[DOVConverter pixelsFromVisualAngles:distanceGuideSizeDOV]);
+		NSBezierPath *foveaZonePath = [VFUtil distanceGuideAroundPoint:visualStimulusTemplate.fixationPoint withSize:distanceGuideSize];
 		
 		[[NSColor grayColor] set];
 		[foveaZonePath stroke];
