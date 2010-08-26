@@ -44,7 +44,7 @@
 @implementation VFFixationRegister
 
 @synthesize customAOIs;
-@synthesize distanceGuideDOV;
+@synthesize deviationThreshold;
 
 - (id)initWithMOC:(NSManagedObjectContext *)anMOC
 {	
@@ -53,7 +53,7 @@
 		fetchHelper = [[VFFetchHelper alloc] initWithMOC:moc];
 		visualStimuliArray = [fetchHelper fetchAllObjectsForName:@"VisualStimulus"];
 		converter = [[VFVisualAngleConverter alloc] initWithMOC:moc];
-		distanceGuideDOV = 5.5;
+		deviationThreshold = 5.5;
 	}
     return self;
 }
@@ -77,9 +77,10 @@
 								[NSPredicate predicateWithFormat:@"(startTime <= %@ AND endTime >= %@)", 
 								 aFixation.startTime, aFixation.startTime]];
 	
-	double deviationThreshold = [converter pixelsFromVisualAngles:distanceGuideDOV];
+	double deviationThresholdInPix = [converter pixelsFromVisualAngles:deviationThreshold];
 	
-	double minDistanceOfAll = deviationThreshold;
+	double minDistanceOfAll = deviationThresholdInPix;
+	
 	VFVisualStimulus *targetStimulus;
 	
 	for (VFVisualStimulus *eachStimulus in onScreenStimuli) {
@@ -87,7 +88,7 @@
 								 [NSPredicate predicateWithFormat:@"(startTime <= %@ AND endTime >= %@)", 
 								  aFixation.startTime, aFixation.startTime]];
 		
-		double minDistanceOfFixation = deviationThreshold;
+		double minDistanceOfFixation = deviationThresholdInPix;
 		NSPoint minCenter;
 		for (VFVisualStimulusFrame *eachFrame in onScreenFrames) {
 			NSPoint center = NSMakePoint(eachFrame.location.x + eachStimulus.template.fixationPoint.x, 
@@ -98,7 +99,7 @@
 			double dis = sqrt(h*h + v*v);
 			if (dis < minDistanceOfFixation) {
 				minDistanceOfFixation = dis;
-				minCenter = center;				
+				minCenter = center;
 			}
 		}
 		
@@ -107,7 +108,12 @@
 			targetStimulus = eachStimulus;
 //			aFixation.fixatedAOI = [NSString stringWithFormat:@"%@, %1.2f, %1.2f, %1.0f, %1.0f", 
 //									eachStimulus.ID, aFixation.location.x - minCenter.x, aFixation.location.y - minCenter.y, minCenter.x, minCenter.y];
-			aFixation.fixatedAOI = eachStimulus.ID;
+			
+//			aFixation.fixatedAOI = eachStimulus.ID;
+			
+			aFixation.fixatedAOI = [NSString stringWithFormat:@"%@, %d, %1.2f, %1.2f, %1.0f, %1.0f", 
+									eachStimulus.ID, [aFixation.endTime intValue] - [aFixation.startTime intValue], 
+									aFixation.location.x, aFixation.location.y, minCenter.x, minCenter.y];
 		}
 	}
 	
@@ -116,12 +122,16 @@
 		for (id key in customAOIs) {
 			NSBezierPath *aoiPath = [customAOIs objectForKey:key];
 			if ([aoiPath containsPoint:aFixation.location]) {
-				[aFixation registerOnAOI:key];
+				aFixation.fixatedAOI = [NSString stringWithFormat:@"%@, %d, %1.2f, %1.2f, NA, NA", 
+										key, [aFixation.endTime intValue] - [aFixation.startTime intValue], 
+										aFixation.location.x, aFixation.location.y];
 			}
 		}
 		// If it's still nil, it's on "Other" area.
 		if (aFixation.fixatedAOI == nil) {
-			[aFixation registerOnAOI:@"Other"];
+			aFixation.fixatedAOI = [NSString stringWithFormat:@"Other, %d, %1.2f, %1.2f, NA, NA", 
+									[aFixation.endTime intValue] - [aFixation.startTime intValue], 
+									aFixation.location.x, aFixation.location.y];
 		}
 	}
 }

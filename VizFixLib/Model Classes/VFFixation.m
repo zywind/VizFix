@@ -93,13 +93,4 @@
     }
 }
 
-- (void)registerOnAOI:(NSString *)aoiID
-{
-	if (self.fixatedAOI == nil) {
-		self.fixatedAOI = aoiID;
-	} else {
-		self.fixatedAOI = [self.fixatedAOI stringByAppendingFormat:@"&%@", aoiID];
-	}
-}
-
 @end
