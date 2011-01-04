@@ -94,6 +94,7 @@
 - (IBAction)toggleShowLabel:(id)sender;
 - (IBAction)toggleShowDistanceGuide:(id)sender;
 - (IBAction)toggleShowGazeSample:(id)sender;
+- (IBAction)toggleShowScanpath:(id)sender;
 - (IBAction)detectFixations:(id)sender;
 - (IBAction)captureVisualization:(id)sender;
 - (void)doDetectAndInsertFixations;

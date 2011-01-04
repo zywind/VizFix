@@ -39,6 +39,7 @@
 
 @synthesize showLabel;
 @synthesize showDistanceGuide;
+@synthesize showScanpath;
 @synthesize dataURL;
 @synthesize viewScale;
 @synthesize showGazeSample;
@@ -56,10 +57,12 @@
 		viewScale = 100.0 / 100.0;
 		showLabel = YES;
 		showGazeSample = YES;
+		showScanpath = YES;
 		showDistanceGuide = NO;
 		[self addObserver:self forKeyPath:@"showLabel" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"showDistanceGuide" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"showGazeSample" options:NSKeyValueObservingOptionNew context:NULL];
+		[self addObserver:self forKeyPath:@"showScanpath" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"viewScale" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"inSummaryMode" options:NSKeyValueObservingOptionNew context:NULL];
 		[self addObserver:self forKeyPath:@"currentTime" options:NSKeyValueObservingOptionNew context:NULL];
@@ -349,7 +352,7 @@
 			}
 		}
 		if (foundFixation) {
-			if (i > 0) {
+			if (showScanpath && i > 0) {
 				[color set];
 				VFFixation *previousFixation = [fixationsArray objectAtIndex:i-1];
 				
@@ -369,7 +372,7 @@
 			[self drawFixation:currentFixation withColor:colorToDraw];
 			
 			// Draw a line from last fixation to this one.
-			if (i > 0) {
+			if (showScanpath && i > 0) {
 				VFFixation *lastFixation = [fixationsArray objectAtIndex:i - 1];
 				
 				NSBezierPath *linePath = [NSBezierPath bezierPath];

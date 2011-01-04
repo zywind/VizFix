@@ -80,7 +80,20 @@
 				FLAG = NO;
 				numConsecutiveInvalidSamples = 0;
 				[ongoingFixationGazes removeAllObjects];
-				[previousFixationGazes removeAllObjects];
+				
+				// 9-6-10 Make the previous fixation.  Before, I simply removed the gazes in the previous fixation, which 
+				// leads to a bug.
+				if ([previousFixationGazes count] >= minNumInFixation) {
+					VFFixation *prevFixation = [NSEntityDescription 
+												insertNewObjectForEntityForName:@"Fixation" inManagedObjectContext:moc];
+					[previousFixationGazes sortUsingDescriptors:[VFUtil timeSortDescriptor]];
+					prevFixation.startTime = ((VFGazeSample *)[previousFixationGazes objectAtIndex:0]).time;
+					prevFixation.endTime = ((VFGazeSample *)[previousFixationGazes lastObject]).time;
+					
+					prevFixation.location = [VFDTFixationAlg centroidOfGazes:previousFixationGazes];
+				}
+				
+			    [previousFixationGazes removeAllObjects];
 			}
 			continue;
 		}

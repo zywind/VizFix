@@ -306,6 +306,9 @@
 	} else if (theAction == @selector(toggleShowGazeSample:)) {
 		NSMenuItem *menuItem = (NSMenuItem *)anItem;
 		[menuItem setState:layoutView.showGazeSample];
+	} else if (theAction == @selector(toggleShowScanpath:)) {
+		NSMenuItem *menuItem = (NSMenuItem *)anItem;
+		[menuItem setState:layoutView.showScanpath];
 	}
 	
 	return YES;
@@ -330,6 +333,13 @@
 	sender = (NSMenuItem *)sender;
 	[sender setState:![sender state]];
 	layoutView.showGazeSample = [sender state];
+}
+
+- (IBAction)toggleShowScanpath:(id)sender
+{
+	sender = (NSMenuItem *)sender;
+	[sender setState:![sender state]];
+	layoutView.showScanpath = [sender state];
 }
 
 #pragma mark -
