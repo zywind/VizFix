@@ -79,11 +79,6 @@
 	fetchHelper = [[VFFetchHelper alloc] initWithMOC:[aSession managedObjectContext]];
 }
 
-- (BOOL)isFlipped
-{
-	return YES;
-}
-
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if (object == self && [keyPath isEqualToString:@"currentTime"]) {
@@ -150,12 +145,13 @@
 	[NSGraphicsContext saveGraphicsState];
 	
 	distanceGuideSizeDOV = [[NSUserDefaults standardUserDefaults] floatForKey:VFDistanceGuideSizeKey];
-	
+    [session.backgroundColor drawSwatchInRect:rect];
+
+    
 	NSAffineTransform* xform = [NSAffineTransform transform];
 	[xform scaleXBy:viewScale yBy:viewScale];
 	[xform concat];
 	// Draw background.
-	[session.backgroundColor drawSwatchInRect:rect];
 	
 	// Draw screen objects.
 	for (VFVisualStimulus *vs in visualStimuliArray)
