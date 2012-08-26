@@ -41,15 +41,15 @@
 {
 }
 
-@property (nonatomic, retain) VFVisualStimulusTemplate * template;
-@property (nonatomic, retain) NSSet* frames;
-@property (nonatomic, retain) NSNumber * endTime;
+@property (nonatomic, strong) VFVisualStimulusTemplate * template;
+@property (nonatomic, strong) NSSet* frames;
+@property (nonatomic, strong) NSNumber * endTime;
 
 /*! Start time.
  */
-@property (nonatomic, retain) NSNumber * startTime;
-@property (nonatomic, retain) NSString * label;
-@property (nonatomic, retain) NSString * ID;
+@property (nonatomic, strong) NSNumber * startTime;
+@property (nonatomic, strong) NSString * label;
+@property (nonatomic, strong) NSString * ID;
 
 @end
 

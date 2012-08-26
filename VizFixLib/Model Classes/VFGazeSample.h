@@ -49,29 +49,29 @@
 /**
  A Boolean value is wrapped in the NSNumber object to indicate whether the gaze sample is valid.
  */
-@property (nonatomic, retain) NSNumber * valid;
+@property (nonatomic, strong) NSNumber * valid;
 /**
  The gaze sample's recording time, in ms.
  */
-@property (nonatomic, retain) NSNumber * time;
+@property (nonatomic, strong) NSNumber * time;
 /**
  Optional.
  */
-@property (nonatomic, retain) NSNumber * pupilDiameter;
+@property (nonatomic, strong) NSNumber * pupilDiameter;
 /**
  Optional.
  */
-@property (nonatomic, retain) NSNumber * focusRange;
+@property (nonatomic, strong) NSNumber * focusRange;
 /**
  Optional.
  */
-@property (nonatomic, retain) NSNumber * xEyeOffset;
+@property (nonatomic, strong) NSNumber * xEyeOffset;
 /**
  Optional.
  */
-@property (nonatomic, retain) NSNumber * yEyeOffset;
+@property (nonatomic, strong) NSNumber * yEyeOffset;
 
-@property (nonatomic, retain) NSString * locationAsString;
+@property (nonatomic, strong) NSString * locationAsString;
 @property (nonatomic, assign) NSPoint primitiveLocation;
 
 @end

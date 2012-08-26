@@ -40,16 +40,16 @@
 	NSPoint fixationPoint;
 }
 
-@property (nonatomic, retain) NSString * imageFilePath;
-@property (nonatomic, retain) NSNumber * zorder;
-@property (nonatomic, retain) NSString * category;
-@property (nonatomic, retain) NSBezierPath * outline;
-@property (nonatomic, retain) NSColor * fillColor;
-@property (nonatomic, retain) NSColor * strokeColor;
-@property (nonatomic, retain) NSSet* ofVisualStimuli;
+@property (nonatomic, strong) NSString * imageFilePath;
+@property (nonatomic, strong) NSNumber * zorder;
+@property (nonatomic, strong) NSString * category;
+@property (nonatomic, strong) NSBezierPath * outline;
+@property (nonatomic, strong) NSColor * fillColor;
+@property (nonatomic, strong) NSColor * strokeColor;
+@property (nonatomic, strong) NSSet* ofVisualStimuli;
 @property (nonatomic, assign) NSPoint fixationPoint;
 @property (nonatomic, assign) NSPoint primitiveFixationPoint;
-@property (nonatomic, retain) NSString * fixationPointAsString;
+@property (nonatomic, strong) NSString * fixationPointAsString;
 
 @end
 

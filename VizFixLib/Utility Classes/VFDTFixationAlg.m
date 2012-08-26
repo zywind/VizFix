@@ -41,6 +41,8 @@
 #import "VFFixation.h"
 #import "VFFetchHelper.h"
 
+// Dispersion Threshold Fixation Detection algorithm
+
 @implementation VFDTFixationAlg
 
 + (void)detectFixation:(NSArray *)gazeArray withDispersionThreshold:(double)DTInDov andMinFixationDuration:(double)minFixationDuration;

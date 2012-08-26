@@ -38,10 +38,10 @@
 {
 }
 
-@property (nonatomic, retain) NSString * audioFilePath;
-@property (nonatomic, retain) NSNumber * duration;
-@property (nonatomic, retain) NSString * category;
-@property (nonatomic, retain) NSSet* ofAuditoryStimuli;
+@property (nonatomic, strong) NSString * audioFilePath;
+@property (nonatomic, strong) NSNumber * duration;
+@property (nonatomic, strong) NSString * category;
+@property (nonatomic, strong) NSSet* ofAuditoryStimuli;
 
 @end
 

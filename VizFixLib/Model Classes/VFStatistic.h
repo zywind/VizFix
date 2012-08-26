@@ -45,12 +45,12 @@
 /**
  The measure name.￼
  */
-@property (nonatomic, retain) NSString * measure;
+@property (nonatomic, strong) NSString * measure;
 /**
  The value in string.￼
  */
-@property (nonatomic, retain) NSString * value;
-@property (nonatomic, retain) VFProcedure * ofTrial;
+@property (nonatomic, strong) NSString * value;
+@property (nonatomic, strong) VFProcedure * ofTrial;
 
 @end
 

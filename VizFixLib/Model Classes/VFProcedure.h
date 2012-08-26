@@ -43,14 +43,14 @@
 {
 }
 
-@property (nonatomic, retain) NSNumber * startTime;
-@property (nonatomic, retain) NSNumber * endTime;
-@property (nonatomic, retain) NSString * ID;
-@property (nonatomic, retain) VFProcedure * parentProc;
-@property (nonatomic, retain) NSSet* subProcs;
+@property (nonatomic, strong) NSNumber * startTime;
+@property (nonatomic, strong) NSNumber * endTime;
+@property (nonatomic, strong) NSString * ID;
+@property (nonatomic, strong) VFProcedure * parentProc;
+@property (nonatomic, strong) NSSet* subProcs;
 
-@property (nonatomic, retain) NSSet* conditions;
-@property (nonatomic, retain) NSSet* statistics;
+@property (nonatomic, strong) NSSet* conditions;
+@property (nonatomic, strong) NSSet* statistics;
 
 @end
 

@@ -93,7 +93,7 @@ static NSArray *visualStimuliSort = nil;
     if (sharedModel == nil) {
 		NSString *modelPath = @"/Library/Frameworks/VizFixLib.framework/Resources/VFModel.mom";
 		NSURL *modelURL = [NSURL fileURLWithPath:[modelPath stringByExpandingTildeInPath]];
-        sharedModel = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] retain];
+        sharedModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
     }
     return sharedModel;
 }

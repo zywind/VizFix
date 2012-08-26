@@ -47,23 +47,23 @@
 /**
  ￼	Experiment name.
  */
-@property (nonatomic, retain) NSString * experiment;
+@property (nonatomic, strong) NSString * experiment;
 /**
  ￼	Subject ID.
  */
-@property (nonatomic, retain) NSString * subjectID;
+@property (nonatomic, strong) NSString * subjectID;
 /**
  ￼	Session ID.
  */
-@property (nonatomic, retain) NSString * sessionID;
+@property (nonatomic, strong) NSString * sessionID;
 /**
  ￼	Session date and time.
  */
-@property (nonatomic, retain) NSDate * date;
+@property (nonatomic, strong) NSDate * date;
 /**
  ￼	Experiment display background color.
  */
-@property (nonatomic, retain) NSColor * backgroundColor;
+@property (nonatomic, strong) NSColor * backgroundColor;
 /**
 	￼Screen resolution in pixels, width X height.
  */
@@ -74,19 +74,19 @@
  */
 @property (nonatomic, assign) NSSize screenDimension;
 @property (nonatomic, assign) NSSize primitiveScreenDimension;
-@property (nonatomic, retain) NSString * screenResolutionAsString;
-@property (nonatomic, retain) NSString * screenDimensionAsString;
+@property (nonatomic, strong) NSString * screenResolutionAsString;
+@property (nonatomic, strong) NSString * screenDimensionAsString;
 /**
  ￼	Subject's eye-to-screen distance, in mm.
  */
-@property (nonatomic, retain) NSNumber * distanceToScreen;
+@property (nonatomic, strong) NSNumber * distanceToScreen;
 /**
  ￼	Eye tracker's sampling rate.
  */
-@property (nonatomic, retain) NSNumber * gazeSampleRate;
+@property (nonatomic, strong) NSNumber * gazeSampleRate;
 /**
  ￼	Session's duration.
  */
-@property (nonatomic, retain) NSNumber * duration;
+@property (nonatomic, strong) NSNumber * duration;
 
 @end

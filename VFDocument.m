@@ -34,7 +34,6 @@
 
 #import "VFDocument.h"
 
-#import "PrioritySplitViewDelegate.h"
 #import "SBCenteringClipView.h"
 #import "VFPreferenceController.h"
 
@@ -102,25 +101,6 @@
 	
 	// Retrieve Session.
 	session = [fetchHelper session];
-	
-	// Control the resizing of splitView
-	PrioritySplitViewDelegate *splitViewDelegate =
-	[[PrioritySplitViewDelegate alloc] init];
-	
-	[splitViewDelegate
-	 setPriority:LEFT_VIEW_PRIORITY
-	 forViewAtIndex:LEFT_VIEW_INDEX];
-	[splitViewDelegate
-	 setMinimumLength:LEFT_VIEW_MINIMUM_WIDTH
-	 forViewAtIndex:LEFT_VIEW_INDEX];
-	[splitViewDelegate
-	 setPriority:RIGHT_VIEW_PRIORITY
-	 forViewAtIndex:RIGHT_VIEW_INDEX];
-	[splitViewDelegate
-	 setMinimumLength:RIGHT_VIEW_MINIMUM_WIDTH
-	 forViewAtIndex:RIGHT_VIEW_INDEX];
-	
-	[splitView setDelegate:splitViewDelegate];
 	
 	// For centering the view in scrollview
 	id docView = [scrollView documentView];

@@ -38,9 +38,9 @@
 {
 }
 
-@property (nonatomic, retain) NSNumber * time;
-@property (nonatomic, retain) NSString * category;
-@property (nonatomic, retain) NSString * key;
+@property (nonatomic, strong) NSNumber * time;
+@property (nonatomic, strong) NSString * category;
+@property (nonatomic, strong) NSString * key;
 
 @end
 

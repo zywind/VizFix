@@ -45,12 +45,12 @@
 /**
 	Factor name.￼
  */
-@property (nonatomic, retain) NSString * factor;
+@property (nonatomic, strong) NSString * factor;
 /**
 	The factor level of this condition.￼
  */
-@property (nonatomic, retain) NSString * level;
-@property (nonatomic, retain) NSSet* ofProcs;
+@property (nonatomic, strong) NSString * level;
+@property (nonatomic, strong) NSSet* ofProcs;
 
 @end
 

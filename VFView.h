@@ -38,7 +38,7 @@
 @class VFDocument;
 
 @interface VFView : NSView {
-	VFDocument *document;
+	VFDocument *__weak document;
 	VFFetchHelper *fetchHelper;
 	
 	IBOutlet NSTextField *keyLabel;
@@ -80,8 +80,8 @@
 @property double currentTime;
 @property double viewEndTime;
 @property double viewStartTime;
-@property (retain) NSURL *dataURL;
-@property VFDocument *document;
+@property (strong) NSURL *dataURL;
+@property (weak) VFDocument *document;
 
 - (void)setSession:(VFSession *)session;
 - (IBAction)changeViewScale:(id)sender;

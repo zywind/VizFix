@@ -41,10 +41,10 @@
 
 @property (nonatomic, assign) NSPoint location;
 @property (nonatomic, assign) NSPoint primitiveLocation;
-@property (nonatomic, retain) NSString * locationAsString;
-@property (nonatomic, retain) NSNumber * startTime;
-@property (nonatomic, retain) NSNumber * endTime;
-@property (nonatomic, retain) NSString * fixatedAOI;
+@property (nonatomic, strong) NSString * locationAsString;
+@property (nonatomic, strong) NSNumber * startTime;
+@property (nonatomic, strong) NSNumber * endTime;
+@property (nonatomic, strong) NSString * fixatedAOI;
 
 @end
 

@@ -48,7 +48,7 @@
 	double deviationThreshold;
 }
 
-@property (retain) NSDictionary * customAOIs;
+@property (strong) NSDictionary * customAOIs;
 @property double deviationThreshold;
 
 - (id)initWithMOC:(NSManagedObjectContext *)anMOC;
