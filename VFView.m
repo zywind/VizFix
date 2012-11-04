@@ -74,7 +74,7 @@
 {
 	session = aSession;
 	DOVConverter = [[VFVisualAngleConverter alloc] initWithMOC:[aSession managedObjectContext]];
-	[self setFrameSize:session.screenResolution];
+	[self setFrameSize:NSMakeSize(session.screenResolution.width + 500, session.screenResolution.height + 500)];
 	
 	fetchHelper = [[VFFetchHelper alloc] initWithMOC:[aSession managedObjectContext]];
 }
@@ -150,14 +150,18 @@
 {
 	// Save the previous graphics state
 	[NSGraphicsContext saveGraphicsState];
+    
+    NSAffineTransform* xform = [NSAffineTransform transform];
+    [xform scaleXBy:viewScale yBy:viewScale];
+	[xform translateXBy:250 yBy:250];
+	[xform concat];
 	
 	distanceGuideSizeDOV = [[NSUserDefaults standardUserDefaults] floatForKey:VFDistanceGuideSizeKey];
-    [session.backgroundColor drawSwatchInRect:rect];
+    [session.backgroundColor drawSwatchInRect:NSMakeRect(0, 0, session.screenResolution.width, session.screenResolution.height)];
 
-    
-	NSAffineTransform* xform = [NSAffineTransform transform];
-	[xform scaleXBy:viewScale yBy:viewScale];
-	[xform concat];
+
+//	NSAffineTransform* xform = [NSAffineTransform transform];
+	
 	// Draw background.
 	
 	// Draw screen objects.
@@ -423,8 +427,10 @@
 	
 	self.viewScale = [[numberFormatter numberFromString:[sender objectValueOfSelectedItem]] doubleValue];
 	
-	[self setFrameSize:NSMakeSize(session.screenResolution.width * viewScale, 
-								  session.screenResolution.height * viewScale)];
+	[self setFrameSize:NSMakeSize((session.screenResolution.width + 500) * viewScale,
+								  (session.screenResolution.height + 500) * viewScale)];
+}
+
 - (BOOL)isFlipped
 {
     return self.flippedView;
