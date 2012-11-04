@@ -32,7 +32,7 @@
  ********************************************************************/
 
 #import <CoreData/CoreData.h>
-
+@class VFVisualStimulusFrame;
 
 @interface VFFixation :  NSManagedObject  
 {
@@ -44,7 +44,7 @@
 @property (nonatomic, strong) NSString * locationAsString;
 @property (nonatomic, strong) NSNumber * startTime;
 @property (nonatomic, strong) NSNumber * endTime;
-@property (nonatomic, strong) NSString * fixatedAOI;
+@property (nonatomic, strong) VFVisualStimulusFrame * fixatedStimulus;
 
 @end
 

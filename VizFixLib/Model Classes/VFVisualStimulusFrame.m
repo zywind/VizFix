@@ -41,6 +41,7 @@
 @dynamic startTime;
 @dynamic ofVisualStimulus;
 @dynamic locationAsString;
+@dynamic registeredFixations;
 
 - (NSPoint)primitiveLocation
 {

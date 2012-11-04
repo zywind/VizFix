@@ -46,6 +46,7 @@
 @property (nonatomic, strong) NSNumber * endTime;
 @property (nonatomic, strong) NSNumber * startTime;
 @property (nonatomic, strong) VFVisualStimulus * ofVisualStimulus;
+@property (nonatomic, strong) NSSet* registeredFixations;
 
 @end
 
