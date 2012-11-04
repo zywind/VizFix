@@ -162,8 +162,8 @@
 	
     // For this example, only present error messages for up to 3 validation errors at a time.
 	
-    unsigned numErrors = [detailedErrors count];
-    NSMutableString *errorString = [NSMutableString stringWithFormat:@"%u validation errors have occurred", numErrors];
+    NSUInteger numErrors = [detailedErrors count];
+    NSMutableString *errorString = [NSMutableString stringWithFormat:@"%lu validation errors have occurred", numErrors];
 	
     if (numErrors > 3) {
         [errorString appendFormat:@".\nThe first 3 are:\n"];
