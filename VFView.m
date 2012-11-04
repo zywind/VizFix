@@ -79,6 +79,13 @@
 	fetchHelper = [[VFFetchHelper alloc] initWithMOC:[aSession managedObjectContext]];
 }
 
+//- (BOOL)isFlipped
+//{
+//    if (session) {
+//        return session.flippedCoordinates;
+//    } else return NO;
+//}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if (object == self && [keyPath isEqualToString:@"currentTime"]) {
@@ -418,6 +425,9 @@
 	
 	[self setFrameSize:NSMakeSize(session.screenResolution.width * viewScale, 
 								  session.screenResolution.height * viewScale)];
+- (BOOL)isFlipped
+{
+    return self.flippedView;
 }
 
 @end

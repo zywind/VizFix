@@ -76,6 +76,7 @@
 @property BOOL showGazeSample;
 @property BOOL showScanpath;
 @property BOOL inSummaryMode;
+@property BOOL flippedView;
 @property double viewScale;
 @property double currentTime;
 @property double viewEndTime;

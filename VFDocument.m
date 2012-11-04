@@ -378,6 +378,12 @@
 	}
 }
 
+- (IBAction)flipView:(id)sender
+{
+    layoutView.flippedView = !layoutView.flippedView;
+    [layoutView setNeedsDisplay:YES];
+}
+
 #pragma mark -
 #pragma mark ---------DETECT FIXATIONS---------
 - (IBAction)detectFixations:(id)sender

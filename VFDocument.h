@@ -97,6 +97,8 @@
 - (IBAction)toggleShowScanpath:(id)sender;
 - (IBAction)detectFixations:(id)sender;
 - (IBAction)captureVisualization:(id)sender;
+- (IBAction)flipView:(id)sender;
+
 - (void)doDetectAndInsertFixations;
 
 - (NSArray *)startTimeSortDescriptor;
