@@ -45,6 +45,8 @@
 @dynamic date;
 @dynamic backgroundColor;
 @dynamic duration;
+@dynamic fixationDetectionDispersionThreshold;
+@dynamic fixationDetectionMinimumDuration;
 
 - (NSSize)primitiveScreenResolution
 {

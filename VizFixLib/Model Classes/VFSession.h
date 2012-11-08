@@ -89,4 +89,7 @@
  */
 @property (nonatomic, strong) NSNumber * duration;
 
+@property (nonatomic, strong) NSNumber * fixationDetectionDispersionThreshold;
+@property (nonatomic, strong) NSNumber * fixationDetectionMinimumDuration;
+
 @end

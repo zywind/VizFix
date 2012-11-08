@@ -53,6 +53,8 @@
 	
 	VFFetchHelper *fetchHelper = [[VFFetchHelper alloc] initWithMOC:moc];
 	VFSession *session = [fetchHelper session];
+    session.fixationDetectionDispersionThreshold = [NSNumber numberWithDouble:DTInDov];
+    session.fixationDetectionMinimumDuration = [NSNumber numberWithDouble:minFixationDuration];
 	
 	double gazeSampleRate = [session.gazeSampleRate doubleValue];
 	
