@@ -40,6 +40,8 @@
 @dynamic endTime;
 @dynamic locationAsString;
 @dynamic fixatedStimulus;
+@dynamic category;
+@dynamic relatedFixation;
 
 - (NSPoint)primitiveLocation
 {

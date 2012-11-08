@@ -119,6 +119,7 @@
 	fixationsArray = [fetchHelper fetchModelObjectsForName:@"Fixation" 
 											   from:startTime 
 												 to:endTime];
+    
 	keyEventsArray = [fetchHelper fetchModelObjectsForName:@"KeyboardEvent" 
 												 from:startTime
 												   to:endTime];
@@ -230,9 +231,16 @@
 	[self drawVisualStimulusTemplate:theStimulus.template withAlpha:alpha];
 	// Depends on the label font size.
 	if (showLabel) {
-		[theStimulus.label drawAtPoint:NSMakePoint(0, 0)
+        NSAffineTransform* xform = [NSAffineTransform transform];
+        [xform scaleXBy:1/viewScale yBy:1/viewScale];
+        [xform concat];
+        
+		[theStimulus.label drawAtPoint:NSMakePoint(-7, -7)
 		 withAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor whiteColor], NSBackgroundColorAttributeName, 
 									[NSColor blackColor], NSForegroundColorAttributeName, nil]];
+        
+        [xform invert];
+        [xform concat];
 	}
 	
 	[transform invert];
@@ -369,17 +377,24 @@
 				[linePath stroke];
 			}
 			[self drawFixation:currentFixation withColor:color];
+            if (currentFixation.relatedFixation)
+                [self drawFixation:currentFixation.relatedFixation withColor:[NSColor grayColor]];
 		}
 	} else {
 		for (int i = 0; i < [fixationsArray count]; i++) {
 			VFFixation *currentFixation = [fixationsArray objectAtIndex:i];
-			// TODO: The alpha component seems not working.
-			NSColor *colorToDraw = [color shadowWithLevel:0.7*pow((viewEndTime - [currentFixation.startTime doubleValue]) / (viewEndTime - viewStartTime), 0.7)];
-			
+            
+            // TODO: The alpha component seems not working.
+            NSColor *colorToDraw = [color shadowWithLevel:0.7*pow((viewEndTime - [currentFixation.startTime doubleValue]) / (viewEndTime - viewStartTime), 0.7)];
+           
 			[self drawFixation:currentFixation withColor:colorToDraw];
+            
+            if (currentFixation.relatedFixation)
+                [self drawFixation:currentFixation.relatedFixation withColor:[NSColor grayColor]];
 			
 			// Draw a line from last fixation to this one.
 			if (showScanpath && i > 0) {
+                [colorToDraw set];
 				VFFixation *lastFixation = [fixationsArray objectAtIndex:i - 1];
 				
 				NSBezierPath *linePath = [NSBezierPath bezierPath];
@@ -411,7 +426,6 @@
 	[durationPath setLineWidth:2];
 	
 	[durationPath stroke];
-	
 	
 	[[color colorWithAlphaComponent:0.4] setFill];
 	[durationPath fill];

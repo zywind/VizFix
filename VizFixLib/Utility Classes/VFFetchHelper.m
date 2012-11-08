@@ -116,12 +116,16 @@
 		else
 			[fetchRequest setSortDescriptors:[VFUtil startTimeSortDescriptor]];
 	}
-	
+    
 	[fetchRequest setEntity:entity];	
 	[fetchRequest setPredicate:predicate];
 	
 	fetchResults = [moc executeFetchRequest:fetchRequest error:&fetchError];
 	if ((fetchResults != nil) && (fetchError == nil)) {
+        if ([entityName isEqualToString:@"Fixation"]) {
+            fetchResults = [fetchResults filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"category != %@", @"has error"]];
+        }
+        
 		return fetchResults;
 	} else {
 		// TODO: refine error

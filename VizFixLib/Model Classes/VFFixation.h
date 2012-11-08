@@ -45,6 +45,8 @@
 @property (nonatomic, strong) NSNumber * startTime;
 @property (nonatomic, strong) NSNumber * endTime;
 @property (nonatomic, strong) VFVisualStimulusFrame * fixatedStimulus;
+@property (nonatomic, strong) NSString *category;
+@property (nonatomic, strong) VFFixation *relatedFixation;
 
 @end
 
