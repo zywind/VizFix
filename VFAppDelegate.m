@@ -47,6 +47,10 @@
 																				brightness:1.0 
 																					 alpha:1.0]];
 	[defaultValues setObject:theData forKey:VFFixationColorKey];
+    
+    NSData *grayColorData = [NSArchiver archivedDataWithRootObject:[NSColor grayColor]];
+    [defaultValues setObject:grayColorData forKey:VFUncorrectedFixationColorKey];
+    [defaultValues setObject:grayColorData forKey:VFDistanceGuideColorKey];
 	
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 }

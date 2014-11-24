@@ -74,9 +74,7 @@ static NSArray *visualStimuliSort = nil;
 
 + (NSPredicate *)predicateForObjectsWithStartTime:(NSNumber *)startTime endTime:(NSNumber *)endTime
 {
-	return [NSPredicate predicateWithFormat:
-			 @"(startTime <= %@ AND endTime >= %@) OR (startTime >= %@ AND startTime <= %@)", 
-			 startTime, startTime, startTime, endTime];
+	return [NSPredicate predicateWithFormat: @"(startTime <= %@ AND endTime >= %@)", endTime, startTime];
 }
 
 + (NSBezierPath *)distanceGuideAroundPoint:(NSPoint)point withSize:(NSSize)aoiSize

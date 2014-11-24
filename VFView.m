@@ -43,6 +43,7 @@
 @synthesize dataURL;
 @synthesize viewScale;
 @synthesize showGazeSample;
+@synthesize showUncorrectedFixations;
 @synthesize inSummaryMode;
 @synthesize currentTime;
 @synthesize viewStartTime;
@@ -228,7 +229,12 @@
 		alpha = 1.0;
 	}
 	
-	[self drawVisualStimulusTemplate:theStimulus.template withAlpha:alpha];
+    // Temporary, just for Williams experiment YZ 12-6-2012
+    NSDictionary *thresDict = @{@"small" : @1.0, @"medium" : @1.4, @"large" : @2.0};
+    NSString *size = [[theStimulus.ID componentsSeparatedByString:@", "] lastObject];
+    double thres = [thresDict[size] doubleValue];
+   
+	[self drawVisualStimulusTemplate:theStimulus.template withAlpha:alpha withDistanceGuideSize:thres];
 	// Depends on the label font size.
 	if (showLabel) {
         NSAffineTransform* xform = [NSAffineTransform transform];
@@ -247,7 +253,7 @@
 	[transform concat];
 }
 
-- (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate withAlpha:(double)alpha
+- (void)drawVisualStimulusTemplate:(VFVisualStimulusTemplate *)visualStimulusTemplate withAlpha:(double)alpha withDistanceGuideSize:(double)size
 {
 	if (visualStimulusTemplate.fillColor != nil) {
 		[visualStimulusTemplate.fillColor setFill];
@@ -293,11 +299,16 @@
 	// If it's drawing background, there's no need to draw distance guide.
 	if (showDistanceGuide && ![visualStimulusTemplate.category isEqualToString:@"background"] 
 		&& (visualStimulusTemplate.fixationPoint.x != 1.0e+5f)) {
-		NSSize distanceGuideSize = NSMakeSize([DOVConverter pixelsFromVisualAngles:distanceGuideSizeDOV], 
-										[DOVConverter pixelsFromVisualAngles:distanceGuideSizeDOV]);
+//		NSSize distanceGuideSize = NSMakeSize([DOVConverter pixelsFromVisualAngles:distanceGuideSizeDOV], [DOVConverter pixelsFromVisualAngles:distanceGuideSizeDOV]);
+//      temporary
+        NSSize distanceGuideSize = NSMakeSize([DOVConverter pixelsFromVisualAngles:size], [DOVConverter pixelsFromVisualAngles:size]);
 		NSBezierPath *foveaZonePath = [VFUtil distanceGuideAroundPoint:visualStimulusTemplate.fixationPoint withSize:distanceGuideSize];
 		
-		[[NSColor grayColor] set];
+        NSColor *guideColor = (NSColor *)[NSUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults]
+                                                                                    objectForKey:VFDistanceGuideColorKey]];
+        
+		[guideColor set];
+        [foveaZonePath setLineWidth:3];
 		[foveaZonePath stroke];
 	}
 }
@@ -374,23 +385,28 @@
 				NSBezierPath *linePath = [NSBezierPath bezierPath];
 				[linePath moveToPoint:previousFixation.location];
 				[linePath lineToPoint:currentFixation.location];
+                [linePath setLineWidth:3.0];
 				[linePath stroke];
 			}
 			[self drawFixation:currentFixation withColor:color];
-            if (currentFixation.relatedFixation)
+            if (self.showUncorrectedFixations && currentFixation.relatedFixation)
                 [self drawFixation:currentFixation.relatedFixation withColor:[NSColor grayColor]];
 		}
 	} else {
 		for (int i = 0; i < [fixationsArray count]; i++) {
 			VFFixation *currentFixation = [fixationsArray objectAtIndex:i];
             
-            // TODO: The alpha component seems not working.
-            NSColor *colorToDraw = [color shadowWithLevel:0.7*pow((viewEndTime - [currentFixation.startTime doubleValue]) / (viewEndTime - viewStartTime), 0.7)];
+            NSColor *colorToDraw = [color shadowWithLevel:(viewEndTime - [currentFixation.startTime doubleValue]) / (viewEndTime - viewStartTime)];
+//            NSColor *colorToDraw = color;
            
 			[self drawFixation:currentFixation withColor:colorToDraw];
             
-            if (currentFixation.relatedFixation)
-                [self drawFixation:currentFixation.relatedFixation withColor:[NSColor grayColor]];
+            if (self.showUncorrectedFixations && currentFixation.relatedFixation) {
+                NSColor *colorForUncorrectedFixations = (NSColor *)[NSUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults]
+                                                                                                          objectForKey:VFUncorrectedFixationColorKey]];
+                
+                [self drawFixation:currentFixation.relatedFixation withColor:colorForUncorrectedFixations];
+            }
 			
 			// Draw a line from last fixation to this one.
 			if (showScanpath && i > 0) {
@@ -400,6 +416,8 @@
 				NSBezierPath *linePath = [NSBezierPath bezierPath];
 				[linePath moveToPoint:lastFixation.location];
 				[linePath lineToPoint:currentFixation.location];
+//                [linePath setLineWidth:3.0];
+                [linePath setLineWidth:2.0];
 				[linePath stroke];
 			}
 		}
@@ -428,6 +446,7 @@
 	[durationPath stroke];
 	
 	[[color colorWithAlphaComponent:0.4] setFill];
+//    [[color colorWithAlphaComponent:0.8] setFill];
 	[durationPath fill];
 }
 

@@ -16,13 +16,13 @@
 		3B85702811CBF4BA00294B59 /* VFFixationRegister.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B85702611CBF4BA00294B59 /* VFFixationRegister.m */; };
 		3B8B947115DEAB5800123289 /* VFInsertHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 3B8B946F15DEAB5800123289 /* VFInsertHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3B8B947215DEAB5800123289 /* VFInsertHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B947015DEAB5800123289 /* VFInsertHelper.m */; };
-		3B9D5E87163F367100B1CD5E /* VFCorrectFixation.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B9D5E86163F367100B1CD5E /* VFCorrectFixation.m */; };
 		3B9FD26B11CC041700F56FAE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BF7CA8311B09D6200E8CD9F /* Cocoa.framework */; };
 		3BA23D8E114715C90079FC20 /* VFPreferenceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BA23D8D114715C90079FC20 /* VFPreferenceController.m */; };
 		3BA23DC9114717020079FC20 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3BA23DC8114717020079FC20 /* Preferences.xib */; };
 		3BC19E891100FD9B00AD4968 /* VFView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC19E881100FD9B00AD4968 /* VFView.m */; };
 		3BC64F4511113D59006F36CE /* SBCenteringClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC64F4411113D59006F36CE /* SBCenteringClipView.m */; };
 		3BE64ABE110595A1008D8939 /* VFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BE64ABD110595A1008D8939 /* VFAppDelegate.m */; };
+		3BF039A616E8FF1100830D6D /* VizFix.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8D15AC370486D014006FF6A4 /* VizFix.app */; };
 		3BF7CA3811B09B1800E8CD9F /* VFGazeSample.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC50456110ADB880004A125 /* VFGazeSample.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3BF7CA3911B09B1900E8CD9F /* VFAuditoryStimulus.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BC5045F110ADB880004A125 /* VFAuditoryStimulus.m */; };
 		3BF7CA3A11B09B1900E8CD9F /* VFAuditoryStimulus.h in Headers */ = {isa = PBXBuildFile; fileRef = 3BC5045E110ADB880004A125 /* VFAuditoryStimulus.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -85,6 +85,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3BF039A516E8FF0300830D6D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /Applications;
+			dstSubfolderSpec = 0;
+			files = (
+				3BF039A616E8FF1100830D6D /* VizFix.app in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -105,8 +115,6 @@
 		3B85702611CBF4BA00294B59 /* VFFixationRegister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFFixationRegister.m; sourceTree = "<group>"; };
 		3B8B946F15DEAB5800123289 /* VFInsertHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFInsertHelper.h; sourceTree = "<group>"; };
 		3B8B947015DEAB5800123289 /* VFInsertHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFInsertHelper.m; sourceTree = "<group>"; };
-		3B9D5E85163F367100B1CD5E /* VFCorrectFixation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFCorrectFixation.h; sourceTree = "<group>"; };
-		3B9D5E86163F367100B1CD5E /* VFCorrectFixation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFCorrectFixation.m; sourceTree = "<group>"; };
 		3BA23D8C114715C90079FC20 /* VFPreferenceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFPreferenceController.h; sourceTree = "<group>"; };
 		3BA23D8D114715C90079FC20 /* VFPreferenceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VFPreferenceController.m; sourceTree = "<group>"; };
 		3BA23DC8114717020079FC20 /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
@@ -226,9 +234,9 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				3B088DAA11B5AD94006C2DAF /* Doxyfile */,
 				2F7446A70DB6BCF400F9684A /* MainMenu.xib */,
 				2F7446A90DB6BCF400F9684A /* VFDocument.xib */,
+				3B088DAA11B5AD94006C2DAF /* Doxyfile */,
 				8D15AC360486D014006FF6A4 /* Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
 				3BA23DC8114717020079FC20 /* Preferences.xib */,
@@ -246,8 +254,6 @@
 				3BF776161112175A00061B38 /* VFVisualAngleConverter.m */,
 				3B7732571114D37300827FCB /* VFUtil.h */,
 				3B7732581114D37300827FCB /* VFUtil.m */,
-				3B9D5E85163F367100B1CD5E /* VFCorrectFixation.h */,
-				3B9D5E86163F367100B1CD5E /* VFCorrectFixation.m */,
 				3BF011951104FA2B00A309E2 /* VFDTFixationAlg.h */,
 				3BF011961104FA2B00A309E2 /* VFDTFixationAlg.m */,
 				3BFB65FF11CBF6A7002A3604 /* VFFetchHelper.h */,
@@ -380,6 +386,7 @@
 				8D15AC2B0486D014006FF6A4 /* Resources */,
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
+				3BF039A516E8FF0300830D6D /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -399,7 +406,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = NO;
-				LastUpgradeCheck = 0450;
+				LastUpgradeCheck = 0610;
 			};
 			buildConfigurationList = 26FC0AA90875C8B900E6366F /* Build configuration list for PBXProject "VizFix" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -480,7 +487,6 @@
 				3BE64ABE110595A1008D8939 /* VFAppDelegate.m in Sources */,
 				3BC64F4511113D59006F36CE /* SBCenteringClipView.m in Sources */,
 				3BA23D8E114715C90079FC20 /* VFPreferenceController.m in Sources */,
-				3B9D5E87163F367100B1CD5E /* VFCorrectFixation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -546,7 +552,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
@@ -564,7 +569,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";

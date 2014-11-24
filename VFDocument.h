@@ -95,6 +95,8 @@
 - (IBAction)toggleShowDistanceGuide:(id)sender;
 - (IBAction)toggleShowGazeSample:(id)sender;
 - (IBAction)toggleShowScanpath:(id)sender;
+- (IBAction)toggleShowUncorrectedFixations:(id)sender;
+- (IBAction)toggleShowHeatmap:(id)sender;
 - (IBAction)detectFixations:(id)sender;
 - (IBAction)captureVisualization:(id)sender;
 - (IBAction)flipView:(id)sender;

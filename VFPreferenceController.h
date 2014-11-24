@@ -35,10 +35,14 @@
 
 extern NSString * const VFDistanceGuideSizeKey;
 extern NSString * const VFFixationColorKey;
+extern NSString * const VFDistanceGuideColorKey;
+extern NSString * const VFUncorrectedFixationColorKey;
 
 @interface VFPreferenceController : NSWindowController {
 	IBOutlet NSTextField *AOISizeTextField;
+    IBOutlet NSColorWell *AOIColorWell;
 	IBOutlet NSColorWell *FixationColorWell;
+    IBOutlet NSColorWell *UncorrectedFixationColorWell;
 }
 
 @end

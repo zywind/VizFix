@@ -72,10 +72,9 @@
 - (void)registerFixationToClosestAOI:(VFFixation *)aFixation
 {
 	aFixation.fixatedStimulus = nil;
-	// The intention of a fixation should only be looking at something happened before that fixation.
+	// A fixation could be looking at any object that appeared before the eye moves away.
 	NSArray *onScreenStimuli = [visualStimuliArray filteredArrayUsingPredicate:
-								[NSPredicate predicateWithFormat:@"(startTime <= %@ AND endTime >= %@)", 
-								 aFixation.startTime, aFixation.startTime]];
+								[NSPredicate predicateWithFormat:@"(startTime <= %@ AND endTime >= %@)", aFixation.endTime, aFixation.startTime]];
 	
 	double deviationThresholdInPix = [converter pixelsFromVisualAngles:deviationThreshold];
 	
@@ -83,8 +82,7 @@
 		
 	for (VFVisualStimulus *eachStimulus in onScreenStimuli) {
 		NSSet *onScreenFrames = [eachStimulus.frames filteredSetUsingPredicate:
-								 [NSPredicate predicateWithFormat:@"(startTime <= %@ AND endTime >= %@)", 
-								  aFixation.startTime, aFixation.startTime]];
+								 [NSPredicate predicateWithFormat:@"(startTime <= %@ AND endTime >= %@)", aFixation.endTime, aFixation.startTime]];
 		
 		double minDistanceOfFixation = deviationThresholdInPix;
 		NSPoint minCenter;

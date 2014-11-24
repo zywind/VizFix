@@ -34,7 +34,9 @@
 #import "VFPreferenceController.h"
 
 NSString * const VFDistanceGuideSizeKey = @"DistanceGuideSize";
+NSString * const VFDistanceGuideColorKey = @"DistanceGuideColor";
 NSString * const VFFixationColorKey = @"FixationColor";
+NSString * const VFUncorrectedFixationColorKey = @"UncorrectedFixationColor";
 
 @implementation VFPreferenceController
 

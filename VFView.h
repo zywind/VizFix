@@ -55,7 +55,7 @@
 	BOOL showLabel;
 	BOOL showDistanceGuide;
 	BOOL showGazeSample;
-	BOOL showScanpath;	
+	BOOL showScanpath;
 	BOOL inSummaryMode;
 	double currentTime;
 	double viewStartTime;
@@ -74,7 +74,9 @@
 @property BOOL showLabel;
 @property BOOL showDistanceGuide;
 @property BOOL showGazeSample;
+@property BOOL showUncorrectedFixations;
 @property BOOL showScanpath;
+
 @property BOOL inSummaryMode;
 @property BOOL flippedView;
 @property double viewScale;

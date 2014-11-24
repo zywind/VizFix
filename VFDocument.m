@@ -315,6 +315,13 @@
 	layoutView.showGazeSample = [sender state];
 }
 
+- (IBAction)toggleShowUncorrectedFixations:(id)sender
+{
+    sender = (NSMenuItem *)sender;
+	[sender setState:![sender state]];
+	layoutView.showUncorrectedFixations = [sender state];
+}
+
 - (IBAction)toggleShowScanpath:(id)sender
 {
 	sender = (NSMenuItem *)sender;
@@ -338,6 +345,12 @@
 	} else {
 		[playTimer invalidate];
 	}
+    
+    if ([sender isKindOfClass:[NSMenuItem class]]) {
+        if (playing) {
+            [sender setTitle:@"Pause"];
+        } else [sender setTitle:@"Play"];
+    }
 }
 
 - (IBAction)speedUp:(id)sender
@@ -454,43 +467,18 @@
 }
 
 - (IBAction)captureVisualization:(id)sender
-{	
-//	[scrollView lockFocus];
-//	NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:[[scrollView contentView] frame]];
-//	[scrollView unlockFocus];
-//	
-//	NSData * data = [rep representationUsingType:NSPNGFileType properties:nil];
-	
-	NSImage *im = [[NSImage alloc] initWithSize:[layoutView bounds].size];
+{
+	NSImage *image = [[NSImage alloc] initWithSize:[layoutView bounds].size];
 
-	[im lockFocus];
-	[layoutView drawRect:[layoutView bounds]];
-	[im unlockFocus];
-	
-	// Flip the image
-	NSSize imgSize;
-	
-	imgSize.width = [[im bestRepresentationForDevice: nil] pixelsWide];
-    imgSize.height = [[im bestRepresentationForDevice: nil] pixelsHigh];
-	
-    NSImage *flippedImage = [[NSImage alloc] initWithSize:imgSize];
-	
-    [flippedImage lockFocus];
-	
-    NSAffineTransform *rotateTF = [NSAffineTransform transform];
-	
-    [rotateTF translateXBy:0.0 yBy:imgSize.height];
-    [rotateTF scaleXBy:1.0 yBy:-1.0];
-    [rotateTF concat];
-	
-    NSRect r1 = NSMakeRect(0, 0, imgSize.width, imgSize.height);
-    [[im bestRepresentationForDevice: nil] drawInRect: r1];
-	
-    [flippedImage unlockFocus];
-	
-	NSData * data = [flippedImage TIFFRepresentation];
-	NSString * path = [[NSString stringWithFormat:@"~/Desktop/visualization %@.tiff", 
-						[[NSDate date] description]] stringByExpandingTildeInPath];
+	[image lockFocus];
+    [layoutView drawRect:[layoutView bounds]];
+	[image unlockFocus];
+    
+    NSData *data = [image TIFFRepresentation];
+    data = [[NSBitmapImageRep imageRepWithData:data] representationUsingType:NSPNGFileType properties:nil];
+    
+    NSString * path = [[NSString stringWithFormat:@"~/Desktop/visualization %@.png",
+                        						[[NSDate date] description]] stringByExpandingTildeInPath];
 	
 	[data writeToFile:path atomically:NO];
 }

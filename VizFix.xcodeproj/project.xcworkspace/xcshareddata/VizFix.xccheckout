@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>B8DF3BF7-30F0-48CD-9205-398941F6319F</string>
+	<key>IDESourceControlProjectName</key>
+	<string>VizFix</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>FF89C162B8F51ECB15648985E400C6DD150F5BF3</key>
+		<string>github.com:zywind/VizFix.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>VizFix.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>FF89C162B8F51ECB15648985E400C6DD150F5BF3</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:zywind/VizFix.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>FF89C162B8F51ECB15648985E400C6DD150F5BF3</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>FF89C162B8F51ECB15648985E400C6DD150F5BF3</string>
+			<key>IDESourceControlWCCName</key>
+			<string>VizFix</string>
+		</dict>
+	</array>
+</dict>
+</plist>
