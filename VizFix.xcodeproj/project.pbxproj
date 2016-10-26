@@ -406,7 +406,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = NO;
-				LastUpgradeCheck = 0610;
+				LastUpgradeCheck = 0710;
 			};
 			buildConfigurationList = 26FC0AA90875C8B900E6366F /* Build configuration list for PBXProject "VizFix" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -534,6 +534,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.uoregon.VizFix;
 				PRODUCT_NAME = VizFix;
 			};
 			name = Debug;
@@ -544,6 +545,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.uoregon.VizFix;
 				PRODUCT_NAME = VizFix;
 			};
 			name = Release;
@@ -555,6 +557,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -562,6 +565,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -576,6 +580,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -593,6 +598,7 @@
 					"-framework",
 					AppKit,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = edu.uoregon.VizFixLib;
 				PRODUCT_NAME = VizFixLib;
 			};
 			name = Debug;
@@ -611,6 +617,7 @@
 					"-framework",
 					AppKit,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = edu.uoregon.VizFixLib;
 				PRODUCT_NAME = VizFixLib;
 			};
 			name = Release;
